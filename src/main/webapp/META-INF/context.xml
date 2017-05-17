@@ -1,0 +1,23 @@
+<Context>
+    <Resource name="jdbc/postgresql"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="100"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="postgres"
+              password="kirill"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/library"/>
+
+    <Resource name="mail/session"
+              auth="Container"
+              type="javax.mail.Session"
+              mail.smtp.host="smtp.gmail.com"
+              mail.smtp.port="587"
+              mail.smtp.auth="true"
+              mail.smtp.user="kirill9704@gmail.com"
+              password="IaKkKy-!w6"
+              mail.smtp.starttls.enable="true"
+              mail.smtp.socketFactory.class="javax.net.ssl.SSLSocketFactory"/>
+</Context>

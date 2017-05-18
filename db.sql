@@ -79,3 +79,26 @@ CREATE TABLE books_orders (
   PRIMARY KEY (book_id, order_id)
 );
 
+INSERT INTO roles (title) VALUES ('READER'), ('MANAGER'), ('ADMIN');
+INSERT INTO users (email, password, name, role_id, enabled)
+VALUES ('kirill@kiril.com', '111', 'Kirill Sergeev', 1, TRUE);
+
+
+SELECT *
+FROM books b, books_authors ba, books_genres bg
+WHERE b.id = ba.book_id AND b.id = bg.book_id
+      AND b.id = 1
+GROUP BY b.id, ba.author_id,ba.book_id, bg.genre_id, bg.book_id;
+
+
+SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres
+FROM books b, books_authors ba, books_genres bg
+WHERE b.id = ba.book_id AND b.id = bg.book_id
+GROUP BY b.id;
+
+
+SELECT o.*, array_agg (DISTINCT bo.book_id) AS books
+FROM orders o, books_orders bo
+WHERE o.id = bo.order_id
+GROUP BY o.id;
+

@@ -5,26 +5,29 @@ import ua.nure.serhieiev.library.model.*;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.BookService;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Main {
 
-    public static void main1(String[] args) {
-       /* Genre genre = new Genre().setTitle("Horror");
-        Genre genre2 = new Genre().setTitle("Classical");
+    public static void main(String[] args) {
+      /*  Genre genre = new Genre().setTitle("Modern");
+        Genre genre2 = new Genre().setTitle("Fantasy");
 
-        Author author = new Author().setName("Pushkin");
-        Author author2 = new Author().setName("Gogol");
+        Author author = new Author().setName("Dostoevsky");
+        Author author2 = new Author().setName("Ivanov");
 
-        Publisher publisher = new Publisher().setTitle("UKA");
+        Publisher publisher = new Publisher().setTitle("MNO");
 
         Book book = new Book()
-                .setIsbn(123456789L)
-                .setTitle("Cobzar")
-                .setQuantity(10)
-                .setAvailable(10)
-                .setDescription("Good book")
+                .setIsbn(12365329L)
+                .setTitle("Bible")
+                .setQuantity(5)
+                .setDescription("Bad book")
                 .setPublicationDate(LocalDate.now())
                 .setPublisher(publisher)
                 .setAuthors(Arrays.asList(author, author2))
@@ -53,22 +56,31 @@ public class Main {
             throw new ApplicationException(e);
         }*/
 
-  /*      try (DaoFactory df = DaoFactory.getInstance()
+        try (DaoFactory df = DaoFactory.getInstance()
          ) {
             BookDao bookDao = df.getBookDao();
-            System.out.println(bookDao.getAll());
+            System.out.println(bookDao.getAll().size());
         } catch (Exception e) {
             throw new ApplicationException(e);
-        }*/
+        }
+
+
+       // System.out.println(BookService.getList(1, BookService.Field.TITLE, true, 2));
     }
 
-    public static void main(String[] args) {
-        long start = System.nanoTime();
+    public static void main2(String[] args) {
+       /* long start = System.nanoTime();
         for (int i = 0; i < 1000; i++) {
             System.out.println(BookService.getAll());
         }
         long finish = System.nanoTime();
-        System.out.println((finish-start)/100000000);
+        System.out.println((finish-start)/100000000);*/
+
+        List<String> fields = new ArrayList<>();
+        for (Field field : Book.class.getDeclaredFields()){
+                fields.add(field.getName().replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase());
+        }
+        System.out.println(fields);
     }
 
 }

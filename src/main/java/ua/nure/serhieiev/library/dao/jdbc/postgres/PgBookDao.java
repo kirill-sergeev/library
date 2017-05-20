@@ -22,13 +22,14 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     private static final String AUTHORS = "authors";
     private static final String GENRES = "genres";
 
-    private static final String SQL_CREATE_BOOK = "INSERT INTO books (title, quantity, available, publisher_id, publication_date, description, isbn) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_CREATE_BOOK = "INSERT INTO books (title, quantity, publisher_id, publication_date, description, isbn) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_DELETE_BOOK = "DELETE FROM books WHERE id = ?";
     private static final String SQL_UPDATE_BOOK = "UPDATE books SET title = ? quantity = ?, available = ?, publisher_id = ?, publication_date = ?, description = ?, isbn = ? WHERE id = ?";
     private static final String SQL_INSERT_AUTHOR_INTO_BOOK = "INSERT INTO books_authors(book_id, author_id) VALUES (?, ?)";
     private static final String SQL_INSERT_GENRE_INTO_BOOK = "INSERT INTO books_genres(book_id, genre_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_AUTHORS_FROM_BOOK = "DELETE FROM books_authors VALUES WHERE book_id = ?";
     private static final String SQL_DELETE_ALL_GENRES_FROM_BOOK = "DELETE FROM books_genres VALUES WHERE book_id = ?";
+    private static final String SQL_COUNT_ALL_BOOK = "SELECT count(*) FROM books";
     private static final String SQL_SELECT_ALL_BOOKS =
             "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
                     " FROM books b, books_authors ba, books_genres bg" +
@@ -44,18 +45,22 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     protected String getSelectQuery() {
         return SQL_SELECT_BOOK_BY_ID;
     }
+
     @Override
     protected String getSelectAllQuery() {
         return SQL_SELECT_ALL_BOOKS;
     }
+
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_BOOK;
     }
+
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_BOOK;
     }
+
     @Override
     protected String getDeleteQuery() {
         return SQL_DELETE_BOOK;
@@ -105,11 +110,10 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         try {
             st.setString(1, book.getTitle());
             st.setInt(2, book.getQuantity());
-            st.setInt(3, book.getAvailable());
-            st.setInt(4, book.getPublisher().getId());
-            st.setDate(5, Date.valueOf(book.getPublicationDate()));
-            st.setString(6, book.getDescription());
-            st.setLong(7, book.getIsbn());
+            st.setInt(3, book.getPublisher().getId());
+            st.setDate(4, Date.valueOf(book.getPublicationDate()));
+            st.setString(5, book.getDescription());
+            st.setLong(6, book.getIsbn());
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -193,6 +197,31 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
 
     PgBookDao(Connection con) {
         super(con);
+    }
+
+    @Override
+    public Integer count() {
+        Integer count;
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(SQL_COUNT_ALL_BOOK)) {
+            rs.next();
+            count = rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        return count;
+    }
+
+    @Override
+    public List<Book> getRange(int offset, int limit, String sortBy, boolean order) {
+        String sql =
+                "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
+                        " FROM books b, books_authors ba, books_genres bg" +
+                        " WHERE b.id = ba.book_id AND b.id = bg.book_id" +
+                        " GROUP BY b.id" +
+                        " ORDER BY " + sortBy + (order ? " " : " DESC") +
+                        " LIMIT ? OFFSET ?";
+        return listQuery(sql, limit, offset);
     }
 
 }

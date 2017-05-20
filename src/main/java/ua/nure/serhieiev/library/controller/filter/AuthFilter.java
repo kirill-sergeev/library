@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.User.Role.*;
 
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"*.do"})
+//@WebFilter(filterName = "AuthFilter", urlPatterns = {"*.do"})
 public class AuthFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthFilter.class);

@@ -6,6 +6,7 @@ import ua.nure.serhieiev.library.controller.util.Alert;
 import ua.nure.serhieiev.library.model.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.UserService;
+import ua.nure.serhieiev.library.service.util.EmailUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,14 +21,15 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 public class ResetPasswordServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResetPasswordServlet.class);
-    private static final String RESET_PAGE = "/reset.jsp";
-    private static final String CHANGE_PASSWORD_PAGE = "/change-password.jsp";
+    private static final String RESET_PAGE = "/WEB-INF/jsp/reset.jsp";
+    private static final String CHANGE_PASSWORD_PAGE = "/WEB-INF/jsp/change-password.jsp";
 
     private void sendResetToken(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String email = request.getParameter("email");
         try {
-            UserService.resetPassword(new User().setEmail(email));
+            User user = UserService.resetPassword(new User().setEmail(email));
+            EmailUtil.sendResetLink(user);
             request.setAttribute("alert", Alert.PASSWORD_RESET_SUCCESSFUL);
             LOG.info("Reset password request with email {}.", email);
         } catch (ApplicationException e) {
@@ -42,6 +44,7 @@ public class ResetPasswordServlet extends HttpServlet {
         String resetToken = request.getParameter("token");
         try {
             User user = UserService.getUniqueMatching(new User().setResetPasswordToken(resetToken));
+            request.setAttribute("token", resetToken);
             LOG.info("Used reset password token on account {}.", user.getEmail());
         } catch (ApplicationException e) {
             request.setAttribute("alert", Alert.WRONG_TOKEN);

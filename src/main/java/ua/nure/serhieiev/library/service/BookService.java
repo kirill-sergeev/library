@@ -126,4 +126,35 @@ public final class BookService {
     private BookService() {
     }
 
+    public static Integer count() {
+        Integer count;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            BookDao bookDao = df.getBookDao();
+            count = bookDao.count();
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return count;
+    }
+
+    public static List<Book> getList(int page, Field sortBy, boolean order, int itemsOnPage) {
+        List<Book> books;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            BookDao bookDao = df.getBookDao();
+            int count = bookDao.count();
+            if ((page - 1) * itemsOnPage > count) {
+                throw new ApplicationException("No such page!");
+            }
+            books = bookDao.getRange((page - 1) * itemsOnPage, itemsOnPage, sortBy.name(), order);
+            fillNestedFields(df, books);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return books;
+    }
+
+    public enum Field{
+        QUANTITY, AVAILABLE, TITLE, ISBN, PUBLISHER
+    }
+
 }

@@ -70,10 +70,8 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
                         .setAuthToken(rs.getString(AUTH_TOKEN))
                         .setEnabled(rs.getBoolean(ENABLED))
                         .setRegistrationDate(rs.getDate(REGISTRATION_DATE).toLocalDate())
-                        .setRole(User.Role.values()[rs.getInt(ROLE)]);
-                if (rs.getDate(LAST_VISIT) != null){
-                    user.setLastVisit(rs.getDate(LAST_VISIT).toLocalDate());
-                }
+                        .setRole(User.Role.values()[rs.getInt(ROLE)])
+                        .setLastVisit(rs.getDate(LAST_VISIT).toLocalDate());
                 list.add(user);
             }
         } catch (SQLException e) {

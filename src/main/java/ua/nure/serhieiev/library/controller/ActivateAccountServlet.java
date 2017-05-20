@@ -28,12 +28,13 @@ public class ActivateAccountServlet extends HttpServlet {
             User user = new User().setActivationToken(activationToken);
             user = UserService.activate(user);
             request.setAttribute("alert", Alert.ACTIVATION_SUCCESSFUL);
+            request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
             LOG.info("Account {} activated.", user.getEmail());
         } catch (ApplicationException e) {
             request.setAttribute("alert", Alert.WRONG_TOKEN);
-            LOG.info("Wrong activation token {}.", activationToken);
+            request.getRequestDispatcher(MAIN_ACTION).forward(request, response);
+            LOG.info("Wrong activation token {}.", activationToken, e);
         }
-        request.getRequestDispatcher(MAIN_ACTION).forward(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

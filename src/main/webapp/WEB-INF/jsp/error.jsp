@@ -15,4 +15,4 @@
     </div>
 </div>
 
-<%@ include file="../jspf/footer-sm.jspf" %>
+<%@ include file="../jspf/footer.jspf" %>

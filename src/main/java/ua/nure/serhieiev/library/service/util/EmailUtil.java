@@ -29,11 +29,24 @@ public class EmailUtil {
             Message message = new MimeMessage(session);
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
             message.setSubject("Ecommerce - activate account");
-            message.setContent("Activation link: http://localhost:8080/activate?token=" + user.getActivationToken(), "text/plain");
+            message.setContent("Activation link: http://localhost:8080/activate.do?token=" + user.getActivationToken()
+                    , "text/plain");
             Transport.send(message);
         } catch (MessagingException e) {
             throw new ApplicationException("Cannot send email!");
         }
     }
 
+    public static void sendResetLink(User user) {
+        try {
+            Message message = new MimeMessage(session);
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+            message.setSubject("Ecommerce - reset password");
+            message.setContent("Reset link: http://localhost:8080/reset.do?token=" + user.getResetPasswordToken(),
+                    "text/plain");
+            Transport.send(message);
+        } catch (MessagingException e) {
+            throw new ApplicationException("Cannot send email!");
+        }
+    }
 }

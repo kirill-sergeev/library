@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pagename" scope="request" value="login"/>
 <%@ include file="../jspf/header.jspf" %>
 <%@ include file="../jspf/navbar.jspf" %>
@@ -47,4 +47,4 @@
 </section>
 <!--/form-->
 
-<%@ include file="../jspf/footer-sm.jspf" %>
+<%@ include file="../jspf/footer.jspf" %>

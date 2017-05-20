@@ -4,6 +4,7 @@ import ua.nure.serhieiev.library.dao.*;
 import ua.nure.serhieiev.library.model.*;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.BookService;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
       /*  Genre genre = new Genre().setTitle("Modern");
         Genre genre2 = new Genre().setTitle("Fantasy");
 
@@ -56,31 +57,36 @@ public class Main {
             throw new ApplicationException(e);
         }*/
 
-        try (DaoFactory df = DaoFactory.getInstance()
+/*        try (DaoFactory df = DaoFactory.getInstance()
          ) {
             BookDao bookDao = df.getBookDao();
-            System.out.println(bookDao.getAll().size());
+
         } catch (Exception e) {
             throw new ApplicationException(e);
-        }
+        }*/
 
 
-       // System.out.println(BookService.getList(1, BookService.Field.TITLE, true, 2));
+
+
+     /*   Pagination pagination = new Pagination().setAscending(true).setLimit(10).setOffset(0).setSortBy("id");
+        System.out.println(BookService.getRangeByAuthor(new Author().setId(10),pagination));*/
+
+       // System.out.println(BookService.getRange(1, BookService.Field.TITLE, true, 2));
     }
 
-    public static void main2(String[] args) {
-       /* long start = System.nanoTime();
+    public static void main(String[] args) {
+        long start = System.nanoTime();
         for (int i = 0; i < 1000; i++) {
-            System.out.println(BookService.getAll());
+            System.out.println(BookService.getAll(true).size());
         }
         long finish = System.nanoTime();
-        System.out.println((finish-start)/100000000);*/
+        System.out.println((finish-start)/100000000);
 
-        List<String> fields = new ArrayList<>();
+       /* List<String> fields = new ArrayList<>();
         for (Field field : Book.class.getDeclaredFields()){
                 fields.add(field.getName().replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase());
         }
-        System.out.println(fields);
+        System.out.println(fields);*/
     }
 
 }

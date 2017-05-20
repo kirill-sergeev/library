@@ -2,6 +2,7 @@ package ua.nure.serhieiev.library.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua.nure.serhieiev.library.service.util.Pagination;
 import ua.nure.serhieiev.library.model.Book;
 
 import javax.servlet.ServletException;
@@ -28,35 +29,51 @@ public class BookListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         List<Book> books;
-        Field sortBy = Field.TITLE;
+        String sortBy;
+        String getBy;
         int itemsOnPage = 20;
-        int page = 1;
-        boolean order = true;
-        int nOfPages = (int) Math.ceil(count() / (double) itemsOnPage);
+        int page;
+        boolean order;
+        int nOfPages;
+
+        Pagination pagination = new Pagination();
 
         try {
-            if (request.getParameterMap().containsKey("page")) {
-                order = Boolean.parseBoolean(request.getParameter("order"));
+            if (request.getParameterMap().containsKey("itemsOnPage")) {
+                page = Integer.parseInt(request.getParameter("itemsOnPage"));
+                pagination.setLimit(itemsOnPage);
+            }
+            if (request.getParameterMap().containsKey("orderBy")) {
+                order = Boolean.parseBoolean(request.getParameter("orderBy"));
+                pagination.setAscending(order);
             }
             if (request.getParameterMap().containsKey("page")) {
                 page = Integer.parseInt(request.getParameter("page"));
+                pagination.setOffset((page - 1) * itemsOnPage);
             }
-            if (request.getParameterMap().containsKey("sort")) {
-                sortBy = Field.valueOf(request.getParameter("sort").toUpperCase());
+            if (request.getParameterMap().containsKey("sortBy")) {
+                sortBy = request.getParameter("sortBy").toUpperCase();
+                pagination.setSortBy(sortBy);
             }
-            if (request.getParameterMap().containsKey("page")) {
-                page = Integer.parseInt(request.getParameter("page"));
+            if (request.getParameterMap().containsKey("getBy")) {
+                getBy = request.getParameter("getBy").toUpperCase();
+                //pagination.setGetBy(getBy);
             }
         } catch (RuntimeException e){
             LOG.trace("Bad parameters for book list extracting.", e);
         }
-        books = getList(page, sortBy, order, itemsOnPage);
+
+     //   nOfPages = (int) Math.ceil(count() / (double) itemsOnPage);
+/*        books = getRange(pagination);
         request.setAttribute("page", page);
         request.setAttribute("order", order);
         request.setAttribute("sort", sortBy.toString().toLowerCase());
         request.setAttribute("nOfPages", nOfPages);
         request.setAttribute("books", books);
-        request.getRequestDispatcher(BOOK_LIST_PAGE).forward(request, response);
+        request.getRequestDispatcher(BOOK_LIST_PAGE).forward(request, response);*/
     }
+
+
+
 
 }

@@ -18,18 +18,12 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
     private static final String NAME = "name";
 
     private static final String SQL_CREATE_AUTHOR = "INSERT INTO authors (name) VALUES (?)";
-    private static final String SQL_DELETE_AUTHOR = "DELETE FROM authors WHERE id = ?";
     private static final String SQL_UPDATE_AUTHOR = "UPDATE authors SET name = ? WHERE id = ?";
-    private static final String SQL_SELECT_ALL_AUTHORS = "SELECT * FROM authors";
     private static final String SQL_SELECT_AUTHOR_BY_ID = "SELECT * FROM authors WHERE id = ?";
 
     @Override
     protected String getSelectQuery() {
         return SQL_SELECT_AUTHOR_BY_ID;
-    }
-    @Override
-    protected String getSelectAllQuery() {
-        return SQL_SELECT_ALL_AUTHORS;
     }
     @Override
     protected String getCreateQuery() {
@@ -39,11 +33,6 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
     protected String getUpdateQuery() {
         return SQL_UPDATE_AUTHOR;
     }
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_AUTHOR;
-    }
-
 
     @Override
     protected List<Author> parseResultSet(ResultSet rs) {

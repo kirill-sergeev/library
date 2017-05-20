@@ -6,6 +6,7 @@ import ua.nure.serhieiev.library.dao.GenreDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Genre;
 
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,18 +19,12 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
     private static final String TITLE = "title";
 
     private static final String SQL_CREATE_GENRE = "INSERT INTO genres (title) VALUES (?)";
-    private static final String SQL_DELETE_GENRE = "DELETE FROM genres WHERE id = ?";
     private static final String SQL_UPDATE_GENRE = "UPDATE genres SET title = ? WHERE id = ?";
-    private static final String SQL_SELECT_ALL_GENRES = "SELECT * FROM genres";
     private static final String SQL_SELECT_GENRE_BY_ID = "SELECT * FROM genres WHERE id = ?";
 
     @Override
     protected String getSelectQuery() {
         return SQL_SELECT_GENRE_BY_ID;
-    }
-    @Override
-    protected String getSelectAllQuery() {
-        return SQL_SELECT_ALL_GENRES;
     }
     @Override
     protected String getCreateQuery() {
@@ -39,11 +34,6 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
     protected String getUpdateQuery() {
         return SQL_UPDATE_GENRE;
     }
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_GENRE;
-    }
-
 
     @Override
     protected List<Genre> parseResultSet(ResultSet rs) {

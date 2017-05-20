@@ -24,8 +24,6 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     private static final String ROLE = "role_id";
 
     private static final String SQL_CREATE_USER = "INSERT INTO users (email, password, name, activation_token, role_id) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_DELETE_USER = "DELETE FROM users WHERE id = ?";
-    private static final String SQL_SELECT_ALL_USERS = "SELECT * FROM users";
     private static final String SQL_SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = ? ORDER BY name";
     private static final String SQL_SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
     private static final String SQL_SELECT_USER_BY_ROLE = "SELECT * FROM users WHERE role_id = ? ORDER BY name";
@@ -39,20 +37,12 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
         return SQL_SELECT_USER_BY_ID;
     }
     @Override
-    protected String getSelectAllQuery() {
-        return SQL_SELECT_ALL_USERS;
-    }
-    @Override
     protected String getCreateQuery() {
         return SQL_CREATE_USER;
     }
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_USER;
-    }
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_USER;
     }
 
     @Override

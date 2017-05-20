@@ -5,28 +5,57 @@ import ua.nure.serhieiev.library.dao.GenericDao;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.model.Identified;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.*;
 import java.util.List;
 
 public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
 
+    private Class<T> entityClass;
     protected static final String ID = "id";
-
     protected Connection con;
+
+    protected String getSelectAllQuery(){
+        return "SELECT * FROM "+ getTableName();
+    }
     protected abstract String getCreateQuery();
-    protected abstract String getDeleteQuery();
-    protected abstract String getSelectAllQuery();
     protected abstract String getSelectQuery();
     protected abstract String getUpdateQuery();
     protected abstract List<T> parseResultSet(ResultSet rs);
     protected abstract void prepareStatementForInsert(PreparedStatement st, T object);
     protected abstract void prepareStatementForUpdate(PreparedStatement st, T object);
 
+    protected static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columns = rsmd.getColumnCount();
+        for (int x = 1; x <= columns; x++) {
+            if (columnName.equals(rsmd.getColumnName(x))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
     protected JdbcDao(Connection con) {
+        ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+        this.entityClass = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
         this.con = con;
+    }
+
+
+
+    @Override
+    public int count() {
+        int count;
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT count(*) FROM " + getTableName())) {
+            rs.next();
+            count = rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        return count;
     }
 
     @Override
@@ -71,7 +100,7 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         if (id == null) {
             throw new IllegalArgumentException("Entity is not created yet, ID is null.");
         }
-        try (PreparedStatement st = con.prepareStatement(getDeleteQuery())) {
+        try (PreparedStatement st = con.prepareStatement("DELETE FROM " + getTableName() + " WHERE id = ?")) {
             st.setInt(1, id);
             if (st.executeUpdate() == 0) {
                 throw new DaoException("Deleting entity failed, no rows affected.");
@@ -107,12 +136,16 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
 
     protected T singleQuery(String sql, Object... params) {
         List<T> list = listQuery(sql, params);
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             throw new NotFoundException();
-        }else if (list.size() > 1){
+        } else if (list.size() > 1) {
             throw new DaoException("Query returned several values, one expected.");
         }
         return list.get(0);
+    }
+
+    protected String getTableName() {
+        return entityClass.getSimpleName().concat("s").toLowerCase();
     }
 
 }

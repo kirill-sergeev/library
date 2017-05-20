@@ -20,7 +20,6 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     private static final String BOOKS = "books";
 
     private static final String SQL_CREATE_ORDER = "INSERT INTO orders (user_id, order_date, expected_date) VALUES (?, ?, ?)";
-    private static final String SQL_DELETE_ORDER = "DELETE FROM orders WHERE id = ?";
     private static final String SQL_UPDATE_ORDER = "UPDATE order SET returned_date = ? WHERE id = ?";
     private static final String SQL_INSERT_BOOK_INTO_ORDER = "INSERT INTO books_orders(book_id, order_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_BOOK_FROM_ORDER = "DELETE FROM books_orders VALUES WHERE order_id = ?";
@@ -50,10 +49,6 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_ORDER;
-    }
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_ORDER;
     }
 
     @Override

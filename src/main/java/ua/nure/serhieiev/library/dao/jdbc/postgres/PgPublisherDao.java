@@ -18,18 +18,12 @@ public class PgPublisherDao extends JdbcDao<Publisher> implements PublisherDao {
     private static final String TITLE = "title";
 
     private static final String SQL_CREATE_PUBLISHER = "INSERT INTO publishers (title) VALUES (?)";
-    private static final String SQL_DELETE_PUBLISHER = "DELETE FROM publishers WHERE id = ?";
     private static final String SQL_UPDATE_PUBLISHER = "UPDATE publishers SET title = ? WHERE id = ?";
-    private static final String SQL_SELECT_ALL_PUBLISHERS = "SELECT * FROM publishers";
     private static final String SQL_SELECT_PUBLISHER_BY_ID = "SELECT * FROM publishers WHERE id = ?";
 
     @Override
     protected String getSelectQuery() {
         return SQL_SELECT_PUBLISHER_BY_ID;
-    }
-    @Override
-    protected String getSelectAllQuery() {
-        return SQL_SELECT_ALL_PUBLISHERS;
     }
     @Override
     protected String getCreateQuery() {
@@ -38,10 +32,6 @@ public class PgPublisherDao extends JdbcDao<Publisher> implements PublisherDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_PUBLISHER;
-    }
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_PUBLISHER;
     }
 
 

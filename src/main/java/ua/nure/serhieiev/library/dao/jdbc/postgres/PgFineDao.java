@@ -21,35 +21,22 @@ public class PgFineDao extends JdbcDao<Fine> implements FineDao {
     private static final String PAID = "paid";
 
     private static final String SQL_CREATE_FINE = "INSERT INTO fines (order_id, cost) VALUES (?, ?)";
-    private static final String SQL_DELETE_FINE = "DELETE FROM fines WHERE id = ?";
     private static final String SQL_UPDATE_FINE = "UPDATE fines SET cost = ?, paid = ? WHERE id = ?";
-    private static final String SQL_SELECT_ALL_FINES = "SELECT * FROM fines";
     private static final String SQL_SELECT_FINE_BY_ID = "SELECT * FROM fines WHERE id = ?";
 
     @Override
     protected String getSelectQuery() {
         return SQL_SELECT_FINE_BY_ID;
     }
-
-    @Override
-    protected String getSelectAllQuery() {
-        return SQL_SELECT_ALL_FINES;
-    }
-
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_FINE;
     }
-
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_FINE;
     }
 
-    @Override
-    protected String getDeleteQuery() {
-        return SQL_DELETE_FINE;
-    }
 
     @Override
     protected List<Fine> parseResultSet(ResultSet rs) {

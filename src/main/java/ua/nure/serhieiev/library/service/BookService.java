@@ -1,16 +1,28 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.*;
-import ua.nure.serhieiev.library.model.Author;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.model.Publisher;
+import ua.nure.serhieiev.library.model.*;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class BookService {
+
+    private static int bookCount;
+
+    public static int getBookCount() {
+        if (bookCount == 0) {
+            try (DaoFactory df = DaoFactory.getInstance()) {
+                BookDao bookDao = df.getBookDao();
+                bookCount = bookDao.count();
+            } catch (Exception e) {
+                throw new ApplicationException(e);
+            }
+        }
+        return bookCount;
+    }
 
     public static Book save(Book book) {
         try (DaoFactory df = DaoFactory.getInstance();
@@ -19,7 +31,8 @@ public final class BookService {
             tm.start();
             try {
                 bookDao.save(book);
-            } catch (Exception e) {
+                bookCount++;
+            } catch (RuntimeException e) {
                 tm.rollback();
                 e.printStackTrace();
             }
@@ -36,7 +49,7 @@ public final class BookService {
             tm.start();
             try {
                 bookDao.update(book);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 tm.rollback();
                 e.printStackTrace();
             }
@@ -53,7 +66,8 @@ public final class BookService {
             tm.start();
             try {
                 bookDao.remove(book.getId());
-            } catch (Exception e) {
+                bookCount--;
+            } catch (RuntimeException e) {
                 tm.rollback();
                 e.printStackTrace();
             }
@@ -63,18 +77,11 @@ public final class BookService {
     }
 
     public static Book getById(int bookId) {
-        return getById(bookId, false);
-    }
-
-    public static Book getById(int bookId, boolean fetchType) {
         Book book;
         try (DaoFactory df = DaoFactory.getInstance()) {
             BookDao bookDao = df.getBookDao();
             book = bookDao.getById(bookId);
-
-            if (fetchType) {
-                fillNestedFields(df, Collections.singletonList(book));
-            }
+            fillNestedFields(df, Collections.singletonList(book));
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -94,6 +101,48 @@ public final class BookService {
             if (fetchType) {
                 fillNestedFields(df, books);
             }
+
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return books;
+    }
+
+    public static List<Book> getRange(Pagination pagination) {
+        return getRange(pagination, null);
+    }
+
+    public static List<Book> getRangeByAuthor(Pagination pagination, Author author) {
+        return getRange(pagination, author);
+    }
+
+    public static List<Book> getRangeByGenre(Pagination pagination, Genre genre) {
+        return getRange(pagination, genre);
+    }
+
+    public static List<Book> getRangeByPublisher(Pagination pagination, Publisher publisher) {
+        return getRange(pagination, publisher);
+    }
+
+    private static List<Book> getRange(Pagination pagination, Identified object) {
+        List<Book> books;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            BookDao bookDao = df.getBookDao();
+            if ((pagination.getOffset()) >= getBookCount()) {
+                throw new ApplicationException("Too high offset!");
+            }
+            if (object == null) {
+                books = bookDao.getRange(pagination);
+            } else if (object instanceof Author) {
+                books = bookDao.getRangeByAuthor((Author) object, pagination);
+            } else if (object instanceof Genre) {
+                books = bookDao.getRangeByGenre((Genre) object, pagination);
+            } else if (object instanceof Publisher) {
+                books = bookDao.getRangeByPublisher((Publisher) object, pagination);
+            } else {
+                throw new IllegalArgumentException("Object must be an Author, Genre, Publisher or nothing.");
+            }
+            fillNestedFields(df, books);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -124,37 +173,6 @@ public final class BookService {
     }
 
     private BookService() {
-    }
-
-    public static Integer count() {
-        Integer count;
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            BookDao bookDao = df.getBookDao();
-            count = bookDao.count();
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-        return count;
-    }
-
-    public static List<Book> getList(int page, Field sortBy, boolean order, int itemsOnPage) {
-        List<Book> books;
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            BookDao bookDao = df.getBookDao();
-            int count = bookDao.count();
-            if ((page - 1) * itemsOnPage > count) {
-                throw new ApplicationException("No such page!");
-            }
-            books = bookDao.getRange((page - 1) * itemsOnPage, itemsOnPage, sortBy.name(), order);
-            fillNestedFields(df, books);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-        return books;
-    }
-
-    public enum Field{
-        QUANTITY, AVAILABLE, TITLE, ISBN, PUBLISHER
     }
 
 }

@@ -51,6 +51,7 @@ public enum Action{
         public static final String USER_LIST_ACTION = "/admin/users.do";
         public static final String BOOK_LIST_ACTION = "/books.do";
         public static final String USER_PROFILE_ACTION = "/user.do";
+        public static final String GENRE_LIST_ACTION = "/genres.do";
 
         private Constants() {
         }

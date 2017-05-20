@@ -16,4 +16,6 @@ public interface GenericDao<T extends Identified> {
 
     List<T> getAll();
 
+    int count();
+
 }

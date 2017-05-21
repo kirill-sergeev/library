@@ -17,13 +17,14 @@ import java.io.IOException;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 
-@WebServlet(name = "RegisterServlet", asyncSupported = true, urlPatterns = {REGISTER_ACTION})
+@WebServlet(name = "RegisterServlet", urlPatterns = {REGISTER_ACTION, REGISTER_LIBRARIAN_ACTION})
 public class RegisterServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
     private static final String REGISTER_PAGE = "/WEB-INF/jsp/login.jsp";
+    private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/admin-new-librarian.jsp";
 
-    private void register(HttpServletRequest request, HttpServletResponse response)
+    private void register(HttpServletRequest request)
             throws ServletException, IOException {
         String name = request.getParameter("name");
         String email = request.getParameter("email").toLowerCase();
@@ -33,69 +34,35 @@ public class RegisterServlet extends HttpServlet {
                 .setEmail(email)
                 .setPassword(password);
         try {
-            user = UserService.save(user);
-            EmailUtil.sendRegistrationLink(user);
+            if (request.getServletPath().equals(REGISTER_ACTION)) {
+                UserService.saveReader(user);
+                EmailUtil.sendRegistrationLink(user);
+            } else {
+                UserService.saveLibrarian(user);
+            }
             request.setAttribute("alert", Alert.REGISTRATION_SUCCESSFUL);
             LOG.info("Registered new user with email {}.", email);
         } catch (ApplicationException e) {
             request.setAttribute("alert", Alert.EMAIL_ALREADY_IN_USE);
             LOG.info("Unsuccessful registration with email {}.", email, e);
         }
-        request.getRequestDispatcher(REGISTER_PAGE).forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        register(request, response);
+        register(request);
+        doGet(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher(REGISTER_PAGE).forward(request, response);
-    }
-
-}
-
-
-
-/*
-
-@WebServlet(name = "RegisterServlet", urlPatterns = {REGISTER_ACTION})
-public class RegisterServlet extends HttpServlet {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
-    private static final String REGISTER_PAGE = "/WEB-INF/jsp/login.jsp";
-
-    private void register(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String name = request.getParameter("name");
-        String email = request.getParameter("email").toLowerCase();
-        String password = request.getParameter("password");
-        User user = new User()
-                .setName(name)
-                .setEmail(email)
-                .setPassword(password);
-        try {
-            user = UserService.save(user);
-            EmailUtil.sendRegistrationLink(user);
-            request.setAttribute("alert", Alert.REGISTRATION_SUCCESSFUL);
-            LOG.info("Registered new user with email {}.", email);
-        } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.EMAIL_ALREADY_IN_USE);
-            LOG.info("Unsuccessful registration with email {}.", email, e);
+        String page;
+        if (request.getServletPath().equals(REGISTER_ACTION)) {
+            page = REGISTER_PAGE;
+        } else {
+            page = REGISTER_LIBRARIAN_PAGE;
         }
-        request.getRequestDispatcher(REGISTER_PAGE).forward(request, response);
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        register(request, response);
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.getRequestDispatcher(REGISTER_PAGE).forward(request, response);
+        request.getRequestDispatcher(page).forward(request, response);
     }
 
 }
-*/

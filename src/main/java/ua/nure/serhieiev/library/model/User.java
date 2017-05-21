@@ -134,17 +134,12 @@ public class User implements Identified{
 
     public enum Role {
 
-        GUEST("guest"), READER("reader"), MANAGER("manager"), ADMIN("admin");
-
-        private final String name;
-
-        Role(String name) {
-            this.name = name;
-        }
+        GUEST, READER, LIBRARIAN, ADMIN;
 
         public String value() {
-            return name;
+            return this.name().toLowerCase();
         }
+
     }
 
 }

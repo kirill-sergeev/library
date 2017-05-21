@@ -11,7 +11,11 @@ public enum Alert {
     REGISTRATION_SUCCESSFUL("alert.success.registration_successful", Type.SUCCESS),
     ACTIVATION_SUCCESSFUL("alert.success.activation_successful", Type.SUCCESS),
     PASSWORD_RESET_SUCCESSFUL("alert.success.reset_successful", Type.SUCCESS),
-    PASSWORD_CHANGED_SUCCESSFUL("alert.success.password_changed_successful", Type.SUCCESS);
+    PASSWORD_CHANGED_SUCCESSFUL("alert.success.password_changed_successful", Type.SUCCESS),
+
+    USER_UNBLOCKED("alert.success.user_unblocked", Type.SUCCESS),
+    USER_BLOCKED("alert.success.user_blocked", Type.SUCCESS),
+    USER_REMOVED("alert.success.user_removed", Type.SUCCESS);
 
 
     private final String description;

@@ -2,24 +2,28 @@ package ua.nure.serhieiev.library.service.util;
 
 public class Pagination {
 
-    private int offset;
+    private int page;
     private int limit;
     private String sortBy;
     private boolean ascending;
 
     public Pagination() {
-        ascending = true;
-        offset = 0;
+        page = 1;
         limit = 20;
         sortBy = "";
+        ascending = true;
     }
 
     public int getOffset() {
-        return offset;
+        return (page - 1) * limit;
     }
 
-    public Pagination setOffset(int offset) {
-        this.offset = offset;
+    public int getPage() {
+        return page;
+    }
+
+    public Pagination setPage(int page) {
+        this.page = page;
         return this;
     }
 

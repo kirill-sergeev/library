@@ -209,7 +209,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy();
+        String sortBy = pagination.getSortBy().isEmpty() ? "b.title" : pagination.getSortBy();
 
         if (author.getId() != null) {
             sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_authors WHERE author_id = ?)" +
@@ -230,7 +230,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy();
+        String sortBy = pagination.getSortBy().isEmpty() ? "b.title" : pagination.getSortBy();
 
         if (genre.getId() != null) {
             sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_genres WHERE genre_id = ?)" +
@@ -251,7 +251,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy();
+        String sortBy = pagination.getSortBy().isEmpty() ? "b.title" : pagination.getSortBy();
 
         if (publisher.getId() != null) {
             sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
@@ -276,7 +276,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy();
+        String sortBy = pagination.getSortBy().isEmpty() ? "b.title" : pagination.getSortBy();
 
         String sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
                 " FROM books b, books_authors ba, books_genres bg" +

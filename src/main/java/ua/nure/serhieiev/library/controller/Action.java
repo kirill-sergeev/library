@@ -17,7 +17,7 @@ public enum Action{
 
     RESET_PASSWORD(RESET_ACTION, GUEST),
 
-    LOGOUT(LOGOUT_ACTION, READER, MANAGER, ADMIN);
+    LOGOUT(LOGOUT_ACTION, READER, LIBRARIAN, ADMIN);
 
     private String path;
     private User.Role[] allowedUsers;
@@ -48,7 +48,9 @@ public enum Action{
         public static final String RESET_ACTION = "/reset.do";
         public static final String LOGOUT_ACTION = "/logout.do";
         public static final String MAIN_ACTION = "/";
-        public static final String USER_LIST_ACTION = "/admin/users.do";
+        public static final String READER_LIST_ACTION = "/admin/readers.do";
+        public static final String LIBRARIAN_LIST_ACTION = "/admin/librarians.do";
+        public static final String REGISTER_LIBRARIAN_ACTION = "/admin/new-librarian.do";
         public static final String BOOK_LIST_ACTION = "/books.do";
         public static final String USER_PROFILE_ACTION = "/user.do";
         public static final String GENRE_LIST_ACTION = "/genres.do";

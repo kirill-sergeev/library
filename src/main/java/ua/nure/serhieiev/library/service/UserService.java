@@ -1,21 +1,36 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.DaoFactory;
+import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.UserDao;
 import ua.nure.serhieiev.library.model.User;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public final class UserService {
 
-    public static User save(User user) {
+    public static User saveReader(User user) {
         String activationToken = UUID.randomUUID().toString();
         try (DaoFactory df = DaoFactory.getInstance()) {
             UserDao userDao = df.getUserDao();
-            user.setRole(User.Role.READER)
-                    .setActivationToken(activationToken);
+                user.setRole(User.Role.READER)
+                        .setActivationToken(activationToken)
+                        .setEnabled(false);
+            userDao.save(user);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return user;
+    }
+
+    public static User saveLibrarian(User user) {
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            UserDao userDao = df.getUserDao();
+            user.setRole(User.Role.LIBRARIAN)
+                    .setEnabled(true);
             userDao.save(user);
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -79,6 +94,20 @@ public final class UserService {
         return registeredUser;
     }
 
+    public static User block(User user) {
+        User registeredUser;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            UserDao userDao = df.getUserDao();
+            registeredUser = getUniqueMatching(userDao, user)
+                    .setEnabled(false)
+                    .setActivationToken(null);
+            userDao.update(registeredUser);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return registeredUser;
+    }
+
     public static User resetPassword(User user) {
         User registeredUser;
         try (DaoFactory df = DaoFactory.getInstance()) {
@@ -106,12 +135,14 @@ public final class UserService {
         return registeredUser;
     }
 
-    public static List<User> getAll() {
+    public static List<User> getAll(User.Role role) {
         List<User> users;
         try (DaoFactory df = DaoFactory.getInstance()) {
             UserDao userDao = df.getUserDao();
-            users = userDao.getAll();
-        } catch (Exception e) {
+            users = userDao.getAll(role);
+        } catch (NotFoundException e){
+            users = Collections.emptyList();
+        }catch (Exception e) {
             throw new ApplicationException(e);
         }
         return users;

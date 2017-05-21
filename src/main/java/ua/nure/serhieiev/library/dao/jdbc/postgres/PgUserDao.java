@@ -23,7 +23,7 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     private static final String LAST_VISIT = "last_visit";
     private static final String ROLE = "role_id";
 
-    private static final String SQL_CREATE_USER = "INSERT INTO users (email, password, name, activation_token, role_id) VALUES (?, ?, ?, ?, ?)";
+    private static final String SQL_CREATE_USER = "INSERT INTO users (email, password, name, activation_token, role_id, enabled) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = ? ORDER BY name";
     private static final String SQL_SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
     private static final String SQL_SELECT_USER_BY_ROLE = "SELECT * FROM users WHERE role_id = ? ORDER BY name";
@@ -81,6 +81,7 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
             st.setString(3, user.getName());
             st.setString(4, user.getActivationToken());
             st.setInt(5, user.getRole().ordinal());
+            st.setBoolean(6, user.getEnabled());
         } catch (SQLException e) {
             throw new DaoException(e);
         }

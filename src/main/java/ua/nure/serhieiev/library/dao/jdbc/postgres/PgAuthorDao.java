@@ -5,6 +5,7 @@ import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.AuthorDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Author;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -70,6 +71,19 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public List<Author> getRange(Pagination pagination) {
+        String order = pagination.isAscending() ? " " : " DESC";
+        int limit = pagination.getLimit();
+        int offset = pagination.getOffset();
+        String sortBy = pagination.getSortBy().isEmpty() ? "name" : pagination.getSortBy();
+
+        String sql = "SELECT * FROM authors" +
+                " ORDER BY " + sortBy + order +
+                " LIMIT ? OFFSET ?";
+        return listQuery(sql, limit, offset);
     }
 
     PgAuthorDao(Connection con) {

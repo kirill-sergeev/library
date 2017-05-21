@@ -80,21 +80,6 @@ CREATE TABLE books_orders (
   PRIMARY KEY (book_id, order_id)
 );
 
-CREATE OR REPLACE FUNCTION trg_available_books()
-  RETURNS TRIGGER AS $available_books$
-BEGIN
-NEW.available = NEW.quantity;
-RETURN NEW;
-END;
-$available_books$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS set_available_books ON books;
-CREATE TRIGGER set_available_books
-BEFORE INSERT ON books
-FOR EACH ROW
-WHEN (NEW.available = 0)
-EXECUTE PROCEDURE trg_available_books();
-
 INSERT INTO roles (title) VALUES ('READER'), ('MANAGER'), ('ADMIN');
 INSERT INTO users (email, password, name, role_id, enabled) VALUES ('kirill@kiril.com', '111', 'Kirill Sergeev', 1, TRUE);
 
@@ -113,21 +98,104 @@ INSERT INTO "books_authors" (book_id,author_id) VALUES (1,14),(2,81),(3,96),(4,5
 INSERT INTO "books_genres" (book_id,genre_id) VALUES (1,3),(2,1),(3,9),(4,17),(5,11),(6,13),(7,20),(8,7),(9,11),(10,5),(11,14),(12,7),(13,16),(14,17),(15,14),(16,19),(17,6),(18,11),(19,13),(20,6),(21,18),(22,10),(24,2),(24,11),(25,16),(26,3),(27,11),(28,11),(29,9),(30,9),(31,11),(32,3),(33,14),(34,12),(35,5),(36,10),(37,2),(38,7),(39,5),(40,18),(41,8),(42,8),(43,18),(44,16),(45,5),(46,13),(47,14),(48,7),(49,9),(50,5),(51,17),(52,16),(53,11),(51,13),(55,1),(56,14),(57,13),(58,9),(59,4),(60,14),(61,8),(62,9),(63,14),(64,7),(65,2),(66,20),(67,4),(68,18),(69,1),(70,12),(71,9),(72,17),(73,1),(74,3),(75,14),(76,19),(77,15),(78,12),(79,17),(80,8),(81,7),(82,17),(83,18),(84,7),(85,16),(86,14),(87,10),(88,17),(89,4),(90,8),(91,13),(92,3),(93,6),(94,17),(95,17),(96,13),(97,5),(98,17),(99,12),(100,3) ON CONFLICT DO NOTHING;
 INSERT INTO "books_genres" (book_id,genre_id) VALUES (1,4),(2,16),(3,1),(4,7),(5,2),(6,8),(7,8),(8,20),(9,2),(10,10),(11,2),(12,14),(13,5),(14,8),(15,7),(16,7),(17,15),(18,19),(19,18),(20,5),(21,18),(22,1),(24,11),(24,12),(25,11),(26,10),(27,6),(28,8),(29,11),(30,1),(31,9),(32,2),(33,9),(34,19),(35,16),(36,19),(37,4),(38,11),(39,16),(40,11),(41,5),(42,2),(43,6),(44,17),(45,3),(46,4),(47,2),(48,5),(49,9),(50,6),(51,4),(52,14),(53,3),(57,15),(55,5),(56,20),(57,5),(58,13),(59,4),(60,6),(61,6),(62,17),(63,4),(64,20),(65,16),(66,11),(67,15),(68,19),(69,12),(70,1),(71,12),(72,5),(73,16),(74,1),(75,9),(76,17),(77,13),(78,20),(79,20),(80,20),(81,3),(82,12),(83,5),(84,11),(85,1),(86,10),(87,9),(88,6),(89,6),(90,17),(91,8),(92,10),(93,14),(94,1),(95,18),(96,7),(97,12),(98,20),(99,6),(100,12) ON CONFLICT DO NOTHING;
 
+-- --------------
+CREATE OR REPLACE FUNCTION trg_available_books()
+  RETURNS TRIGGER AS $$
+BEGIN
+  NEW.available = NEW.quantity;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-SELECT *
-FROM books b, books_authors ba, books_genres bg
-WHERE b.id = ba.book_id AND b.id = bg.book_id
-GROUP BY b.id, ba.author_id,ba.book_id, bg.genre_id, bg.book_id;
+DROP TRIGGER IF EXISTS trg_available_books ON books;
+CREATE TRIGGER trg_available_books
+BEFORE INSERT ON books
+FOR EACH ROW
+WHEN (NEW.available = 0)
+EXECUTE PROCEDURE trg_available_books();
 
 
-SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres
-FROM books b, books_authors ba, books_genres bg
-WHERE b.id = ba.book_id AND b.id = bg.book_id
-GROUP BY b.id;
+-- --------------
+
+CREATE OR REPLACE FUNCTION trg_useless_authors()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM authors WHERE id NOT IN (SELECT author_id FROM books_authors);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_authors_on_books ON books;
+CREATE TRIGGER trg_useless_authors_on_books
+AFTER DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_authors();
+
+DROP TRIGGER IF EXISTS trg_useless_authors_on_books_authors ON books_authors;
+CREATE TRIGGER trg_useless_authors_on_books_authors
+AFTER DELETE ON books_authors
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_authors();
+
+-- --------------
+
+CREATE OR REPLACE FUNCTION trg_useless_genres()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM genres WHERE id NOT IN (SELECT genre_id FROM books_genres);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_genres_on_books ON books;
+CREATE TRIGGER trg_useless_genres_on_books
+AFTER DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_genres();
+
+DROP TRIGGER IF EXISTS trg_useless_authors_on_books_authors ON authors;
+CREATE TRIGGER trg_useless_genres_on_books_authors
+AFTER DELETE ON books_genres
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_genres();
 
 
-SELECT o.*, array_agg (DISTINCT bo.book_id) AS books
-FROM orders o, books_orders bo
-WHERE o.id = bo.order_id
-GROUP BY o.id;
+-- -----
+
+CREATE OR REPLACE FUNCTION trg_useless_publishers()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM publishers WHERE id NOT IN (SELECT publisher_id FROM books);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_publishers_on_books ON books;
+CREATE TRIGGER trg_useless_publishers_on_books
+AFTER DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_publishers();
+
+
+-- ----
+
+CREATE OR REPLACE FUNCTION trg_unconfirmed_users()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM users
+  WHERE id IN (SELECT id
+               FROM users
+               WHERE activation_token IS NOT NULL AND registration_date < now() - INTERVAL '7 days');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_unconfirmed_users ON users;
+CREATE TRIGGER trg_unconfirmed_users
+BEFORE INSERT ON users
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_unconfirmed_users();
+
+
+
 

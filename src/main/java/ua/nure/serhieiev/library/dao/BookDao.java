@@ -9,6 +9,12 @@ import java.util.List;
 
 public interface BookDao extends GenericDao<Book> {
 
+    int count(Author author);
+
+    int count(Genre genre);
+
+    int count(Publisher publisher);
+
     List<Book> getRange(Pagination pagination);
 
     List<Book> getRangeByAuthor(Author author, Pagination pagination);

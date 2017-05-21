@@ -2,7 +2,12 @@ package ua.nure.serhieiev.library.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua.nure.serhieiev.library.controller.util.PaginationMapper;
+import ua.nure.serhieiev.library.model.Book;
 import ua.nure.serhieiev.library.model.Genre;
+import ua.nure.serhieiev.library.service.BookService;
+import ua.nure.serhieiev.library.service.GenreService;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,10 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.GENRE_LIST_ACTION;
-
-@WebServlet(name = "GenreListServlet", urlPatterns = GENRE_LIST_ACTION)
+@WebServlet(name = "GenreListServlet", urlPatterns = {"/genres.do"})
 public class GenreListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenreListServlet.class);
@@ -26,15 +30,17 @@ public class GenreListServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        Pagination pagination = PaginationMapper.getPagination(request);
+        Map<Integer, List<Genre>> genresMap;
         List<Genre> genres;
+        int genresCount;
+        genresMap = GenreService.getRange(pagination);
+        genres= genresMap.entrySet().iterator().next().getValue();
+        genresCount = genresMap.entrySet().iterator().next().getKey();
 
-/*        genres = GenreSer;
-        request.setAttribute("page", page);
-        request.setAttribute("order", order);
-        request.setAttribute("sort", sortBy.toString().toLowerCase());
+        int nOfPages = (int) Math.ceil(genresCount/ ((double) pagination.getLimit()));
         request.setAttribute("nOfPages", nOfPages);
         request.setAttribute("genres", genres);
-        request.getRequestDispatcher(GENRE_LIST_PAGE).forward(request, response);*/
+        request.getRequestDispatcher(GENRE_LIST_PAGE).forward(request, response);
     }
-
 }

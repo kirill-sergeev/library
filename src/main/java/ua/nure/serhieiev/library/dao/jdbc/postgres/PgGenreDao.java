@@ -5,6 +5,7 @@ import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.GenreDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Genre;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
@@ -71,6 +72,19 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public List<Genre> getRange(Pagination pagination) {
+        String order = pagination.isAscending() ? " " : " DESC";
+        int limit = pagination.getLimit();
+        int offset = pagination.getOffset();
+        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
+
+        String sql = "SELECT * FROM genres" +
+                " ORDER BY " + sortBy + order +
+                " LIMIT ? OFFSET ?";
+        return listQuery(sql, limit, offset);
     }
 
     PgGenreDao(Connection con) {

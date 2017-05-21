@@ -4,25 +4,9 @@ import ua.nure.serhieiev.library.dao.*;
 import ua.nure.serhieiev.library.model.*;
 import ua.nure.serhieiev.library.service.util.Pagination;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class BookService {
-
-    private static int bookCount;
-
-    public static int getBookCount() {
-        if (bookCount == 0) {
-            try (DaoFactory df = DaoFactory.getInstance()) {
-                BookDao bookDao = df.getBookDao();
-                bookCount = bookDao.count();
-            } catch (Exception e) {
-                throw new ApplicationException(e);
-            }
-        }
-        return bookCount;
-    }
 
     public static Book save(Book book) {
         try (DaoFactory df = DaoFactory.getInstance();
@@ -31,7 +15,6 @@ public final class BookService {
             tm.start();
             try {
                 bookDao.save(book);
-                bookCount++;
             } catch (RuntimeException e) {
                 tm.rollback();
                 e.printStackTrace();
@@ -66,7 +49,6 @@ public final class BookService {
             tm.start();
             try {
                 bookDao.remove(book.getId());
-                bookCount--;
             } catch (RuntimeException e) {
                 tm.rollback();
                 e.printStackTrace();
@@ -108,45 +90,63 @@ public final class BookService {
         return books;
     }
 
-    public static List<Book> getRange(Pagination pagination) {
+    public static Map<Integer, List<Book>> getRange(Pagination pagination) {
         return getRange(pagination, null);
     }
 
-    public static List<Book> getRangeByAuthor(Pagination pagination, Author author) {
+    public static Map<Integer, List<Book>> getRangeByAuthor(Pagination pagination, Author author) {
         return getRange(pagination, author);
     }
 
-    public static List<Book> getRangeByGenre(Pagination pagination, Genre genre) {
+    public static Map<Integer, List<Book>> getRangeByGenre(Pagination pagination, Genre genre) {
         return getRange(pagination, genre);
     }
 
-    public static List<Book> getRangeByPublisher(Pagination pagination, Publisher publisher) {
+    public static Map<Integer, List<Book>> getRangeByPublisher(Pagination pagination, Publisher publisher) {
         return getRange(pagination, publisher);
     }
 
-    private static List<Book> getRange(Pagination pagination, Identified object) {
+    private static Map<Integer, List<Book>> getRange(Pagination pagination, Identified object) {
+        Map<Integer, List<Book>> bookMap = new HashMap<>(1);
         List<Book> books;
+        Integer count;
         try (DaoFactory df = DaoFactory.getInstance()) {
             BookDao bookDao = df.getBookDao();
-            if ((pagination.getOffset()) >= getBookCount()) {
-                throw new ApplicationException("Too high offset!");
-            }
             if (object == null) {
+                count = bookDao.count();
+                checkPagination(pagination, count);
                 books = bookDao.getRange(pagination);
             } else if (object instanceof Author) {
+                count = bookDao.count((Author) object);
+                checkPagination(pagination, count);
                 books = bookDao.getRangeByAuthor((Author) object, pagination);
             } else if (object instanceof Genre) {
+                count = bookDao.count((Genre) object);
+                checkPagination(pagination, count);
                 books = bookDao.getRangeByGenre((Genre) object, pagination);
             } else if (object instanceof Publisher) {
+                count = bookDao.count((Publisher) object);
+                checkPagination(pagination, count);
                 books = bookDao.getRangeByPublisher((Publisher) object, pagination);
             } else {
                 throw new IllegalArgumentException("Object must be an Author, Genre, Publisher or nothing.");
             }
             fillNestedFields(df, books);
+            bookMap.put(count, books);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
-        return books;
+        return bookMap;
+    }
+
+    private static void checkPagination(Pagination pagination, Integer count) {
+        List<String> fields = Arrays.asList("quantity", "available", "title", "isbn", "publication_date", "");
+        if ((pagination.getOffset()) >= count) {
+            throw new ApplicationException("Too high offset!");
+        }
+        if (!fields.contains(pagination.getSortBy())) {
+            throw new ApplicationException("Bad sort field!");
+        }
     }
 
     private static void fillNestedFields(DaoFactory df, List<Book> books) {

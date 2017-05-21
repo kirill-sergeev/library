@@ -43,8 +43,6 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         this.con = con;
     }
 
-
-
     @Override
     public int count() {
         int count;

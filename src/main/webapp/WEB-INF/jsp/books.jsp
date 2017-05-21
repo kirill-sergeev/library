@@ -44,59 +44,8 @@
             </table>
         </div>
     </div>
-    <nav>
-        <div class="text-center">
-        <ul class="pagination justify-content-center">
-            <c:if test="${page > 2}">
-                <li>
-                    <a href="<c:url value="books.do?page=${1}&sort=${sort}&order=${order}"/>">
-                        <i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
-                </li>
-            </c:if>
-            <c:if test="${page > 1}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page-1}&sort=${sort}&order=${order}"/>">
-                        <i class="fa fa-angle-left" aria-hidden="true"></i></a>
-                </li>
-            </c:if>
-            <c:if test="${page > 2}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page-2}&sort=${sort}&order=${order}"/>">${page-2}</a>
-                </li>
-            </c:if>
-            <c:if test="${page > 1}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page-1}&sort=${sort}&order=${order}"/>">${page-1}</a>
-                </li>
-            </c:if>
-            <li class="active page-item disabled">
-                <a href="#">${page}</a>
-            </li>
-            <c:if test="${nOfPages > page}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page+1}&sort=${sort}&order=${order}"/>">${page+1}</a>
-                </li>
-            </c:if>
-            <c:if test="${nOfPages > page+1}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page+2}&sort=${sort}&order=${order}"/>">${page+2}</a>
-                </li>
-            </c:if>
-            <c:if test="${page < nOfPages}">
-                <li>
-                    <a href="<c:url value="books.do?page=${page+1}&sort=${sort}&order=${order}"/>">
-                        <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                </li>
-            </c:if>
-            <c:if test="${page + 1 < nOfPages}">
-                <li>
-                    <a href="<c:url value="books.do?page=${nOfPages}&sort=${sort}&order=${order}"/>">
-                        <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
-                </li>
-            </c:if>
-        </ul>
-        </div>
-    </nav>
+    <c:set var="action" scope="page" value="books.do"/>
+    <%@ include file="../jspf/pagination.jspf" %>
 </div>
 
 <%@ include file="../jspf/footer.jspf" %>

@@ -1,0 +1,64 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<nav>
+    <div class="text-center">
+        <ul class="pagination justify-content-center">
+
+            <c:if test="${not empty sort}"><c:set var="sort" scope="page" value="&sort=${sort}"/></c:if>
+            <c:if test="${not empty order}"><c:set var="order" scope="page" value="&order=${order}"/></c:if>
+            <c:if test="${not empty items}"><c:set var="items" scope="page" value="&items=${items}"/></c:if>
+
+            <c:if test="${not empty author}"><c:set var="group" scope="page" value="author=${author}&"/></c:if>
+            <c:if test="${not empty genre}"><c:set var="group" scope="page" value="genre=${genre}&"/></c:if>
+            <c:if test="${not empty publisher}"><c:set var="group" scope="page" value="publisher=${publisher}&"/></c:if>
+
+            <c:if test="${page > 2}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=1${items}${sort}${order}"/>">
+                        <i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
+                </li>
+            </c:if>
+            <c:if test="${page > 1}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page-1}${items}${sort}${order}"/>">
+                        <i class="fa fa-angle-left" aria-hidden="true"></i></a>
+                </li>
+            </c:if>
+            <c:if test="${page > 2}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page-2}${items}${sort}${order}"/>">${page-2}</a>
+                </li>
+            </c:if>
+            <c:if test="${page > 1}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page-1}${items}${sort}${order}"/>">${page-1}</a>
+                </li>
+            </c:if>
+            <li class="active page-item disabled">
+                <a href="#">${page}</a>
+            </li>
+            <c:if test="${nOfPages > page}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page+1}${items}${sort}${order}"/>">${page+1}</a>
+                </li>
+            </c:if>
+            <c:if test="${nOfPages > page+1}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page+2}${items}${sort}${order}"/>">${page+2}</a>
+                </li>
+            </c:if>
+            <c:if test="${page < nOfPages}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${page+1}${items}${sort}${order}"/>">
+                        <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                </li>
+            </c:if>
+            <c:if test="${page + 1 < nOfPages}">
+                <li>
+                    <a href="<c:url value="${action}?${group}page=${nOfPages}${items}${sort}${order}"/>">
+                        <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+                </li>
+            </c:if>
+        </ul>
+    </div>
+</nav>

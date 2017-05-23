@@ -4,9 +4,9 @@ import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
-import ua.nure.serhieiev.library.model.Author;
 import ua.nure.serhieiev.library.model.Book;
 import ua.nure.serhieiev.library.model.Order;
+import ua.nure.serhieiev.library.model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,9 +17,13 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     private static final String ORDER_DATE = "order_date";
     private static final String EXPECTED_DATE = "expected_date";
     private static final String RETURNED_DATE = "return_date";
+    private static final String INTERNAL = "internal";
+    private static final String READER = "reader_id";
+    private static final String LIBRARIAN = "librarian_id";
     private static final String BOOKS = "books";
+    private static final String[] SORT_FIELDS = {EXPECTED_DATE, ID, INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
 
-    private static final String SQL_CREATE_ORDER = "INSERT INTO orders (user_id, order_date, expected_date) VALUES (?, ?, ?)";
+    private static final String SQL_CREATE_ORDER = "INSERT INTO orders (reader_id, librarian_id,  order_date, expected_date, internal) VALUES (?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_ORDER = "UPDATE order SET returned_date = ? WHERE id = ?";
     private static final String SQL_INSERT_BOOK_INTO_ORDER = "INSERT INTO books_orders(book_id, order_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_BOOK_FROM_ORDER = "DELETE FROM books_orders VALUES WHERE order_id = ?";
@@ -50,6 +54,10 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     protected String getUpdateQuery() {
         return SQL_UPDATE_ORDER;
     }
+    @Override
+    protected String[] getSortFields() {
+        return SORT_FIELDS.clone();
+    }
 
     @Override
     protected List<Order> parseResultSet(ResultSet rs) {
@@ -58,6 +66,9 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
             while (rs.next()) {
                 Order order = new Order()
                         .setId(rs.getInt(ID))
+                        .setReader(new User().setId(rs.getInt(READER)))
+                        .setLibrarian(new User().setId(rs.getInt(LIBRARIAN)))
+                        .setInternal(rs.getBoolean(INTERNAL))
                         .setOrderDate((rs.getDate(ORDER_DATE).toLocalDate()))
                         .setExpectedReturnDate((rs.getDate(EXPECTED_DATE).toLocalDate()))
                         .setReturnDate((rs.getDate(RETURNED_DATE).toLocalDate()));
@@ -82,9 +93,11 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     @Override
     protected void prepareStatementForInsert(PreparedStatement st, Order order) {
         try {
-            st.setInt(1, order.getUser().getId());
-            st.setDate(2, Date.valueOf(order.getOrderDate()));
-            st.setDate(3, Date.valueOf(order.getExpectedReturnDate()));
+            st.setInt(1, order.getReader().getId());
+            st.setInt(2, order.getLibrarian().getId());
+            st.setDate(3, Date.valueOf(order.getOrderDate()));
+            st.setDate(4, Date.valueOf(order.getExpectedReturnDate()));
+            st.setBoolean(5, order.getInternal());
         } catch (SQLException e) {
             throw new DaoException(e);
         }

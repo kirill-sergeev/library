@@ -5,7 +5,6 @@ import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.AuthorDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Author;
-import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,15 +16,11 @@ import java.util.List;
 public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
 
     private static final String NAME = "name";
+    private static final String[] SORT_FIELDS = {ID, NAME};
 
     private static final String SQL_CREATE_AUTHOR = "INSERT INTO authors (name) VALUES (?)";
     private static final String SQL_UPDATE_AUTHOR = "UPDATE authors SET name = ? WHERE id = ?";
-    private static final String SQL_SELECT_AUTHOR_BY_ID = "SELECT * FROM authors WHERE id = ?";
 
-    @Override
-    protected String getSelectQuery() {
-        return SQL_SELECT_AUTHOR_BY_ID;
-    }
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_AUTHOR;
@@ -33,6 +28,10 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_AUTHOR;
+    }
+    @Override
+    protected String[] getSortFields() {
+        return SORT_FIELDS.clone();
     }
 
     @Override
@@ -71,19 +70,6 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-    }
-
-    @Override
-    public List<Author> getRange(Pagination pagination) {
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "name" : pagination.getSortBy();
-
-        String sql = "SELECT * FROM authors" +
-                " ORDER BY " + sortBy + order +
-                " LIMIT ? OFFSET ?";
-        return listQuery(sql, limit, offset);
     }
 
     PgAuthorDao(Connection con) {

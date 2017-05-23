@@ -8,14 +8,22 @@ import ua.nure.serhieiev.library.model.User;
 
 import java.util.List;
 
+import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.model.User.Role.READER;
+
 public final class OrderService {
 
     public static Order save(Order order) {
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
             UserDao userDao = df.getUserDao();
-            User user = userDao.getById(order.getUser().getId());
-            order.setUser(user);
+            User reader = userDao.getById(order.getReader().getId());
+            User librarian = userDao.getById(order.getLibrarian().getId());
+            if (reader.getRole() != READER || librarian.getRole() != LIBRARIAN){
+                throw new ApplicationException("Order must have reader and librarian!");
+            }
+            order.setReader(reader)
+                    .setLibrarian(librarian);
             orderDao.save(order);
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -48,8 +56,10 @@ public final class OrderService {
             OrderDao orderDao = df.getOrderDao();
             UserDao userDao = df.getUserDao();
             order = orderDao.getById(orderId);
-            User user = userDao.getById(order.getUser().getId());
-            order.setUser(user);
+            User reader = userDao.getById(order.getReader().getId());
+            User librarian = userDao.getById(order.getLibrarian().getId());
+            order.setReader(reader)
+                    .setLibrarian(librarian);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -63,8 +73,10 @@ public final class OrderService {
             UserDao userDao = df.getUserDao();
             orders = orderDao.getAll();
             for (Order order : orders) {
-                User user = userDao.getById(order.getUser().getId());
-                order.setUser(user);
+                User reader = userDao.getById(order.getReader().getId());
+                User librarian = userDao.getById(order.getLibrarian().getId());
+                order.setReader(reader)
+                        .setLibrarian(librarian);
             }
         } catch (Exception e) {
             throw new ApplicationException(e);

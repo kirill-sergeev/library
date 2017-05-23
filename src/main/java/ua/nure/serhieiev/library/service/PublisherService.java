@@ -40,12 +40,8 @@ public final class PublisherService {
     }
 
     private static void checkPagination(Pagination pagination, Integer count) {
-        List<String> fields = Arrays.asList("title", "");
         if ((pagination.getOffset()) >= count) {
             throw new ApplicationException("Too high offset!");
-        }
-        if (!fields.contains(pagination.getSortBy())) {
-            throw new ApplicationException("Bad sort field!");
         }
     }
 

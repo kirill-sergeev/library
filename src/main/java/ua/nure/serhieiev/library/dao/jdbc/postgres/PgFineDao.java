@@ -22,12 +22,7 @@ public class PgFineDao extends JdbcDao<Fine> implements FineDao {
 
     private static final String SQL_CREATE_FINE = "INSERT INTO fines (order_id, cost) VALUES (?, ?)";
     private static final String SQL_UPDATE_FINE = "UPDATE fines SET cost = ?, paid = ? WHERE id = ?";
-    private static final String SQL_SELECT_FINE_BY_ID = "SELECT * FROM fines WHERE id = ?";
 
-    @Override
-    protected String getSelectQuery() {
-        return SQL_SELECT_FINE_BY_ID;
-    }
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_FINE;
@@ -35,6 +30,11 @@ public class PgFineDao extends JdbcDao<Fine> implements FineDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_FINE;
+    }
+
+    @Override
+    protected String[] getSortFields() {
+        return new String[0];
     }
 
 

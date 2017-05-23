@@ -6,27 +6,40 @@ import java.util.List;
 public class Order implements Identified{
 
     Integer id;
-    User user;
+    User reader;
+    User librarian;
     LocalDate orderDate;
     LocalDate expectedReturnDate;
     LocalDate returnDate;
+    Boolean internal;
     List<Book> books;
 
+    @Override
     public Integer getId() {
         return id;
     }
 
+    @Override
     public Order setId(Integer id) {
         this.id = id;
         return this;
     }
 
-    public User getUser() {
-        return user;
+    public User getReader() {
+        return reader;
     }
 
-    public Order setUser(User user) {
-        this.user = user;
+    public Order setReader(User reader) {
+        this.reader = reader;
+        return this;
+    }
+
+    public User getLibrarian() {
+        return librarian;
+    }
+
+    public Order setLibrarian(User librarian) {
+        this.librarian = librarian;
         return this;
     }
 
@@ -57,6 +70,15 @@ public class Order implements Identified{
         return this;
     }
 
+    public Boolean getInternal() {
+        return internal;
+    }
+
+    public Order setInternal(Boolean internal) {
+        this.internal = internal;
+        return this;
+    }
+
     public List<Book> getBooks() {
         return books;
     }
@@ -70,10 +92,12 @@ public class Order implements Identified{
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", user=" + user +
+                ", reader=" + reader +
+                ", librarian=" + librarian +
                 ", orderDate=" + orderDate +
                 ", expectedReturnDate=" + expectedReturnDate +
                 ", returnDate=" + returnDate +
+                ", internal=" + internal +
                 ", books=" + books +
                 '}';
     }

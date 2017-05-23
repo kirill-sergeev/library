@@ -140,12 +140,8 @@ public final class BookService {
     }
 
     private static void checkPagination(Pagination pagination, Integer count) {
-        List<String> fields = Arrays.asList("quantity", "available", "title", "isbn", "publication_date", "");
         if ((pagination.getOffset()) >= count) {
             throw new ApplicationException("Too high offset!");
-        }
-        if (!fields.contains(pagination.getSortBy())) {
-            throw new ApplicationException("Bad sort field!");
         }
     }
 

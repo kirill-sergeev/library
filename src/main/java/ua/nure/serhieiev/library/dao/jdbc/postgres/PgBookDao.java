@@ -22,6 +22,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     private static final String ISBN = "isbn";
     private static final String AUTHORS = "authors";
     private static final String GENRES = "genres";
+    private static final String[] SORT_FIELDS = {AVAILABLE, ID, PUBLICATION_DATE,PUBLISHER, QUANTITY, TITLE};
 
     private static final String SQL_CREATE_BOOK = "INSERT INTO books (title, quantity, publisher_id, publication_date, description, isbn) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_BOOK = "UPDATE books SET title = ? quantity = ?, available = ?, publisher_id = ?, publication_date = ?, description = ?, isbn = ? WHERE id = ?";
@@ -29,7 +30,6 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     private static final String SQL_INSERT_GENRE_INTO_BOOK = "INSERT INTO books_genres(book_id, genre_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_AUTHORS_FROM_BOOK = "DELETE FROM books_authors VALUES WHERE book_id = ?";
     private static final String SQL_DELETE_ALL_GENRES_FROM_BOOK = "DELETE FROM books_genres VALUES WHERE book_id = ?";
-    private static final String SQL_COUNT_ALL_BOOK = "SELECT count(*) FROM books";
     private static final String SQL_SELECT_ALL_BOOKS =
             "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
                     " FROM books b, books_authors ba, books_genres bg" +
@@ -56,6 +56,10 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_BOOK;
+    }
+    @Override
+    protected String[] getSortFields() {
+        return SORT_FIELDS.clone();
     }
 
     @Override
@@ -191,19 +195,6 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     }
 
     @Override
-    public int count() {
-        Integer count;
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(SQL_COUNT_ALL_BOOK)) {
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
-    }
-
-    @Override
     public List<Book> getRangeByAuthor(Author author, Pagination pagination) {
         String sql;
         String order = pagination.isAscending() ? " " : " DESC";
@@ -311,22 +302,6 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
             throw new DaoException(e);
         }
         return count;
-    }
-
-    @Override
-    public List<Book> getRange(Pagination pagination) {
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-
-        String sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
-                " FROM books b, books_authors ba, books_genres bg" +
-                " WHERE b.id = ba.book_id AND b.id = bg.book_id" +
-                " GROUP BY b.id" +
-                " ORDER BY " + sortBy + order +
-                " LIMIT ? OFFSET ?";
-        return listQuery(sql, limit, offset);
     }
 
     PgBookDao(Connection con) {

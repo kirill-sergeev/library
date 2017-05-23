@@ -3,10 +3,13 @@ package ua.nure.serhieiev.library.dao.jdbc;
 import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.GenericDao;
 import ua.nure.serhieiev.library.dao.NotFoundException;
+import ua.nure.serhieiev.library.model.Book;
 import ua.nure.serhieiev.library.model.Identified;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
@@ -15,26 +18,19 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     protected static final String ID = "id";
     protected Connection con;
 
+
+    protected String getSelectQuery(){
+        return String.format( "SELECT * FROM %s WHERE id = ?", getTableName());
+    }
     protected String getSelectAllQuery(){
-        return "SELECT * FROM "+ getTableName();
+        return String.format("SELECT * FROM %s", getTableName());
     }
     protected abstract String getCreateQuery();
-    protected abstract String getSelectQuery();
     protected abstract String getUpdateQuery();
+    protected abstract String[] getSortFields();
     protected abstract List<T> parseResultSet(ResultSet rs);
     protected abstract void prepareStatementForInsert(PreparedStatement st, T object);
     protected abstract void prepareStatementForUpdate(PreparedStatement st, T object);
-
-    protected static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columns = rsmd.getColumnCount();
-        for (int x = 1; x <= columns; x++) {
-            if (columnName.equals(rsmd.getColumnName(x))) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @SuppressWarnings("unchecked")
     protected JdbcDao(Connection con) {
@@ -46,8 +42,9 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     @Override
     public int count() {
         int count;
+        String sql = String.format("SELECT count(*) FROM %s", getTableName());
         try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT count(*) FROM " + getTableName())) {
+             ResultSet rs = st.executeQuery(sql)) {
             rs.next();
             count = rs.getInt(1);
         } catch (SQLException e) {
@@ -98,7 +95,8 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         if (id == null) {
             throw new IllegalArgumentException("Entity is not created yet, ID is null.");
         }
-        try (PreparedStatement st = con.prepareStatement("DELETE FROM " + getTableName() + " WHERE id = ?")) {
+        String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
+        try (PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, id);
             if (st.executeUpdate() == 0) {
                 throw new DaoException("Deleting entity failed, no rows affected.");
@@ -116,6 +114,19 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     @Override
     public List<T> getAll() {
         return listQuery(getSelectAllQuery());
+    }
+
+    @Override
+    public List<T> getRange(Pagination pagination) {
+        int limit = pagination.getLimit();
+        int offset = pagination.getOffset();
+        String order = pagination.isAscending() ? "" : "DESC";
+        String sortBy = pagination.getSortBy();
+        if (sortBy == null || sortBy.isEmpty() || Arrays.binarySearch(getSortFields(), sortBy) == -1){
+            sortBy = getSortFields()[0];
+        }
+        String sql = String.format("%s ORDER BY %s %s LIMIT ? OFFSET ?", getSelectAllQuery(), sortBy, order);
+        return listQuery(sql, limit, offset);
     }
 
     protected List<T> listQuery(String sql, Object... params) {
@@ -142,7 +153,18 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         return list.get(0);
     }
 
-    protected String getTableName() {
+    protected static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columns = metaData.getColumnCount();
+        for (int x = 1; x <= columns; x++) {
+            if (columnName.equals(metaData.getColumnName(x))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getTableName() {
         return entityClass.getSimpleName().concat("s").toLowerCase();
     }
 

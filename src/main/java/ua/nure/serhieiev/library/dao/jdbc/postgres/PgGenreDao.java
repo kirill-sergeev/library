@@ -5,9 +5,7 @@ import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.GenreDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.service.util.Pagination;
 
-import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,15 +16,11 @@ import java.util.List;
 public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
 
     private static final String TITLE = "title";
+    private static final String[] SORT_FIELDS = {ID, TITLE};
 
     private static final String SQL_CREATE_GENRE = "INSERT INTO genres (title) VALUES (?)";
     private static final String SQL_UPDATE_GENRE = "UPDATE genres SET title = ? WHERE id = ?";
-    private static final String SQL_SELECT_GENRE_BY_ID = "SELECT * FROM genres WHERE id = ?";
 
-    @Override
-    protected String getSelectQuery() {
-        return SQL_SELECT_GENRE_BY_ID;
-    }
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_GENRE;
@@ -34,6 +28,10 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_GENRE;
+    }
+    @Override
+    protected String[] getSortFields() {
+        return SORT_FIELDS.clone();
     }
 
     @Override
@@ -72,19 +70,6 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-    }
-
-    @Override
-    public List<Genre> getRange(Pagination pagination) {
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-
-        String sql = "SELECT * FROM genres" +
-                " ORDER BY " + sortBy + order +
-                " LIMIT ? OFFSET ?";
-        return listQuery(sql, limit, offset);
     }
 
     PgGenreDao(Connection con) {

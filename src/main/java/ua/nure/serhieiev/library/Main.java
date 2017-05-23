@@ -15,9 +15,9 @@ import java.util.List;
 
 public class Main {
 
-    public static void main2(String[] args) {
-      /*  Genre genre = new Genre().setTitle("Modern");
-        Genre genre2 = new Genre().setTitle("Fantasy");
+    public static void main(String[] args) {
+        Genre genre = new Genre().setTitle("Modernon");
+        Genre genre2 = new Genre().setTitle("Fantasynon");
 
         Author author = new Author().setName("Dostoevsky");
         Author author2 = new Author().setName("Ivanov");
@@ -55,7 +55,7 @@ public class Main {
             }
         } catch (Exception e) {
             throw new ApplicationException(e);
-        }*/
+        }
 
 /*        try (DaoFactory df = DaoFactory.getInstance()
          ) {
@@ -74,7 +74,7 @@ public class Main {
        // System.out.println(BookService.getRange(1, BookService.Field.TITLE, true, 2));
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         long start = System.nanoTime();
         for (int i = 0; i < 1000; i++) {
             System.out.println(BookService.getAll(true).size());

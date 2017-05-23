@@ -12,8 +12,62 @@ public final class BookService {
         try (DaoFactory df = DaoFactory.getInstance();
              TransactionManager tm = df.getTransactionManager()) {
             BookDao bookDao = df.getBookDao();
+            AuthorDao authorDao = df.getAuthorDao();
+            GenreDao genreDao = df.getGenreDao();
+            PublisherDao publisherDao = df.getPublisherDao();
+
             tm.start();
+
+            for(Author bookAuthor : book.getAuthors()){
+                try {
+                    for (Author withSameName : authorDao.getByName(bookAuthor.getName())) {
+                        if (bookAuthor.getName().equalsIgnoreCase(withSameName.getName())) {
+                            bookAuthor.setId(withSameName.getId());
+                            break;
+                        }
+                    }
+                }catch (NotFoundException e){
+
+                }
+               if(bookAuthor.getId() == null){
+                   authorDao.save(bookAuthor);
+               }
+            }
+
+
+            for(Genre bookGenre : book.getGenres()){
+                try {
+                    for (Genre withSameTitle : genreDao.getByTitle(bookGenre.getTitle())) {
+                        if (bookGenre.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
+                            bookGenre.setId(withSameTitle.getId());
+                            break;
+                        }
+                    }
+                }catch (NotFoundException e){
+
+                }
+                if(bookGenre.getId() == null){
+                    genreDao.save(bookGenre);
+                }
+            }
+
+            Publisher bookPublisher = book.getPublisher();
             try {
+                for (Publisher withSameTitle : publisherDao.getByTitle(bookPublisher.getTitle())) {
+                    if (bookPublisher.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
+                        bookPublisher.setId(withSameTitle.getId());
+                        break;
+                    }
+                }
+            }catch (NotFoundException e){
+
+            }
+            if(bookPublisher.getId() == null){
+                publisherDao.save(bookPublisher);
+            }
+
+            try {
+
                 bookDao.save(book);
             } catch (RuntimeException e) {
                 tm.rollback();

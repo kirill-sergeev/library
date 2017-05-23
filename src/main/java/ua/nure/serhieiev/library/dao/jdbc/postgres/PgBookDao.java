@@ -22,8 +22,11 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     private static final String ISBN = "isbn";
     private static final String AUTHORS = "authors";
     private static final String GENRES = "genres";
-    private static final String[] SORT_FIELDS = {AVAILABLE, ID, PUBLICATION_DATE,PUBLISHER, QUANTITY, TITLE};
+    private static final String[] SORT_FIELDS = {AVAILABLE, PUBLICATION_DATE, PUBLISHER, QUANTITY, TITLE};
 
+    private static final String SQL_COUNT_BOOKS_BY_AUTHOR = "SELECT count(*) FROM books_authors WHERE author_id = ?";
+    private static final String SQL_COUNT_BOOKS_BY_GENRE = "SELECT count(*) FROM books_genres WHERE genre_id = ?";
+    private static final String SQL_COUNT_BOOKS_BY_PUBLISHER = "SELECT count(*) FROM books WHERE publisher_id = ?";
     private static final String SQL_CREATE_BOOK = "INSERT INTO books (title, quantity, publisher_id, publication_date, description, isbn) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_BOOK = "UPDATE books SET title = ? quantity = ?, available = ?, publisher_id = ?, publication_date = ?, description = ?, isbn = ? WHERE id = ?";
     private static final String SQL_INSERT_AUTHOR_INTO_BOOK = "INSERT INTO books_authors(book_id, author_id) VALUES (?, ?)";
@@ -41,22 +44,27 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
                     " WHERE b.id = ba.book_id AND b.id = bg.book_id AND b.id = ?" +
                     " GROUP BY b.id";
 
+
     @Override
     protected String getSelectQuery() {
         return SQL_SELECT_BOOK_BY_ID;
     }
+
     @Override
     protected String getSelectAllQuery() {
         return SQL_SELECT_ALL_BOOKS;
     }
+
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_BOOK;
     }
+
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_BOOK;
     }
+
     @Override
     protected String[] getSortFields() {
         return SORT_FIELDS.clone();
@@ -135,7 +143,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     }
 
     private void addAuthorsToBook(Book book) {
-        try (PreparedStatement st = con.prepareStatement(SQL_INSERT_GENRE_INTO_BOOK)) {
+        try (PreparedStatement st = con.prepareStatement(SQL_INSERT_AUTHOR_INTO_BOOK)) {
             for (Author author : book.getAuthors()) {
                 st.setInt(1, book.getId());
                 st.setInt(2, author.getId());
@@ -148,7 +156,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     }
 
     private void addGenresToBook(Book book) {
-        try (PreparedStatement st = con.prepareStatement(SQL_INSERT_AUTHOR_INTO_BOOK)) {
+        try (PreparedStatement st = con.prepareStatement(SQL_INSERT_GENRE_INTO_BOOK)) {
             for (Genre genre : book.getGenres()) {
                 st.setInt(1, book.getId());
                 st.setInt(2, genre.getId());
@@ -181,8 +189,8 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     @Override
     public void save(Book book) {
         super.save(book);
-        addAuthorsToBook(book);
         addGenresToBook(book);
+        addAuthorsToBook(book);
     }
 
     @Override
@@ -196,112 +204,57 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
 
     @Override
     public List<Book> getRangeByAuthor(Author author, Pagination pagination) {
-        String sql;
+        checkId(author);
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-
-        if (author.getId() != null) {
-            sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_authors WHERE author_id = ?)" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else if (author.getName() != null) {
-            sql = "SELECT * FROM books b WHERE b.id IN (SELECT ba.book_id FROM books_authors ba WHERE ba.author_id IN" +
-                    " (SELECT id FROM authors a WHERE a.name = ?))" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else {
-            throw new IllegalArgumentException("Author must contains ID or NAME");
-        }
-        return listQuery(sql, author.getId() == null ? author.getName() : author.getId(), limit, offset);
+        String sortBy = pagination.getSortBy().isEmpty() ? "name" : pagination.getSortBy();
+        String sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_authors WHERE author_id = ?)" + " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
+        return listQuery(sql, author.getId(), limit, offset);
     }
 
     @Override
     public List<Book> getRangeByGenre(Genre genre, Pagination pagination) {
-        String sql;
+        checkId(genre);
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
         String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-
-        if (genre.getId() != null) {
-            sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_genres WHERE genre_id = ?)" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else if (genre.getTitle() != null) {
-            sql = "SELECT * FROM books b WHERE b.id IN (SELECT bg.book_id FROM books_genres bg WHERE bg.genre_id IN " +
-                    " (SELECT id FROM genres g WHERE g.title = ?))" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else {
-            throw new IllegalArgumentException("Genre must contains ID or NAME");
-        }
-        return listQuery(sql, genre.getId() == null ? genre.getTitle() : genre.getId(), limit, offset);
+        String sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_genres WHERE genre_id = ?)" + " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
+        return listQuery(sql, genre.getId(), limit, offset);
     }
 
     @Override
     public List<Book> getRangeByPublisher(Publisher publisher, Pagination pagination) {
-        String sql;
+        checkId(publisher);
         String order = pagination.isAscending() ? " " : " DESC";
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
         String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-
-        if (publisher.getId() != null) {
-            sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
-                    " FROM books b, books_authors ba, books_genres bg, authors a, genres g" +
-                    " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = ?" +
-                    " GROUP BY b.id" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else if (publisher.getTitle() != null) {
-            sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
-                    " FROM books b, books_authors ba, books_genres bg, authors a, genres g, publishers p" +
-                    " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = p.id AND p.title = ?" +
-                    " GROUP BY b.id" +
-                    " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        } else {
-            throw new IllegalArgumentException("Publisher must contains ID or NAME");
-        }
-        return listQuery(sql, publisher.getId() == null ? publisher.getTitle() : publisher.getId(), limit, offset);
+        String sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
+                " FROM books b, books_authors ba, books_genres bg, authors a, genres g" +
+                " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = ?" +
+                " GROUP BY b.id" +
+                " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
+        return listQuery(sql, publisher.getId(), limit, offset);
     }
 
     @Override
     public int count(Author author) {
-        int count;
-        try (PreparedStatement ps = con.prepareStatement("SELECT count(*) FROM books_authors WHERE author_id = ?")){
-            ps.setInt(1, author.getId());
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
+        checkId(author);
+        return count(SQL_COUNT_BOOKS_BY_AUTHOR, author.getId());
     }
 
     @Override
     public int count(Genre genre) {
-        int count;
-        try (PreparedStatement ps = con.prepareStatement("SELECT count(*) FROM books_genres WHERE genre_id = ?")){
-            ps.setInt(1, genre.getId());
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
+        checkId(genre);
+        return count(SQL_COUNT_BOOKS_BY_GENRE, genre.getId());
     }
 
     @Override
     public int count(Publisher publisher) {
-        int count;
-        try (PreparedStatement ps = con.prepareStatement("SELECT count(*) FROM books WHERE publisher_id = ?")){
-            ps.setInt(1, publisher.getId());
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
+        checkId(publisher);
+        return count(SQL_COUNT_BOOKS_BY_PUBLISHER, publisher.getId());
     }
 
     PgBookDao(Connection con) {

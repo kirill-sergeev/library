@@ -6,5 +6,7 @@ import ua.nure.serhieiev.library.service.util.Pagination;
 import java.util.List;
 
 public interface GenreDao extends GenericDao<Genre> {
-    List<Genre> getRange(Pagination pagination);
+
+    List<Genre> getByTitle(String title);
+
 }

@@ -14,10 +14,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 
-@WebServlet(name = "RegisterServlet", urlPatterns = {REGISTER_ACTION, REGISTER_LIBRARIAN_ACTION})
+@WebServlet(name = "RegisterServlet", asyncSupported = true,urlPatterns = {REGISTER_ACTION, REGISTER_LIBRARIAN_ACTION})
 public class RegisterServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
@@ -36,7 +38,7 @@ public class RegisterServlet extends HttpServlet {
         try {
             if (request.getServletPath().equals(REGISTER_ACTION)) {
                 UserService.saveReader(user);
-                EmailUtil.sendRegistrationLink(user);
+                new Thread(() -> EmailUtil.sendRegistrationLink(user)).start();
             } else {
                 UserService.saveLibrarian(user);
             }

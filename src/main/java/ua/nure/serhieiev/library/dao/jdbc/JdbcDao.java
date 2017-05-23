@@ -77,9 +77,7 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
 
     @Override
     public void update(T object) {
-        if (object == null || object.getId() == null) {
-            throw new IllegalArgumentException("Entity is not created yet, ID is null.");
-        }
+        checkId(object);
         try (PreparedStatement st = con.prepareStatement(getUpdateQuery())) {
             prepareStatementForUpdate(st, object);
             if (st.executeUpdate() == 0) {
@@ -122,8 +120,9 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         int offset = pagination.getOffset();
         String order = pagination.isAscending() ? "" : "DESC";
         String sortBy = pagination.getSortBy();
-        if (sortBy == null || sortBy.isEmpty() || Arrays.binarySearch(getSortFields(), sortBy) == -1){
-            sortBy = getSortFields()[0];
+        String[] sortedFields = getSortFields();
+        if (sortBy == null || sortBy.isEmpty() || Arrays.binarySearch(sortedFields, sortBy) == -1){
+            sortBy = sortedFields[sortedFields.length-1];
         }
         String sql = String.format("%s ORDER BY %s %s LIMIT ? OFFSET ?", getSelectAllQuery(), sortBy, order);
         return listQuery(sql, limit, offset);
@@ -153,6 +152,19 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         return list.get(0);
     }
 
+    protected int count(String sql, Integer id){
+        int count;
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            count = rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        return count;
+    }
+
     protected static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columns = metaData.getColumnCount();
@@ -162,6 +174,12 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
             }
         }
         return false;
+    }
+
+    protected static void checkId(Identified object){
+        if (object == null || object.getId() == null || object.getId() < 1) {
+            throw new IllegalArgumentException("Entity must contains ID.");
+        }
     }
 
     private String getTableName() {

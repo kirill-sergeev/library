@@ -44,6 +44,9 @@
             </table>
         </div>
     </div>
+    <c:if test="${not empty author}"><c:set var="group" scope="page" value="author=${author}&"/></c:if>
+    <c:if test="${not empty genre}"><c:set var="group" scope="page" value="genre=${genre}&"/></c:if>
+    <c:if test="${not empty publisher}"><c:set var="group" scope="page" value="publisher=${publisher}&"/></c:if>
     <c:set var="action" scope="page" value="books.do"/>
     <%@ include file="../jspf/pagination.jspf" %>
 </div>

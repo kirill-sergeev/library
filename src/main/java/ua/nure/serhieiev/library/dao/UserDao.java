@@ -16,4 +16,6 @@ public interface UserDao extends GenericDao<User> {
 
     List<User> getAll(User.Role role);
 
+    List<User> getByName(String name);
+
 }

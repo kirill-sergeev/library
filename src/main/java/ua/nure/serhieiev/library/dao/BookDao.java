@@ -15,8 +15,6 @@ public interface BookDao extends GenericDao<Book> {
 
     int count(Publisher publisher);
 
-    List<Book> getRange(Pagination pagination);
-
     List<Book> getRangeByAuthor(Author author, Pagination pagination);
 
     List<Book> getRangeByGenre(Genre genre, Pagination pagination);

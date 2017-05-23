@@ -37,6 +37,7 @@ public class PgDaoFactory extends DaoFactory {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return con;
     }
 

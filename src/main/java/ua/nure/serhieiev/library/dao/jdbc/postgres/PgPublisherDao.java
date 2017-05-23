@@ -16,10 +16,11 @@ import java.util.List;
 public class PgPublisherDao extends JdbcDao<Publisher> implements PublisherDao {
 
     private static final String TITLE = "title";
-    private static final String[] SORT_FIELDS = {ID, TITLE};
+    private static final String[] SORT_FIELDS = {TITLE};
 
     private static final String SQL_CREATE_PUBLISHER = "INSERT INTO publishers (title) VALUES (?)";
     private static final String SQL_UPDATE_PUBLISHER = "UPDATE publishers SET title = ? WHERE id = ?";
+    private static final String SQL_SELECT_PUBLISHER_BY_TITLE = "SELECT * FROM publishers WHERE lower(title) LIKE (?)";
 
     @Override
     protected String getCreateQuery() {
@@ -70,6 +71,11 @@ public class PgPublisherDao extends JdbcDao<Publisher> implements PublisherDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public List<Publisher> getByTitle(String title) {
+        return listQuery(SQL_SELECT_PUBLISHER_BY_TITLE, "%" + title.toLowerCase() + "%");
     }
 
     PgPublisherDao(Connection con) {

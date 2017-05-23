@@ -4,6 +4,7 @@ import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.GenreDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
+import ua.nure.serhieiev.library.model.Author;
 import ua.nure.serhieiev.library.model.Genre;
 
 import java.sql.Connection;
@@ -16,10 +17,11 @@ import java.util.List;
 public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
 
     private static final String TITLE = "title";
-    private static final String[] SORT_FIELDS = {ID, TITLE};
+    private static final String[] SORT_FIELDS = {TITLE};
 
     private static final String SQL_CREATE_GENRE = "INSERT INTO genres (title) VALUES (?)";
     private static final String SQL_UPDATE_GENRE = "UPDATE genres SET title = ? WHERE id = ?";
+    private static final String SQL_SELECT_GENRE_BY_TITLE = "SELECT * FROM genres WHERE lower(title) LIKE (?)";
 
     @Override
     protected String getCreateQuery() {
@@ -70,6 +72,11 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public List<Genre> getByTitle(String title) {
+        return listQuery(SQL_SELECT_GENRE_BY_TITLE, "%" + title.toLowerCase() + "%");
     }
 
     PgGenreDao(Connection con) {

@@ -6,7 +6,9 @@ import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
 import ua.nure.serhieiev.library.model.Book;
 import ua.nure.serhieiev.library.model.Order;
+import ua.nure.serhieiev.library.model.Publisher;
 import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,8 +23,9 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     private static final String READER = "reader_id";
     private static final String LIBRARIAN = "librarian_id";
     private static final String BOOKS = "books";
-    private static final String[] SORT_FIELDS = {EXPECTED_DATE, ID, INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
+    private static final String[] SORT_FIELDS = {EXPECTED_DATE, INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
 
+    private static final String SQL_COUNT_ORDERS_BY_READER = "SELECT count(*) FROM orders WHERE reader_id = ?";
     private static final String SQL_CREATE_ORDER = "INSERT INTO orders (reader_id, librarian_id,  order_date, expected_date, internal) VALUES (?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_ORDER = "UPDATE order SET returned_date = ? WHERE id = ?";
     private static final String SQL_INSERT_BOOK_INTO_ORDER = "INSERT INTO books_orders(book_id, order_id) VALUES (?, ?)";
@@ -42,18 +45,22 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     protected String getSelectQuery() {
         return SQL_SELECT_ORDER_BY_ID;
     }
+
     @Override
     protected String getSelectAllQuery() {
         return SQL_SELECT_ALL_ORDERS;
     }
+
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_ORDER;
     }
+
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_ORDER;
     }
+
     @Override
     protected String[] getSortFields() {
         return SORT_FIELDS.clone();
@@ -70,15 +77,15 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
                         .setLibrarian(new User().setId(rs.getInt(LIBRARIAN)))
                         .setInternal(rs.getBoolean(INTERNAL))
                         .setOrderDate((rs.getDate(ORDER_DATE).toLocalDate()))
-                        .setExpectedReturnDate((rs.getDate(EXPECTED_DATE).toLocalDate()))
-                        .setReturnDate((rs.getDate(RETURNED_DATE).toLocalDate()));
-
+                        .setExpectedReturnDate((rs.getDate(EXPECTED_DATE).toLocalDate()));
+                if (rs.getDate(RETURNED_DATE) != null) {
+                    order.setReturnDate((rs.getDate(RETURNED_DATE).toLocalDate()));
+                }
                 List<Book> books = new ArrayList<>();
                 for (Integer bookId : (Integer[]) rs.getArray(BOOKS).getArray()) {
                     books.add(new Book().setId(bookId));
                 }
                 order.setBooks(books);
-
                 list.add(order);
             }
         } catch (SQLException e) {
@@ -114,7 +121,7 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     }
 
     private void addBooksToOrder(Order order) {
-        try(PreparedStatement st = con.prepareStatement(SQL_INSERT_BOOK_INTO_ORDER)){
+        try (PreparedStatement st = con.prepareStatement(SQL_INSERT_BOOK_INTO_ORDER)) {
             for (Book book : order.getBooks()) {
                 st.setInt(1, order.getId());
                 st.setInt(2, book.getId());
@@ -146,6 +153,27 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
         super.save(order);
         removeBooksFromOrder(order);
         addBooksToOrder(order);
+    }
+
+    @Override
+    public List<Order> getRangeByReader(User reader, Pagination pagination) {
+        checkId(reader);
+        String order = pagination.isAscending() ? " " : " DESC";
+        int limit = pagination.getLimit();
+        int offset = pagination.getOffset();
+        String sortBy = pagination.getSortBy().isEmpty() ? EXPECTED_DATE : pagination.getSortBy();
+        String sql = "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
+                " FROM orders o, books_orders bo" +
+                " WHERE o.id = bo.order_id AND reader_id = ?" +
+                " GROUP BY o.id" +
+                " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
+        return listQuery(sql, reader.getId(), limit, offset);
+    }
+
+    @Override
+    public int count(User reader) {
+        checkId(reader);
+        return count(SQL_COUNT_ORDERS_BY_READER, reader.getId());
     }
 
     PgOrderDao(Connection con) {

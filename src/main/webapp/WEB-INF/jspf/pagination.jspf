@@ -8,10 +8,6 @@
             <c:if test="${not empty order}"><c:set var="order" scope="page" value="&order=${order}"/></c:if>
             <c:if test="${not empty items}"><c:set var="items" scope="page" value="&items=${items}"/></c:if>
 
-            <c:if test="${not empty author}"><c:set var="group" scope="page" value="author=${author}&"/></c:if>
-            <c:if test="${not empty genre}"><c:set var="group" scope="page" value="genre=${genre}&"/></c:if>
-            <c:if test="${not empty publisher}"><c:set var="group" scope="page" value="publisher=${publisher}&"/></c:if>
-
             <c:if test="${page > 2}">
                 <li>
                     <a href="<c:url value="${action}?${group}page=1${items}${sort}${order}"/>">

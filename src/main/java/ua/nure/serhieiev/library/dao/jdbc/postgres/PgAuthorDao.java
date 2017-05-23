@@ -16,10 +16,11 @@ import java.util.List;
 public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
 
     private static final String NAME = "name";
-    private static final String[] SORT_FIELDS = {ID, NAME};
+    private static final String[] SORT_FIELDS = {NAME};
 
     private static final String SQL_CREATE_AUTHOR = "INSERT INTO authors (name) VALUES (?)";
     private static final String SQL_UPDATE_AUTHOR = "UPDATE authors SET name = ? WHERE id = ?";
+    private static final String SQL_SELECT_AUTHOR_BY_NAME = "SELECT * FROM authors WHERE lower(name) LIKE (?)";
 
     @Override
     protected String getCreateQuery() {
@@ -70,6 +71,11 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public List<Author> getByName(String name) {
+        return listQuery(SQL_SELECT_AUTHOR_BY_NAME, "%" + name.toLowerCase() + "%");
     }
 
     PgAuthorDao(Connection con) {

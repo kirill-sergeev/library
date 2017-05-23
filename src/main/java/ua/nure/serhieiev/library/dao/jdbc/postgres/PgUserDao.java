@@ -4,6 +4,7 @@ import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.UserDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
+import ua.nure.serhieiev.library.model.Author;
 import ua.nure.serhieiev.library.model.User;
 
 import java.sql.*;
@@ -22,10 +23,11 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     private static final String REGISTRATION_DATE = "registration_date";
     private static final String LAST_VISIT = "last_visit";
     private static final String ROLE = "role_id";
-    private static final String[] SORT_FIELDS = {ENABLED, ID, LAST_VISIT, NAME, REGISTRATION_DATE, ROLE};
+    private static final String[] SORT_FIELDS = {ENABLED, LAST_VISIT, NAME, REGISTRATION_DATE, ROLE};
 
     private static final String SQL_CREATE_USER = "INSERT INTO users (email, password, name, activation_token, role_id, enabled) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
+    private static final String SQL_SELECT_USER_BY_NAME = "SELECT * FROM users WHERE lower(name) LIKE (?)";
     private static final String SQL_SELECT_USER_BY_ROLE = "SELECT * FROM users WHERE role_id = ? ORDER BY name";
     private static final String SQL_SELECT_USER_BY_AUTH_TOKEN = "SELECT * FROM users WHERE auth_token = ?";
     private static final String SQL_SELECT_USER_BY_ACTIVATION_TOKEN = "SELECT * FROM users WHERE activation_token = ?";
@@ -127,6 +129,11 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     @Override
     public User getByEmail(String email) {
         return singleQuery(SQL_SELECT_USER_BY_EMAIL, email);
+    }
+
+    @Override
+    public List<User> getByName(String name) {
+        return listQuery(SQL_SELECT_USER_BY_NAME, "%" + name.toLowerCase() + "%");
     }
 
     PgUserDao(Connection con) {

@@ -4,6 +4,7 @@ import ua.nure.serhieiev.library.dao.*;
 import ua.nure.serhieiev.library.model.*;
 import ua.nure.serhieiev.library.service.util.Pagination;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,16 +15,45 @@ import static ua.nure.serhieiev.library.model.User.Role.READER;
 
 public final class OrderService {
 
-    public static Order save(Order order) {
+    public static Order makeOrder(Order order) {
+        User reader = order.getReader();
+        if (reader == null
+                || reader.getId() == null
+                || reader.getRole() != READER
+                || !reader.getEnabled()) {
+            throw new ApplicationException("Bad reader!");
+        }
+        if (order.getBooks() == null || order.getBooks().isEmpty()){
+            throw new ApplicationException("Empty order!");
+        }
+        if (order.getInternal() == null){
+            order.setInternal(false);
+        }
+
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
-            UserDao userDao = df.getUserDao();
-            User reader = userDao.getById(order.getReader().getId());
-            User librarian = userDao.getById(order.getLibrarian().getId());
-            if (reader.getRole() != READER || librarian.getRole() != LIBRARIAN) {
-                throw new ApplicationException("Order must have reader and librarian!");
-            }
-            order.setReader(reader)
+            orderDao.save(order);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return order;
+    }
+
+    public static Order acceptOrder(Order order) {
+        if (order == null || order.getId() == null){
+            throw new ApplicationException("Bad order!");
+        }
+        User librarian = order.getLibrarian();
+        if (librarian == null
+                || librarian.getId() == null
+                || librarian.getRole() != LIBRARIAN
+                || !librarian.getEnabled()) {
+            throw new ApplicationException("Bad librarian!");
+        }
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            OrderDao orderDao = df.getOrderDao();
+            order = orderDao.getById(order.getId());
+            order.setOrderDate(LocalDate.now())
                     .setLibrarian(librarian);
             orderDao.save(order);
         } catch (Exception e) {
@@ -32,20 +62,13 @@ public final class OrderService {
         return order;
     }
 
-    public static Order update(Order order) {
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            OrderDao orderDao = df.getOrderDao();
-            orderDao.update(order);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
+    public static void declineOrder(Order order) {
+        if (order == null || order.getId() == null){
+            throw new ApplicationException("Bad order!");
         }
-        return order;
-    }
-
-    public static void remove(Integer orderId) {
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
-            orderDao.remove(orderId);
+            orderDao.remove(order.getId());
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -65,6 +88,18 @@ public final class OrderService {
             throw new ApplicationException(e);
         }
         return order;
+    }
+
+    public static List<Order> getUnconfirmed() {
+        List<Order> orders;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            OrderDao orderDao = df.getOrderDao();
+            orders = orderDao.getUnconfirmed();
+            fillNestedFields(df, orders);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return orders;
     }
 
     public static List<Order> getAll() {

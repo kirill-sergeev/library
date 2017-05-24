@@ -35,6 +35,11 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
                     " FROM orders o, books_orders bo" +
                     " WHERE o.id = bo.order_id" +
                     " GROUP BY o.id";
+    private static final String SQL_SELECT_UNCONFIRMED_ORDERS =
+            "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
+                    " FROM orders o, books_orders bo" +
+                    " WHERE o.id = bo.order_id AND order_date IS NULL" +
+                    " GROUP BY o.id";
     private static final String SQL_SELECT_ORDER_BY_ID =
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
                     " FROM orders o, books_orders bo" +
@@ -174,6 +179,11 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     public int count(User reader) {
         checkId(reader);
         return count(SQL_COUNT_ORDERS_BY_READER, reader.getId());
+    }
+
+    @Override
+    public List<Order> getUnconfirmed() {
+        return listQuery(SQL_SELECT_UNCONFIRMED_ORDERS);
     }
 
     PgOrderDao(Connection con) {

@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +52,19 @@ public class BookListServlet extends HttpServlet {
         } else {
             bookMap = BookService.getRange(pagination);
         }
+
+
+        Map<LocalDateTime, Integer> globalCart = (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");
         books = bookMap.entrySet().iterator().next().getValue();
+        for (Book book: books){
+            int inCart = Collections.frequency(globalCart.values(), book.getId());
+            System.out.println(book.getAvailable());
+            System.out.println(inCart);
+            book.setAvailable(book.getAvailable() - inCart);
+        }
+
+
+
         booksCount = bookMap.entrySet().iterator().next().getKey();
         int nOfPages = (int) Math.ceil(booksCount/ ((double) pagination.getLimit()));
         request.setAttribute("nOfPages", nOfPages);

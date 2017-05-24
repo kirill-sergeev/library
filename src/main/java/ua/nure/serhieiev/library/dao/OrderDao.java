@@ -10,6 +10,8 @@ public interface OrderDao extends GenericDao<Order>{
 
     int count(User reader);
 
+    List<Order> getUnconfirmed();
+
     List<Order> getRangeByReader(User reader, Pagination pagination);
 
 }

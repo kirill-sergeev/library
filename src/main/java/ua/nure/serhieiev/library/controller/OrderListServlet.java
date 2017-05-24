@@ -1,3 +1,4 @@
+/*
 package ua.nure.serhieiev.library.controller;
 
 import org.slf4j.Logger;
@@ -52,3 +53,4 @@ public class OrderListServlet extends HttpServlet {
         request.getRequestDispatcher(ORDER_LIST_PAGE).forward(request, response);
     }
 }
+*/

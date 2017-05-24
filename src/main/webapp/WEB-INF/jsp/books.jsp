@@ -10,6 +10,7 @@
             <table class="table table-sm table-bordered sortable">
                 <thead>
                 <tr>
+                    <th>id</th>
                     <th>Title</th>
                     <th>Authors</th>
                     <th>Genres</th>
@@ -17,6 +18,7 @@
                     <th>Publication</th>
                     <th>ISBN</th>
                     <th>Available</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -24,6 +26,7 @@
                 <c:forEach items="${books}" var="book">
                     <tr>
                         <th scope="row">${book.title}</th>
+                        <th scope="row">${book.id}</th>
                         <td>
                             <c:forEach items="${book.authors}" var="author" varStatus="status">
                                 ${author.name}<c:if test="${not status.last}">,</c:if>
@@ -38,6 +41,25 @@
                         <td>${book.publicationDate}</td>
                         <td>${book.isbn}</td>
                         <td>${book.available}</td>
+                        <td>
+                            <div class="btn-group">
+                                <form action="<c:url value="/cart.do"/>" method="post">
+                                    <input type="hidden" name="book" value="${book.id}"/>
+                                    <jsp:useBean id="localCart" scope="session" type="java.util.Map<java.lang.Integer, java.time.LocalDateTime>"/>
+                                    <c:if test="${empty localCart.get(book.id)}">
+                                        <button type="submit" name="button" value="add" class="btn btn-danger">Add
+                                        </button>
+                                    </c:if>
+                                    <c:if test="${not empty localCart.get(book.id)}">
+                                        <button type="submit" name="button" value="remove" class="btn btn-danger">
+                                            Remove
+                                        </button>
+                                    </c:if>
+                                    <button type="submit" name="button" value="clear" class="btn btn-danger">Clear
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 </c:forEach>
                 </tbody>

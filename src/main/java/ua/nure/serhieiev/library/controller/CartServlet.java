@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@WebServlet(name = "CartServlet", urlPatterns = "/cart.do")
+import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+
+@WebServlet(name = "CartServlet", urlPatterns = CART_ACTION)
 public class CartServlet extends HttpServlet {
 
     private static final String CART_PAGE = "/WEB-INF/jsp/cart.jsp";
@@ -47,6 +49,10 @@ public class CartServlet extends HttpServlet {
         Map<Integer, LocalDateTime> localCart = getLocalCart(request);
         if (localCart.containsKey(bookId)) {
             request.setAttribute("alert", "You already add this book to cart!");
+            return;
+        }
+        if (localCart.size() > 10) {
+            request.setAttribute("alert", "Limit 10 books for reader!");
             return;
         }
         try {
@@ -82,12 +88,26 @@ public class CartServlet extends HttpServlet {
         localCart.clear();
     }
 
-    private void makeOrder(HttpServletRequest request, HttpServletResponse response) {
+    private List<Book> getCartContent(HttpServletRequest request) {
+        Map<LocalDateTime, Integer> globalCart = getGlobalCart();
+        Map<Integer, LocalDateTime> localCart = getLocalCart(request);
+        localCart.keySet().retainAll(globalCart.values());
+
+        List<Book> books = new ArrayList<>();
+        for (Integer id : localCart.keySet()) {
+            Book book = BookService.getById(id);
+            books.add(book);
+        }
+        return books;
+    }
+
+    private void makeOrder(HttpServletRequest request) {
         Boolean internal = Boolean.valueOf(request.getParameter("internal"));
         User user = (User) request.getSession().getAttribute("user");
         Order order = new Order()
                 .setReader(user)
-                .setInternal(internal);
+                .setInternal(internal)
+                .setBooks(getCartContent(request));
         OrderService.makeOrder(order);
     }
 
@@ -103,24 +123,17 @@ public class CartServlet extends HttpServlet {
                 break;
             case "clear":
                 clearCart(request, response);
+                break;
             case "order":
-                makeOrder(request, response);
+                makeOrder(request);
                 clearCart(request, response);
         }
-        doGet(request, response);
+        getCartContent(request);
+        request.getRequestDispatcher(BOOK_LIST_ACTION).forward(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Map<LocalDateTime, Integer> globalCart = getGlobalCart();
-        Map<Integer, LocalDateTime> localCart = getLocalCart(request);
-
-        localCart.keySet().retainAll(globalCart.values());
-
-        List<Book> books = new ArrayList<>();
-        for (Integer id : localCart.keySet()) {
-            books.add(BookService.getById(id));
-        }
-        request.setAttribute("books", books);
+        request.setAttribute("books", getCartContent(request));
         request.getRequestDispatcher(CART_PAGE).forward(request, response);
     }
 

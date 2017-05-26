@@ -6,32 +6,49 @@
 
 <div class="container">
     <div class="row">
-        <table class="table table-sm table-bordered sortable">
-            <thead>
-            <tr>
-                <th>Reader</th>
-                <th>Books</th>
-                <th>Order Date</th>
-                <th>Expected Date</th>
-                <th>Return Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${orders}" var="order">
-                <tr>
-                    <th>${order.reader.name}</th>
-                    <th>
-                        <c:forEach items="${order.books}" var="book">
-                            <a href="<c:url value="books.do?id=${book.id}"/>">${book.title}</a><br>
-                        </c:forEach>
-                    </th>
-                    <td>${order.orderDate}</td>
-                    <td>${order.expectedReturnDate}</td>
-                    <td>${order.returnDate}</td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+        <c:choose>
+            <c:when test="${not empty orders}">
+                <table class="table table-sm table-bordered sortable">
+                    <thead>
+                    <tr>
+                        <th>Reader</th>
+                        <th>Books</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach items="${orders}" var="order">
+                        <tr>
+                            <th>${order.reader.name}</th>
+                            <th>
+                                <c:forEach items="${order.books}" var="book">
+                                    <a href="<c:url value="books.do?id=${book.id}"/>">${book.title}</a><br>
+                                </c:forEach>
+                            </th>
+                            <td>
+                                <div class="btn-group">
+                                    <form action="<c:url value="/unconfirmed-orders.do"/>" method="post">
+                                        <input type="hidden" name="order" value="${order.id}"/>
+                                        <button type="submit" name="button" value="accept" class="btn btn-danger">
+                                            Accept
+                                        </button>
+                                        <button type="submit" name="button" value="decline" class="btn btn-danger">
+                                            Decline
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </c:when>
+            <c:otherwise>
+                <div class="alert alert-info">
+                    No unconfirmed orders!
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
 

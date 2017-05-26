@@ -28,7 +28,7 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     private static final String SQL_COUNT_BOOKS_BY_GENRE = "SELECT count(*) FROM books_genres WHERE genre_id = ?";
     private static final String SQL_COUNT_BOOKS_BY_PUBLISHER = "SELECT count(*) FROM books WHERE publisher_id = ?";
     private static final String SQL_CREATE_BOOK = "INSERT INTO books (title, quantity, publisher_id, publication_date, description, isbn) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String SQL_UPDATE_BOOK = "UPDATE books SET title = ? quantity = ?, available = ?, publisher_id = ?, publication_date = ?, description = ?, isbn = ? WHERE id = ?";
+    private static final String SQL_UPDATE_BOOK = "UPDATE books SET title = ?, quantity = ?, available = ?, publisher_id = ?, publication_date = ?, description = ?, isbn = ? WHERE id = ?";
     private static final String SQL_INSERT_AUTHOR_INTO_BOOK = "INSERT INTO books_authors(book_id, author_id) VALUES (?, ?)";
     private static final String SQL_INSERT_GENRE_INTO_BOOK = "INSERT INTO books_genres(book_id, genre_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_AUTHORS_FROM_BOOK = "DELETE FROM books_authors VALUES WHERE book_id = ?";
@@ -105,9 +105,6 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
             }
         } catch (SQLException e) {
             throw new DaoException(e);
-        }
-        if (list.isEmpty()) {
-            throw new NotFoundException();
         }
         return list;
     }

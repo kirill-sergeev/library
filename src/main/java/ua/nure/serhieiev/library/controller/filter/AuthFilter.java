@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.User.Role.*;
 
-//@WebFilter(filterName = "AuthFilter", urlPatterns = {"*.do"})
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"*.do"})
 public class AuthFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthFilter.class);
@@ -56,7 +56,6 @@ public class AuthFilter implements Filter {
             user = setUserRole(req);
         }
 
-        System.out.println(Arrays.toString(Action.values()));
         for (Action action : Action.values()) {
             if (req.getServletPath().contains(action.getPath())) {
                 for (User.Role role : action.getAllowedUsers()) {

@@ -48,9 +48,6 @@ public class PgPublisherDao extends JdbcDao<Publisher> implements PublisherDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-        if (list.isEmpty()) {
-            throw new NotFoundException();
-        }
         return list;
     }
 

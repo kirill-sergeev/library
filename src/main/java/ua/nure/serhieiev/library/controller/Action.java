@@ -9,6 +9,13 @@ import static ua.nure.serhieiev.library.model.User.Role.*;
 
 public enum Action{
 
+    BOOK_LIST(BOOK_LIST_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    ORDER_LIST(ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
+    UNCONFIRMED_ORDER_LIST(UNCONFIRMED_ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
+    CURRENT_ORDER_LIST(CURRENT_ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
+    CART(CART_ACTION, READER),
+
+
     REGISTER(REGISTER_ACTION, GUEST),
 
     LOGIN(LOGIN_ACTION, GUEST),
@@ -41,22 +48,28 @@ public enum Action{
                 "} " + super.toString();
     }
 
-    public static class Constants {
-        public static final String REGISTER_ACTION = "/register.do";
-        public static final String LOGIN_ACTION = "/login.do";
-        public static final String ACTIVATE_ACTION = "/activate.do";
-        public static final String RESET_ACTION = "/reset.do";
-        public static final String LOGOUT_ACTION = "/logout.do";
-        public static final String MAIN_ACTION = "/";
-        public static final String READER_LIST_ACTION = "/admin/readers.do";
-        public static final String LIBRARIAN_LIST_ACTION = "/admin/librarians.do";
-        public static final String REGISTER_LIBRARIAN_ACTION = "/admin/new-librarian.do";
-        public static final String BOOK_LIST_ACTION = "/books.do";
-        public static final String USER_PROFILE_ACTION = "/user.do";
-        public static final String GENRE_LIST_ACTION = "/genres.do";
+    public interface Constants {
+        String LOGIN_ACTION = "/login.do";
+        String BOOK_LIST_ACTION = "/books.do";
+        String ORDER_LIST_ACTION = "/orders.do";
+        String UNCONFIRMED_ORDER_LIST_ACTION = "/unconfirmed-orders.do";
+        String CURRENT_ORDER_LIST_ACTION = "/current-orders.do";
+        String CART_ACTION = "/cart.do";
 
-        private Constants() {
-        }
+
+        String REGISTER_ACTION = "/register.do";
+
+        String ACTIVATE_ACTION = "/activate.do";
+        String RESET_ACTION = "/reset.do";
+        String LOGOUT_ACTION = "/logout.do";
+        String MAIN_ACTION = "/";
+        String READER_LIST_ACTION = "/admin/readers.do";
+        String LIBRARIAN_LIST_ACTION = "/admin/librarians.do";
+        String REGISTER_LIBRARIAN_ACTION = "/admin/new-librarian.do";
+
+        String USER_PROFILE_ACTION = "/user.do";
+        String GENRE_LIST_ACTION = "/genres.do";
+
     }
 
 }

@@ -147,7 +147,7 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         if (list.isEmpty()) {
             throw new NotFoundException();
         } else if (list.size() > 1) {
-            throw new DaoException("Query returned several values, one expected.");
+            throw new DaoException("Query returned several values, but one expected.");
         }
         return list.get(0);
     }

@@ -32,6 +32,10 @@ public class BookListServlet extends HttpServlet {
     private static final String BOOK_LIST_PAGE = "/WEB-INF/jsp/books.jsp";
 
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request,response);
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Map<Integer, List<Book>> bookMap;
@@ -58,8 +62,6 @@ public class BookListServlet extends HttpServlet {
         books = bookMap.entrySet().iterator().next().getValue();
         for (Book book: books){
             int inCart = Collections.frequency(globalCart.values(), book.getId());
-            System.out.println(book.getAvailable());
-            System.out.println(inCart);
             book.setAvailable(book.getAvailable() - inCart);
         }
 

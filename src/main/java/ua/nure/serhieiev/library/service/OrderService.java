@@ -5,10 +5,7 @@ import ua.nure.serhieiev.library.model.*;
 import ua.nure.serhieiev.library.service.util.Pagination;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
 import static ua.nure.serhieiev.library.model.User.Role.READER;
@@ -23,16 +20,26 @@ public final class OrderService {
                 || !reader.getEnabled()) {
             throw new ApplicationException("Bad reader!");
         }
-        if (order.getBooks() == null || order.getBooks().isEmpty()){
+        if (order.getBooks() == null || order.getBooks().isEmpty()) {
             throw new ApplicationException("Empty order!");
         }
-        if (order.getInternal() == null){
+        if (order.getInternal() == null) {
             order.setInternal(false);
         }
 
-        try (DaoFactory df = DaoFactory.getInstance()) {
+        try (DaoFactory df = DaoFactory.getInstance();
+             TransactionManager tm = df.getTransactionManager()) {
             OrderDao orderDao = df.getOrderDao();
+            BookDao bookDao = df.getBookDao();
+
+            tm.start();
             orderDao.save(order);
+
+            for (Book book : order.getBooks()) {
+                book = bookDao.getById(book.getId());
+                book.setAvailable(book.getAvailable() - 1);
+                bookDao.update(book);
+            }
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -40,7 +47,7 @@ public final class OrderService {
     }
 
     public static Order acceptOrder(Order order) {
-        if (order == null || order.getId() == null){
+        if (order == null || order.getId() == null) {
             throw new ApplicationException("Bad order!");
         }
         User librarian = order.getLibrarian();
@@ -52,10 +59,11 @@ public final class OrderService {
         }
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
+
             order = orderDao.getById(order.getId());
-            order.setOrderDate(LocalDate.now())
-                    .setLibrarian(librarian);
-            orderDao.save(order);
+            order.setOrderDate(LocalDate.now());
+            order.setLibrarian(librarian);
+            orderDao.update(order);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -63,12 +71,47 @@ public final class OrderService {
     }
 
     public static void declineOrder(Order order) {
-        if (order == null || order.getId() == null){
+        if (order == null || order.getId() == null) {
             throw new ApplicationException("Bad order!");
         }
-        try (DaoFactory df = DaoFactory.getInstance()) {
+        try (DaoFactory df = DaoFactory.getInstance();
+             TransactionManager tm = df.getTransactionManager()) {
             OrderDao orderDao = df.getOrderDao();
+            BookDao bookDao = df.getBookDao();
+
+            tm.start();
+            order = orderDao.getById(order.getId());
             orderDao.remove(order.getId());
+
+            for (Book book : order.getBooks()) {
+                book = bookDao.getById(book.getId());
+                book.setAvailable(book.getAvailable() + 1);
+                bookDao.update(book);
+            }
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    public static void returnOrder(Order order) {
+        if (order == null || order.getId() == null) {
+            throw new ApplicationException("Bad order!");
+        }
+        try (DaoFactory df = DaoFactory.getInstance();
+             TransactionManager tm = df.getTransactionManager()) {
+            OrderDao orderDao = df.getOrderDao();
+            BookDao bookDao = df.getBookDao();
+
+            tm.start();
+            order = orderDao.getById(order.getId());
+            order.setReturnDate(LocalDate.now());
+            orderDao.update(order);
+
+            for (Book book : order.getBooks()) {
+                book = bookDao.getById(book.getId());
+                book.setAvailable(book.getAvailable() + 1);
+                bookDao.update(book);
+            }
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -118,6 +161,23 @@ public final class OrderService {
         return getRange(pagination, null);
     }
 
+    public static Map<Integer, List<Order>> getRangeCurrent(Pagination pagination) {
+        Map<Integer, List<Order>> orderMap = new HashMap<>(1);
+        List<Order> orders;
+        Integer count;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            OrderDao orderDao = df.getOrderDao();
+            count = orderDao.count();
+            checkPagination(pagination, count);
+            orders = orderDao.getRangeCurrent(pagination);
+            fillNestedFields(df, orders);
+            orderMap.put(count, orders);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return orderMap;
+    }
+
     public static Map<Integer, List<Order>> getRangeByReader(Pagination pagination, User reader) {
         return getRange(pagination, reader);
     }
@@ -159,7 +219,12 @@ public final class OrderService {
 
         for (Order order : orders) {
             User reader = userDao.getById(order.getReader().getId());
-            User librarian = userDao.getById(order.getLibrarian().getId());
+
+            User librarian = null;
+            if (order.getLibrarian() != null) {
+                librarian = userDao.getById(order.getLibrarian().getId());
+            }
+
             List<Book> books = new ArrayList<>();
             for (Book book : order.getBooks()) {
                 books.add(bookDao.getById(book.getId()));

@@ -48,9 +48,6 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-        if (list.isEmpty()) {
-            throw new NotFoundException();
-        }
         return list;
     }
 

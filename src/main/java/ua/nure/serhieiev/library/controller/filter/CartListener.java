@@ -90,8 +90,6 @@ public class CartListener implements ServletContextListener,
     }
 
     public void requestInitialized(ServletRequestEvent sre) {
-        System.out.println("request + "+ sre.getServletRequest().getAttribute("globalCart")+
-                sre.getServletRequest().getParameter("globalCart"));
     }
 
 

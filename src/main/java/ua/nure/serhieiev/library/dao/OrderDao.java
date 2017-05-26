@@ -12,6 +12,8 @@ public interface OrderDao extends GenericDao<Order>{
 
     List<Order> getUnconfirmed();
 
+    List<Order> getRangeCurrent(Pagination pagination);
+
     List<Order> getRangeByReader(User reader, Pagination pagination);
 
 }

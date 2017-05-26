@@ -53,9 +53,6 @@ public class PgFineDao extends JdbcDao<Fine> implements FineDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-        if (list.isEmpty()) {
-            throw new NotFoundException();
-        }
         return list;
     }
 

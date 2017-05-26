@@ -25,7 +25,6 @@ public class LoginServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoginServlet.class);
     private static final String LOGIN_PAGE = "/WEB-INF/jsp/login.jsp";
-    private final String authToken = UUID.randomUUID().toString();
 
     private void login(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,9 +36,10 @@ public class LoginServlet extends HttpServlet {
                 .setPassword(password);
         try {
             if (remember) {
+                String authToken = UUID.randomUUID().toString();
                 user.setAuthToken(authToken);
                 user = UserService.authenticate(user);
-                setCookie(request, response);
+                setCookie(request, response , authToken);
             } else {
                 user = UserService.authenticate(user);
             }
@@ -54,7 +54,7 @@ public class LoginServlet extends HttpServlet {
         response.sendRedirect(MAIN_ACTION);
     }
 
-    private void setCookie(HttpServletRequest request, HttpServletResponse response) {
+    private void setCookie(HttpServletRequest request, HttpServletResponse response, String authToken) {
         Cookie loginCookie = new Cookie(AuthFilter.LOGIN_COOKIE, authToken);
         loginCookie.setPath(request.getContextPath());
         loginCookie.setMaxAge(24 * 60 * 60);

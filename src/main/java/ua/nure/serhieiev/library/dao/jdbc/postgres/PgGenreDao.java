@@ -49,9 +49,6 @@ public class PgGenreDao extends JdbcDao<Genre> implements GenreDao {
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-        if (list.isEmpty()) {
-            throw new NotFoundException();
-        }
         return list;
     }
 

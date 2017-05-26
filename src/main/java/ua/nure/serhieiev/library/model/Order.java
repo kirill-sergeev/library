@@ -9,7 +9,6 @@ public class Order implements Identified{
     User reader;
     User librarian;
     LocalDate orderDate;
-    LocalDate expectedReturnDate;
     LocalDate returnDate;
     Boolean internal;
     List<Book> books;
@@ -52,15 +51,6 @@ public class Order implements Identified{
         return this;
     }
 
-    public LocalDate getExpectedReturnDate() {
-        return expectedReturnDate;
-    }
-
-    public Order setExpectedReturnDate(LocalDate expectedReturnDate) {
-        this.expectedReturnDate = expectedReturnDate;
-        return this;
-    }
-
     public LocalDate getReturnDate() {
         return returnDate;
     }
@@ -95,7 +85,6 @@ public class Order implements Identified{
                 ", reader=" + reader +
                 ", librarian=" + librarian +
                 ", orderDate=" + orderDate +
-                ", expectedReturnDate=" + expectedReturnDate +
                 ", returnDate=" + returnDate +
                 ", internal=" + internal +
                 ", books=" + books +

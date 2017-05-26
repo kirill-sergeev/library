@@ -1,4 +1,4 @@
-package ua.nure.serhieiev.library.model;
+package ua.nure.serhieiev.library.model.entities;
 
 public class Fine implements Identified{
 

@@ -14,7 +14,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <%--@elvariable id="genres" type="java.util.List<ua.nure.serhieiev.library.model.Book>"--%>
+                <%--@elvariable id="genres" type="java.util.List<ua.nure.serhieiev.library.model.entities.Book>"--%>
                 <c:forEach items="${genres}" var="genre">
                     <tr>
                         <th scope="row">

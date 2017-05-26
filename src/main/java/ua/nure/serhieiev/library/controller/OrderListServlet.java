@@ -4,10 +4,10 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
-import ua.nure.serhieiev.library.model.Order;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.BOOK_LIST_ACTION;
-import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 
 @WebServlet(name = "OrderListServlet", urlPatterns = "/orders.do")
 public class OrderListServlet extends HttpServlet {

@@ -1,11 +1,13 @@
 package ua.nure.serhieiev.library.dao;
 
-import ua.nure.serhieiev.library.model.Identified;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Identified;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.List;
 
 public interface GenericDao<T extends Identified> {
+
+    Integer count();
 
     T getById(Integer id);
 
@@ -17,8 +19,6 @@ public interface GenericDao<T extends Identified> {
 
     List<T> getAll();
 
-    List<T> getRange(Pagination pagination);
-
-    int count();
+    List<T> getAll(Pagination pagination);
 
 }

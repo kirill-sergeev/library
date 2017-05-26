@@ -2,10 +2,10 @@ package ua.nure.serhieiev.library.controller;
 
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.controller.util.Validator;
-import ua.nure.serhieiev.library.model.Order;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -38,22 +38,24 @@ public class OrderServlet extends HttpServlet {
     private void getAllOrders(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
-        Map<Integer, List<Order>> ordersMap = OrderService.getRange(pagination);
-        List<Order> orders = ordersMap.entrySet().iterator().next().getValue();
-        int ordersCount = ordersMap.entrySet().iterator().next().getKey();
-        int nOfPages = (int) Math.ceil(ordersCount/ ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        List<Order> orders = OrderService.getRange(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("orders", orders);
     }
 
     private void getCurrentOrders(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
-        Map<Integer, List<Order>> ordersMap = OrderService.getRangeCurrent(pagination);
-        List<Order> orders = ordersMap.entrySet().iterator().next().getValue();
-        int ordersCount = ordersMap.entrySet().iterator().next().getKey();
-        int nOfPages = (int) Math.ceil(ordersCount/ ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        List<Order> orders = OrderService.getCurrent(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
+        request.setAttribute("orders", orders);
+    }
+
+    private void getUnconfirmedOrders(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Pagination pagination = PaginationMapper.getPagination(request);
+        List<Order> orders = OrderService.getUnconfirmed(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("orders", orders);
     }
 
@@ -82,7 +84,7 @@ public class OrderServlet extends HttpServlet {
         String path = request.getServletPath();
         switch (path) {
             case UNCONFIRMED_ORDER_LIST_ACTION:
-                request.setAttribute("orders", OrderService.getUnconfirmed());
+                getUnconfirmedOrders(request, response);
                 request.getRequestDispatcher(UNCONFIRMED_ORDER_LIST_PAGE).forward(request, response);
                 return;
             case CURRENT_ORDER_LIST_ACTION:

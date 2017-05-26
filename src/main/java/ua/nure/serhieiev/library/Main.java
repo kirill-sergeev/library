@@ -1,17 +1,15 @@
 package ua.nure.serhieiev.library;
 
 import ua.nure.serhieiev.library.dao.*;
-import ua.nure.serhieiev.library.model.*;
+import ua.nure.serhieiev.library.model.entities.Author;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.entities.Genre;
+import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.BookService;
-import ua.nure.serhieiev.library.service.util.Pagination;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Main {
 
@@ -69,9 +67,9 @@ public class Main {
 
 
      /*   Pagination pagination = new Pagination().setAscending(true).setLimit(10).setOffset(0).setSortBy("id");
-        System.out.println(BookService.getRangeByAuthor(new Author().setId(10),pagination));*/
+        System.out.println(BookService.getByAuthor(new Author().setId(10),pagination));*/
 
-       // System.out.println(BookService.getRange(1, BookService.Field.TITLE, true, 2));
+       // System.out.println(BookService.getAll(1, BookService.Field.TITLE, true, 2));
     }
 
     public static void main2(String[] args) {

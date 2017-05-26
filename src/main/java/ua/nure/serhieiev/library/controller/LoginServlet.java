@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.filter.AuthFilter;
 import ua.nure.serhieiev.library.controller.util.Alert;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.UserService;
 

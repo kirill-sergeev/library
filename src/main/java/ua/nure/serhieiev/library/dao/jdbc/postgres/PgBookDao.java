@@ -1,11 +1,13 @@
 package ua.nure.serhieiev.library.dao.jdbc.postgres;
 
 import ua.nure.serhieiev.library.dao.DaoException;
-import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.BookDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
-import ua.nure.serhieiev.library.model.*;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Author;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.entities.Genre;
+import ua.nure.serhieiev.library.model.entities.Publisher;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -42,6 +44,13 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
             "SELECT b.*, array_agg(DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
                     " FROM books b, books_authors ba, books_genres bg" +
                     " WHERE b.id = ba.book_id AND b.id = bg.book_id AND b.id = ?" +
+                    " GROUP BY b.id";
+    private static final String SQL_SELECT_BOOK_BY_AUTHOR = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_authors WHERE author_id = ?)";
+    private static final String SQL_SELECT_BOOK_BY_GENRE = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_genres WHERE genre_id = ?)";
+    private static final String SQL_SELECT_BOOK_BY_PUBLISHER =
+            "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
+                    " FROM books b, books_authors ba, books_genres bg, authors a, genres g" +
+                    " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = ?" +
                     " GROUP BY b.id";
 
 
@@ -200,58 +209,36 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     }
 
     @Override
-    public List<Book> getRangeByAuthor(Author author, Pagination pagination) {
-        checkId(author);
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "name" : pagination.getSortBy();
-        String sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_authors WHERE author_id = ?)" + " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        return listQuery(sql, author.getId(), limit, offset);
+    public List<Book> getByAuthor(Pagination pagination, Integer authorId) {
+        checkId(authorId);
+        pagination.setNumberOfItems(countByAuthor(authorId));
+        return getAll(pagination, SQL_SELECT_BOOK_BY_AUTHOR, authorId);
     }
 
     @Override
-    public List<Book> getRangeByGenre(Genre genre, Pagination pagination) {
-        checkId(genre);
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-        String sql = "SELECT * FROM books WHERE id IN (SELECT book_id FROM books_genres WHERE genre_id = ?)" + " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        return listQuery(sql, genre.getId(), limit, offset);
+    public List<Book> getByGenre(Pagination pagination, Integer genreId) {
+        checkId(genreId);
+        pagination.setNumberOfItems(countByGenre(genreId));
+        return getAll(pagination, SQL_SELECT_BOOK_BY_GENRE, genreId);
     }
 
     @Override
-    public List<Book> getRangeByPublisher(Publisher publisher, Pagination pagination) {
-        checkId(publisher);
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? "title" : pagination.getSortBy();
-        String sql = "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
-                " FROM books b, books_authors ba, books_genres bg, authors a, genres g" +
-                " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = ?" +
-                " GROUP BY b.id" +
-                " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        return listQuery(sql, publisher.getId(), limit, offset);
+    public List<Book> getByPublisher(Pagination pagination, Integer publisherId) {
+        checkId(publisherId);
+        pagination.setNumberOfItems(countByPublisher(publisherId));
+        return getAll(pagination, SQL_SELECT_BOOK_BY_PUBLISHER, publisherId);
     }
 
-    @Override
-    public int count(Author author) {
-        checkId(author);
-        return count(SQL_COUNT_BOOKS_BY_AUTHOR, author.getId());
+    private int countByAuthor(Integer authorId) {
+        return count(SQL_COUNT_BOOKS_BY_AUTHOR, authorId);
     }
 
-    @Override
-    public int count(Genre genre) {
-        checkId(genre);
-        return count(SQL_COUNT_BOOKS_BY_GENRE, genre.getId());
+    private int countByGenre(Integer genreId) {
+        return count(SQL_COUNT_BOOKS_BY_GENRE, genreId);
     }
 
-    @Override
-    public int count(Publisher publisher) {
-        checkId(publisher);
-        return count(SQL_COUNT_BOOKS_BY_PUBLISHER, publisher.getId());
+    private int countByPublisher(Integer publisherId) {
+        return count(SQL_COUNT_BOOKS_BY_PUBLISHER, publisherId);
     }
 
     PgBookDao(Connection con) {

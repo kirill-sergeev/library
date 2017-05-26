@@ -3,7 +3,7 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.Alert;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.UserService;
 import ua.nure.serhieiev.library.service.util.EmailUtil;
@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 

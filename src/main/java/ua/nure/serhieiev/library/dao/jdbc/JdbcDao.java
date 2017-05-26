@@ -3,9 +3,8 @@ package ua.nure.serhieiev.library.dao.jdbc;
 import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.GenericDao;
 import ua.nure.serhieiev.library.dao.NotFoundException;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Identified;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Identified;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.*;
@@ -19,17 +18,24 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     protected Connection con;
 
 
-    protected String getSelectQuery(){
-        return String.format( "SELECT * FROM %s WHERE id = ?", getTableName());
+    protected String getSelectQuery() {
+        return String.format("SELECT * FROM %s WHERE id = ?", getTableName());
     }
-    protected String getSelectAllQuery(){
+
+    protected String getSelectAllQuery() {
         return String.format("SELECT * FROM %s", getTableName());
     }
+
     protected abstract String getCreateQuery();
+
     protected abstract String getUpdateQuery();
+
     protected abstract String[] getSortFields();
+
     protected abstract List<T> parseResultSet(ResultSet rs);
+
     protected abstract void prepareStatementForInsert(PreparedStatement st, T object);
+
     protected abstract void prepareStatementForUpdate(PreparedStatement st, T object);
 
     @SuppressWarnings("unchecked")
@@ -37,20 +43,6 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
         this.entityClass = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
         this.con = con;
-    }
-
-    @Override
-    public int count() {
-        int count;
-        String sql = String.format("SELECT count(*) FROM %s", getTableName());
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
     }
 
     @Override
@@ -90,9 +82,7 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
 
     @Override
     public void remove(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Entity is not created yet, ID is null.");
-        }
+        checkId(id);
         String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
         try (PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, id);
@@ -106,6 +96,7 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
 
     @Override
     public T getById(Integer id) {
+        checkId(id);
         return singleQuery(getSelectQuery(), id);
     }
 
@@ -115,17 +106,51 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     }
 
     @Override
-    public List<T> getRange(Pagination pagination) {
+    public List<T> getAll(Pagination pagination) {
+        return getAll(pagination, null);
+    }
+
+    protected List<T> getAll(Pagination pagination, String sql, Object... params) {
         int limit = pagination.getLimit();
         int offset = pagination.getOffset();
         String order = pagination.isAscending() ? "" : "DESC";
         String sortBy = pagination.getSortBy();
         String[] sortedFields = getSortFields();
-        if (sortBy == null || sortBy.isEmpty() || Arrays.binarySearch(sortedFields, sortBy) == -1){
-            sortBy = sortedFields[sortedFields.length-1];
+        if (sortBy == null || sortBy.isEmpty() || Arrays.binarySearch(sortedFields, sortBy) == -1) {
+            sortBy = sortedFields[0];
         }
-        String sql = String.format("%s ORDER BY %s %s LIMIT ? OFFSET ?", getSelectAllQuery(), sortBy, order);
-        return listQuery(sql, limit, offset);
+        String sqlWithPagination = String.format("%s ORDER BY %s %s LIMIT ? OFFSET ?",
+                sql == null ? getSelectAllQuery() : sql, sortBy, order);
+        if (pagination.getNumberOfItems() == null) {
+            pagination.setNumberOfItems(count());
+        }
+        Object[] returnParams = Arrays.copyOf(params, params.length + 2);
+        returnParams[params.length] = limit;
+        returnParams[params.length + 1] = offset;
+        return listQuery(sqlWithPagination, returnParams);
+    }
+
+    @Override
+    public Integer count() {
+        return count(null);
+    }
+
+    protected Integer count(String sql, Object... params) {
+        if (sql == null || sql.isEmpty()) {
+            sql = String.format("SELECT count(*) FROM %s", getTableName());
+        }
+        int count;
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                st.setObject(i + 1, params[i]);
+            }
+            ResultSet rs = st.executeQuery();
+            rs.next();
+            count = rs.getInt(1);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        return count;
     }
 
     protected List<T> listQuery(String sql, Object... params) {
@@ -152,19 +177,6 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         return list.get(0);
     }
 
-    protected int count(String sql, Integer id){
-        int count;
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            count = rs.getInt(1);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-        return count;
-    }
-
     protected static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columns = metaData.getColumnCount();
@@ -176,7 +188,13 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
         return false;
     }
 
-    protected static void checkId(Identified object){
+    protected static void checkId(Integer id) {
+        if (id == null || id < 1) {
+            throw new IllegalArgumentException("Entity must contains ID.");
+        }
+    }
+
+    protected static void checkId(Identified object) {
         if (object == null || object.getId() == null || object.getId() < 1) {
             throw new IllegalArgumentException("Entity must contains ID.");
         }

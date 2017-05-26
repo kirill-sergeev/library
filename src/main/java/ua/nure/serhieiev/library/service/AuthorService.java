@@ -3,8 +3,8 @@ package ua.nure.serhieiev.library.service;
 import ua.nure.serhieiev.library.dao.DaoFactory;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.AuthorDao;
-import ua.nure.serhieiev.library.model.Author;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Author;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.*;
 
@@ -31,7 +31,7 @@ public class AuthorService {
             AuthorDao authorDao = df.getAuthorDao();
             count = authorDao.count();
             checkPagination(pagination, count);
-            authors = authorDao.getRange(pagination);
+            authors = authorDao.getAll(pagination);
             authorsMap.put(count, authors);
         } catch (Exception e) {
             throw new ApplicationException(e);

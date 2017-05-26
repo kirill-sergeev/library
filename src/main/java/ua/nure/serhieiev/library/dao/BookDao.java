@@ -1,24 +1,15 @@
 package ua.nure.serhieiev.library.dao;
-import ua.nure.serhieiev.library.model.Author;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.model.Publisher;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.List;
 
 public interface BookDao extends GenericDao<Book> {
 
-    int count(Author author);
+    List<Book> getByAuthor(Pagination pagination, Integer authorId);
 
-    int count(Genre genre);
+    List<Book> getByGenre(Pagination pagination, Integer genreId);
 
-    int count(Publisher publisher);
-
-    List<Book> getRangeByAuthor(Author author, Pagination pagination);
-
-    List<Book> getRangeByGenre(Genre genre, Pagination pagination);
-
-    List<Book> getRangeByPublisher(Publisher publisher, Pagination pagination);
+    List<Book> getByPublisher(Pagination pagination, Integer publisherId);
 
 }

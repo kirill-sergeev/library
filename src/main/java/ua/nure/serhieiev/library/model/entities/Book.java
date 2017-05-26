@@ -1,4 +1,4 @@
-package ua.nure.serhieiev.library.model;
+package ua.nure.serhieiev.library.model.entities;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,6 +1,6 @@
 package ua.nure.serhieiev.library.service.util;
 
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
 
 import javax.mail.Message;

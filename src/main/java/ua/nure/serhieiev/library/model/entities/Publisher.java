@@ -1,6 +1,6 @@
-package ua.nure.serhieiev.library.model;
+package ua.nure.serhieiev.library.model.entities;
 
-public class Genre implements Identified {
+public class Publisher implements Identified {
 
     Integer id;
     String title;
@@ -11,7 +11,7 @@ public class Genre implements Identified {
     }
 
     @Override
-    public Genre setId(Integer id) {
+    public Publisher setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -20,14 +20,14 @@ public class Genre implements Identified {
         return title;
     }
 
-    public Genre setTitle(String title) {
+    public Publisher setTitle(String title) {
         this.title = title;
         return this;
     }
 
     @Override
     public String toString() {
-        return "Genre{" +
+        return "Publisher{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 '}';

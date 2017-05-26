@@ -2,10 +2,10 @@ package ua.nure.serhieiev.library.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ua.nure.serhieiev.library.model.Author;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.model.Publisher;
+import ua.nure.serhieiev.library.model.entities.Author;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.entities.Genre;
+import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.BookService;
 
 import javax.servlet.ServletException;

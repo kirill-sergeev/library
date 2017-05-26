@@ -1,19 +1,17 @@
 package ua.nure.serhieiev.library.dao;
 
-import ua.nure.serhieiev.library.model.Order;
-import ua.nure.serhieiev.library.model.User;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.List;
 
 public interface OrderDao extends GenericDao<Order>{
 
-    int count(User reader);
+    List<Order> getUnconfirmed(Pagination pagination);
 
-    List<Order> getUnconfirmed();
+    List<Order> getCurrent(Pagination pagination);
 
-    List<Order> getRangeCurrent(Pagination pagination);
-
-    List<Order> getRangeByReader(User reader, Pagination pagination);
+    List<Order> getByReader(Pagination pagination, Integer readerId);
 
 }

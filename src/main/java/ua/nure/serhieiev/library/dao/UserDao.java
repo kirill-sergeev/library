@@ -1,6 +1,6 @@
 package ua.nure.serhieiev.library.dao;
 
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.User;
 
 import java.util.List;
 

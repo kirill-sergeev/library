@@ -1,14 +1,12 @@
 package ua.nure.serhieiev.library.dao.jdbc.postgres;
 
 import ua.nure.serhieiev.library.dao.DaoException;
-import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Order;
-import ua.nure.serhieiev.library.model.Publisher;
-import ua.nure.serhieiev.library.model.User;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,6 +22,8 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     private static final String BOOKS = "books";
     private static final String[] SORT_FIELDS = {INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
 
+    private static final String SQL_COUNT_CURRENT_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NULL";
+    private static final String SQL_COUNT_UNCONFIRMED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NULL";
     private static final String SQL_COUNT_ORDERS_BY_READER = "SELECT count(*) FROM orders WHERE reader_id = ?";
     private static final String SQL_CREATE_ORDER = "INSERT INTO orders (reader_id, internal) VALUES (?, ?)";
     private static final String SQL_UPDATE_ORDER = "UPDATE orders SET librarian_id = ?, order_date = ?, return_date = ? WHERE id = ?";
@@ -33,6 +33,11 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
                     " FROM orders o, books_orders bo" +
                     " WHERE o.id = bo.order_id" +
+                    " GROUP BY o.id";
+    private static final String SQL_SELECT_ORDER_BY_ID =
+            "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
+                    " FROM orders o, books_orders bo" +
+                    " WHERE o.id = bo.order_id AND o.id = ?" +
                     " GROUP BY o.id";
     private static final String SQL_SELECT_UNCONFIRMED_ORDERS =
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
@@ -44,10 +49,10 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
                     " FROM orders o, books_orders bo" +
                     " WHERE o.id = bo.order_id AND order_date IS NOT NULL AND return_date IS NULL" +
                     " GROUP BY o.id";
-    private static final String SQL_SELECT_ORDER_BY_ID =
+    private static final String SQL_SELECT_ORDERS_BY_READER =
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
                     " FROM orders o, books_orders bo" +
-                    " WHERE o.id = bo.order_id AND o.id = ?" +
+                    " WHERE o.id = bo.order_id AND o.reader_id = ?" +
                     " GROUP BY o.id";
 
     @Override
@@ -165,39 +170,35 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     }
 
     @Override
-    public List<Order> getRangeByReader(User reader, Pagination pagination) {
-        checkId(reader);
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? ORDER_DATE : pagination.getSortBy();
-        String sql = "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
-                " FROM orders o, books_orders bo" +
-                " WHERE o.id = bo.order_id AND reader_id = ?" +
-                " GROUP BY o.id" +
-                " ORDER BY " + sortBy + order + " LIMIT ? OFFSET ?";
-        return listQuery(sql, reader.getId(), limit, offset);
+    public List<Order> getByReader(Pagination pagination, Integer readerId) {
+        checkId(readerId);
+        pagination.setNumberOfItems(countByReader(readerId));
+        return getAll(pagination, SQL_SELECT_ORDERS_BY_READER, readerId);
     }
 
     @Override
-    public List<Order> getRangeCurrent(Pagination pagination) {
-        String order = pagination.isAscending() ? " " : " DESC";
-        int limit = pagination.getLimit();
-        int offset = pagination.getOffset();
-        String sortBy = pagination.getSortBy().isEmpty() ? ORDER_DATE : pagination.getSortBy();
-        String sql = String.format("%s ORDER BY %s %s LIMIT ? OFFSET ?", SQL_SELECT_CURRENT_ORDERS, sortBy, order);
-        return listQuery(sql, limit, offset);
+    public List<Order> getCurrent(Pagination pagination) {
+        pagination.setNumberOfItems(countCurrent());
+        return getAll(pagination, SQL_SELECT_CURRENT_ORDERS);
     }
 
     @Override
-    public int count(User reader) {
-        checkId(reader);
-        return count(SQL_COUNT_ORDERS_BY_READER, reader.getId());
+    public List<Order> getUnconfirmed(Pagination pagination) {
+        pagination.setNumberOfItems(countUnconfirmed());
+        return getAll(pagination, SQL_SELECT_UNCONFIRMED_ORDERS);
     }
 
-    @Override
-    public List<Order> getUnconfirmed() {
-        return listQuery(SQL_SELECT_UNCONFIRMED_ORDERS);
+    private int countByReader(Integer readerId) {
+        checkId(readerId);
+        return count(SQL_COUNT_ORDERS_BY_READER, readerId);
+    }
+
+    private int countCurrent() {
+        return count(SQL_COUNT_CURRENT_ORDERS);
+    }
+
+    private int countUnconfirmed() {
+        return count(SQL_COUNT_UNCONFIRMED_ORDERS);
     }
 
     PgOrderDao(Connection con) {

@@ -1,8 +1,8 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.*;
-import ua.nure.serhieiev.library.model.*;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.*;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ public final class BookService {
 
             tm.start();
 
-            for(Author bookAuthor : book.getAuthors()){
+            for (Author bookAuthor : book.getAuthors()) {
                 try {
                     for (Author withSameName : authorDao.getByName(bookAuthor.getName())) {
                         if (bookAuthor.getName().equalsIgnoreCase(withSameName.getName())) {
@@ -26,16 +26,16 @@ public final class BookService {
                             break;
                         }
                     }
-                }catch (NotFoundException e){
+                } catch (NotFoundException e) {
 
                 }
-               if(bookAuthor.getId() == null){
-                   authorDao.save(bookAuthor);
-               }
+                if (bookAuthor.getId() == null) {
+                    authorDao.save(bookAuthor);
+                }
             }
 
 
-            for(Genre bookGenre : book.getGenres()){
+            for (Genre bookGenre : book.getGenres()) {
                 try {
                     for (Genre withSameTitle : genreDao.getByTitle(bookGenre.getTitle())) {
                         if (bookGenre.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
@@ -43,10 +43,10 @@ public final class BookService {
                             break;
                         }
                     }
-                }catch (NotFoundException e){
+                } catch (NotFoundException e) {
 
                 }
-                if(bookGenre.getId() == null){
+                if (bookGenre.getId() == null) {
                     genreDao.save(bookGenre);
                 }
             }
@@ -59,10 +59,10 @@ public final class BookService {
                         break;
                     }
                 }
-            }catch (NotFoundException e){
+            } catch (NotFoundException e) {
 
             }
-            if(bookPublisher.getId() == null){
+            if (bookPublisher.getId() == null) {
                 publisherDao.save(bookPublisher);
             }
 
@@ -144,59 +144,43 @@ public final class BookService {
         return books;
     }
 
-    public static Map<Integer, List<Book>> getRange(Pagination pagination) {
+    public static List<Book> getRange(Pagination pagination) {
         return getRange(pagination, null);
     }
 
-    public static Map<Integer, List<Book>> getRangeByAuthor(Pagination pagination, Author author) {
+    public static List<Book> getRangeByAuthor(Pagination pagination, Author author) {
         return getRange(pagination, author);
     }
 
-    public static Map<Integer, List<Book>> getRangeByGenre(Pagination pagination, Genre genre) {
+    public static List<Book> getRangeByGenre(Pagination pagination, Genre genre) {
         return getRange(pagination, genre);
     }
 
-    public static Map<Integer, List<Book>> getRangeByPublisher(Pagination pagination, Publisher publisher) {
+    public static List<Book> getRangeByPublisher(Pagination pagination, Publisher publisher) {
         return getRange(pagination, publisher);
     }
 
-    private static Map<Integer, List<Book>> getRange(Pagination pagination, Identified object) {
-        Map<Integer, List<Book>> bookMap = new HashMap<>(1);
+    private static List<Book> getRange(Pagination pagination, Identified object) {
         List<Book> books;
-        Integer count;
+
         try (DaoFactory df = DaoFactory.getInstance()) {
             BookDao bookDao = df.getBookDao();
             if (object == null) {
-                count = bookDao.count();
-                checkPagination(pagination, count);
-                books = bookDao.getRange(pagination);
+                books = bookDao.getAll(pagination);
             } else if (object instanceof Author) {
-                count = bookDao.count((Author) object);
-                checkPagination(pagination, count);
-                books = bookDao.getRangeByAuthor((Author) object, pagination);
+                books = bookDao.getByAuthor(pagination, object.getId());
             } else if (object instanceof Genre) {
-                count = bookDao.count((Genre) object);
-                checkPagination(pagination, count);
-                books = bookDao.getRangeByGenre((Genre) object, pagination);
+                books = bookDao.getByGenre(pagination, object.getId());
             } else if (object instanceof Publisher) {
-                count = bookDao.count((Publisher) object);
-                checkPagination(pagination, count);
-                books = bookDao.getRangeByPublisher((Publisher) object, pagination);
+                books = bookDao.getByPublisher(pagination, object.getId());
             } else {
                 throw new IllegalArgumentException("Object must be an Author, Genre, Publisher or nothing.");
             }
             fillNestedFields(df, books);
-            bookMap.put(count, books);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
-        return bookMap;
-    }
-
-    private static void checkPagination(Pagination pagination, Integer count) {
-        if ((pagination.getOffset()) >= count) {
-            throw new ApplicationException("Too high offset!");
-        }
+        return books;
     }
 
     private static void fillNestedFields(DaoFactory df, List<Book> books) {

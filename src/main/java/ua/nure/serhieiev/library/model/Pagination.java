@@ -1,11 +1,12 @@
-package ua.nure.serhieiev.library.service.util;
+package ua.nure.serhieiev.library.model;
 
 public class Pagination {
 
     private int page;
     private int limit;
-    private String sortBy;
     private boolean ascending;
+    private Integer numberOfItems;
+    private String sortBy;
 
     public Pagination() {
         page = 1;
@@ -16,6 +17,13 @@ public class Pagination {
 
     public int getOffset() {
         return (page - 1) * limit;
+    }
+
+    public int getNumberOfPages() {
+        if(numberOfItems == null){
+            return  0;
+        }
+        return (int) Math.ceil(numberOfItems / ((double) limit));
     }
 
     public int getPage() {
@@ -36,12 +44,12 @@ public class Pagination {
         return this;
     }
 
-    public String getSortBy() {
-        return sortBy;
+    public Integer getNumberOfItems() {
+        return numberOfItems;
     }
 
-    public Pagination setSortBy(String sortBy) {
-        this.sortBy = sortBy;
+    public Pagination setNumberOfItems(Integer numberOfItems) {
+        this.numberOfItems = numberOfItems;
         return this;
     }
 
@@ -53,4 +61,14 @@ public class Pagination {
         this.ascending = ascending;
         return this;
     }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public Pagination setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+        return this;
+    }
+
 }

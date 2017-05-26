@@ -1,14 +1,17 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.*;
-import ua.nure.serhieiev.library.model.*;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.model.entities.Identified;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.time.LocalDate;
 import java.util.*;
 
-import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
-import static ua.nure.serhieiev.library.model.User.Role.READER;
+import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
 public final class OrderService {
 
@@ -133,11 +136,23 @@ public final class OrderService {
         return order;
     }
 
-    public static List<Order> getUnconfirmed() {
+    public static List<Order> getUnconfirmed(Pagination pagination) {
         List<Order> orders;
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
-            orders = orderDao.getUnconfirmed();
+            orders = orderDao.getUnconfirmed(pagination);
+            fillNestedFields(df, orders);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return orders;
+    }
+
+    public static List<Order> getCurrent(Pagination pagination) {
+        List<Order> orders;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            OrderDao orderDao = df.getOrderDao();
+            orders = orderDao.getCurrent(pagination);
             fillNestedFields(df, orders);
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -157,60 +172,30 @@ public final class OrderService {
         return orders;
     }
 
-    public static Map<Integer, List<Order>> getRange(Pagination pagination) {
+    public static List<Order> getRange(Pagination pagination) {
         return getRange(pagination, null);
     }
 
-    public static Map<Integer, List<Order>> getRangeCurrent(Pagination pagination) {
-        Map<Integer, List<Order>> orderMap = new HashMap<>(1);
-        List<Order> orders;
-        Integer count;
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            OrderDao orderDao = df.getOrderDao();
-            count = orderDao.count();
-            checkPagination(pagination, count);
-            orders = orderDao.getRangeCurrent(pagination);
-            fillNestedFields(df, orders);
-            orderMap.put(count, orders);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-        return orderMap;
-    }
-
-    public static Map<Integer, List<Order>> getRangeByReader(Pagination pagination, User reader) {
+    public static List<Order> getRangeByReader(Pagination pagination, User reader) {
         return getRange(pagination, reader);
     }
 
-    private static Map<Integer, List<Order>> getRange(Pagination pagination, Identified object) {
-        Map<Integer, List<Order>> orderMap = new HashMap<>(1);
+    private static List<Order> getRange(Pagination pagination, Identified object) {
         List<Order> orders;
-        Integer count;
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
             if (object == null) {
-                count = orderDao.count();
-                checkPagination(pagination, count);
-                orders = orderDao.getRange(pagination);
+                orders = orderDao.getAll(pagination);
             } else if (object instanceof User) {
-                count = orderDao.count((User) object);
-                checkPagination(pagination, count);
-                orders = orderDao.getRangeByReader((User) object, pagination);
+                orders = orderDao.getByReader(pagination, object.getId());
             } else {
                 throw new IllegalArgumentException("Object must be an Author, Genre, Publisher or nothing.");
             }
             fillNestedFields(df, orders);
-            orderMap.put(count, orders);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
-        return orderMap;
-    }
-
-    private static void checkPagination(Pagination pagination, Integer count) {
-        if ((pagination.getOffset()) >= count) {
-            throw new ApplicationException("Too high offset!");
-        }
+        return orders;
     }
 
     private static void fillNestedFields(DaoFactory df, List<Order> orders) {

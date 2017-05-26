@@ -3,11 +3,9 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
-import ua.nure.serhieiev.library.model.Book;
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.service.BookService;
+import ua.nure.serhieiev.library.model.entities.Genre;
 import ua.nure.serhieiev.library.service.GenreService;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

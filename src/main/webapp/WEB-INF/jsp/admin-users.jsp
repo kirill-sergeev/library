@@ -25,7 +25,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <%--@elvariable id="users" type="java.util.List<ua.nure.serhieiev.library.model.User>"--%>
+                <%--@elvariable id="users" type="java.util.List<ua.nure.serhieiev.library.model.entities.User>"--%>
                 <c:forEach items="${users}" var="user">
                     <tr>
                         <th scope="row">${user.email}</th>

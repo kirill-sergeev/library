@@ -1,7 +1,6 @@
 package ua.nure.serhieiev.library.dao;
 
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Genre;
 
 import java.util.List;
 

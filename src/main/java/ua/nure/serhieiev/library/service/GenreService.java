@@ -1,8 +1,8 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.*;
-import ua.nure.serhieiev.library.model.Genre;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.entities.Genre;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class GenreService {
             GenreDao genreDao = df.getGenreDao();
             count = genreDao.count();
             checkPagination(pagination, count);
-            genres = genreDao.getRange(pagination);
+            genres = genreDao.getAll(pagination);
             genresMap.put(count, genres);
         } catch (Exception e) {
             throw new ApplicationException(e);

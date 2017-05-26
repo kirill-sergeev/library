@@ -3,10 +3,10 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
-import ua.nure.serhieiev.library.model.Order;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.Order;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
-import ua.nure.serhieiev.library.service.util.Pagination;
+import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/profile.do"})
 public class ProfileServlet extends HttpServlet {
@@ -35,21 +35,16 @@ public class ProfileServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
 
         String path;
-        Map<Integer, List<Order>> ordersMap;
+        List<Order> orders;
         if (user.getRole().ordinal() < LIBRARIAN.ordinal()){
-            ordersMap = OrderService.getRangeByReader(pagination, user);
+            orders = OrderService.getRangeByReader(pagination, user);
             path = PROFILE_PAGE;
         } else{
-            ordersMap = OrderService.getRange(pagination);
+            orders = OrderService.getRange(pagination);
             path = ORDER_LIST_PAGE;
         }
 
-        int ordersCount;
-        List<Order> orders = ordersMap.entrySet().iterator().next().getValue();
-        ordersCount = ordersMap.entrySet().iterator().next().getKey();
-
-        int nOfPages = (int) Math.ceil(ordersCount / ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("orders", orders);
         request.getRequestDispatcher(path).forward(request, response);
     }

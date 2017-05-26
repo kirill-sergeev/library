@@ -33,25 +33,25 @@
             <li class="active page-item disabled">
                 <a href="#">${page}</a>
             </li>
-            <c:if test="${nOfPages > page}">
+            <c:if test="${numberOfPages > page}">
                 <li>
                     <a href="<c:url value="${action}?${group}page=${page+1}${items}${sort}${order}"/>">${page+1}</a>
                 </li>
             </c:if>
-            <c:if test="${nOfPages > page+1}">
+            <c:if test="${numberOfPages > page+1}">
                 <li>
                     <a href="<c:url value="${action}?${group}page=${page+2}${items}${sort}${order}"/>">${page+2}</a>
                 </li>
             </c:if>
-            <c:if test="${page < nOfPages}">
+            <c:if test="${page < numberOfPages}">
                 <li>
                     <a href="<c:url value="${action}?${group}page=${page+1}${items}${sort}${order}"/>">
                         <i class="fa fa-angle-right" aria-hidden="true"></i></a>
                 </li>
             </c:if>
-            <c:if test="${page + 1 < nOfPages}">
+            <c:if test="${page + 1 < numberOfPages}">
                 <li>
-                    <a href="<c:url value="${action}?${group}page=${nOfPages}${items}${sort}${order}"/>">
+                    <a href="<c:url value="${action}?${group}page=${numberOfPages}${items}${sort}${order}"/>">
                         <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
                 </li>
             </c:if>

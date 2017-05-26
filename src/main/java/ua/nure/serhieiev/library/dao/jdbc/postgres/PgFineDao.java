@@ -1,11 +1,10 @@
 package ua.nure.serhieiev.library.dao.jdbc.postgres;
 
 import ua.nure.serhieiev.library.dao.DaoException;
-import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.FineDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
-import ua.nure.serhieiev.library.model.Fine;
-import ua.nure.serhieiev.library.model.Order;
+import ua.nure.serhieiev.library.model.entities.Fine;
+import ua.nure.serhieiev.library.model.entities.Order;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

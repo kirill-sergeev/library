@@ -3,7 +3,7 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.Alert;
-import ua.nure.serhieiev.library.model.User;
+import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.UserService;
 
 import javax.servlet.ServletException;
@@ -12,12 +12,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
-import static ua.nure.serhieiev.library.model.User.Role.LIBRARIAN;
-import static ua.nure.serhieiev.library.model.User.Role.READER;
+import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
 @WebServlet(name = "UserListServlet", urlPatterns = {READER_LIST_ACTION, LIBRARIAN_LIST_ACTION})
 public class UserListServlet extends HttpServlet {

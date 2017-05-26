@@ -22,7 +22,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <%--@elvariable id="books" type="java.util.List<ua.nure.serhieiev.library.model.Book>"--%>
+                <%--@elvariable id="books" type="java.util.List<ua.nure.serhieiev.library.model.entities.Book>"--%>
                 <c:forEach items="${books}" var="book">
                     <tr>
                         <th scope="row">${book.title}</th>

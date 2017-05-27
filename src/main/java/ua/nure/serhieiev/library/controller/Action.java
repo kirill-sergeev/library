@@ -9,11 +9,14 @@ import static ua.nure.serhieiev.library.model.entities.User.Role.*;
 
 public enum Action{
 
-    BOOK_LIST(BOOK_LIST_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
-    ORDER_LIST(ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
-    UNCONFIRMED_ORDER_LIST(UNCONFIRMED_ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
-    CURRENT_ORDER_LIST(CURRENT_ORDER_LIST_ACTION, LIBRARIAN, ADMIN),
+    BOOK_LIST(BOOKS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    ORDER_LIST(CLOSED_ORDERS_ACTION, LIBRARIAN, ADMIN),
+    UNCONFIRMED_ORDER_LIST(ORDERS_ACTION, LIBRARIAN, ADMIN),
+    CURRENT_ORDER_LIST(CURRENT_ORDERS_ACTION, LIBRARIAN, ADMIN),
     CART(CART_ACTION, READER),
+    READERS(READERS_ACTION, LIBRARIAN, ADMIN),
+    LIBRARIANS(LIBRARIANS_ACTION, ADMIN),
+    REGISTER_LIBRARIAN(REGISTER_LIBRARIAN_ACTION, ADMIN),
 
 
     REGISTER(REGISTER_ACTION, GUEST),
@@ -50,11 +53,17 @@ public enum Action{
 
     public interface Constants {
         String LOGIN_ACTION = "/login.do";
-        String BOOK_LIST_ACTION = "/books.do";
-        String ORDER_LIST_ACTION = "/orders.do";
-        String UNCONFIRMED_ORDER_LIST_ACTION = "/unconfirmed-orders.do";
-        String CURRENT_ORDER_LIST_ACTION = "/current-orders.do";
+        String BOOKS_ACTION = "/books.do";
+        String CLOSED_ORDERS_ACTION = "/closed-orders.do";
+        String ORDERS_ACTION = "/orders.do";
+        String CURRENT_ORDERS_ACTION = "/current-orders.do";
         String CART_ACTION = "/cart.do";
+        String READERS_ACTION = "/readers.do";
+        String LIBRARIANS_ACTION = "/librarians.do";
+        String REGISTER_LIBRARIAN_ACTION = "/new-librarian.do";
+
+
+
 
 
         String REGISTER_ACTION = "/register.do";
@@ -63,9 +72,6 @@ public enum Action{
         String RESET_ACTION = "/reset.do";
         String LOGOUT_ACTION = "/logout.do";
         String MAIN_ACTION = "/";
-        String READER_LIST_ACTION = "/admin/readers.do";
-        String LIBRARIAN_LIST_ACTION = "/admin/librarians.do";
-        String REGISTER_LIBRARIAN_ACTION = "/admin/new-librarian.do";
 
         String USER_PROFILE_ACTION = "/user.do";
         String GENRE_LIST_ACTION = "/genres.do";

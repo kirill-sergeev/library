@@ -3,6 +3,8 @@ package ua.nure.serhieiev.library.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.Alert;
+import ua.nure.serhieiev.library.controller.util.PaginationMapper;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.UserService;
 
@@ -18,11 +20,11 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
-@WebServlet(name = "UserListServlet", urlPatterns = {READER_LIST_ACTION, LIBRARIAN_LIST_ACTION})
+@WebServlet(name = "UserListServlet", urlPatterns = {READERS_ACTION, LIBRARIANS_ACTION})
 public class UserListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserListServlet.class);
-    private static final String USER_LIST_PAGE = "/WEB-INF/jsp/admin-users.jsp";
+    private static final String USER_LIST_PAGE = "/WEB-INF/jsp/users.jsp";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
@@ -50,17 +52,19 @@ public class UserListServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        Pagination pagination = PaginationMapper.getPagination(request);
         List<User> users;
+
         String pageType;
-        if (request.getServletPath().equals(READER_LIST_ACTION)){
-            users = UserService.getAll(READER);
+        if (request.getServletPath().equals(READERS_ACTION)){
+            users = UserService.getByRole(pagination, READER);
             pageType = READER.value();
         } else {
-            users = UserService.getAll(LIBRARIAN);
+            users = UserService.getByRole(pagination, LIBRARIAN);
             pageType = LIBRARIAN.value();
         }
         request.setAttribute("pageType", pageType);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("users", users);
         request.getRequestDispatcher(USER_LIST_PAGE).forward(request, response);
     }

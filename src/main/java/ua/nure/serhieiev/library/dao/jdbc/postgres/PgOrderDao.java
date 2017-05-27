@@ -22,9 +22,10 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     private static final String BOOKS = "books";
     private static final String[] SORT_FIELDS = {INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
 
-    private static final String SQL_COUNT_CURRENT_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NULL";
-    private static final String SQL_COUNT_UNCONFIRMED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NULL";
     private static final String SQL_COUNT_ORDERS_BY_READER = "SELECT count(*) FROM orders WHERE reader_id = ?";
+    private static final String SQL_COUNT_UNCONFIRMED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NULL";
+    private static final String SQL_COUNT_CURRENT_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NULL";
+    private static final String SQL_COUNT_CLOSED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NOT NULL";
     private static final String SQL_CREATE_ORDER = "INSERT INTO orders (reader_id, internal) VALUES (?, ?)";
     private static final String SQL_UPDATE_ORDER = "UPDATE orders SET librarian_id = ?, order_date = ?, return_date = ? WHERE id = ?";
     private static final String SQL_INSERT_BOOK_INTO_ORDER = "INSERT INTO books_orders(book_id, order_id) VALUES (?, ?)";
@@ -48,6 +49,11 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
                     " FROM orders o, books_orders bo" +
                     " WHERE o.id = bo.order_id AND order_date IS NOT NULL AND return_date IS NULL" +
+                    " GROUP BY o.id";
+    private static final String SQL_SELECT_CLOSED_ORDERS =
+            "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
+                    " FROM orders o, books_orders bo" +
+                    " WHERE o.id = bo.order_id AND order_date IS NOT NULL AND return_date IS NOT NULL" +
                     " GROUP BY o.id";
     private static final String SQL_SELECT_ORDERS_BY_READER =
             "SELECT o.*, array_agg (DISTINCT bo.book_id) AS books" +
@@ -177,15 +183,21 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     }
 
     @Override
+    public List<Order> getUnconfirmed(Pagination pagination) {
+        pagination.setNumberOfItems(countUnconfirmed());
+        return getAll(pagination, SQL_SELECT_UNCONFIRMED_ORDERS);
+    }
+
+    @Override
     public List<Order> getCurrent(Pagination pagination) {
         pagination.setNumberOfItems(countCurrent());
         return getAll(pagination, SQL_SELECT_CURRENT_ORDERS);
     }
 
     @Override
-    public List<Order> getUnconfirmed(Pagination pagination) {
-        pagination.setNumberOfItems(countUnconfirmed());
-        return getAll(pagination, SQL_SELECT_UNCONFIRMED_ORDERS);
+    public List<Order> getClosed(Pagination pagination) {
+        pagination.setNumberOfItems(countClosed());
+        return getAll(pagination, SQL_SELECT_CLOSED_ORDERS);
     }
 
     private int countByReader(Integer readerId) {
@@ -199,6 +211,10 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
 
     private int countUnconfirmed() {
         return count(SQL_COUNT_UNCONFIRMED_ORDERS);
+    }
+
+    private int countClosed() {
+        return count(SQL_COUNT_CLOSED_ORDERS);
     }
 
     PgOrderDao(Connection con) {

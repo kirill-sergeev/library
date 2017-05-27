@@ -12,62 +12,13 @@ public final class BookService {
         try (DaoFactory df = DaoFactory.getInstance();
              TransactionManager tm = df.getTransactionManager()) {
             BookDao bookDao = df.getBookDao();
-            AuthorDao authorDao = df.getAuthorDao();
-            GenreDao genreDao = df.getGenreDao();
-            PublisherDao publisherDao = df.getPublisherDao();
 
             tm.start();
-
-            for (Author bookAuthor : book.getAuthors()) {
-                try {
-                    for (Author withSameName : authorDao.getByName(bookAuthor.getName())) {
-                        if (bookAuthor.getName().equalsIgnoreCase(withSameName.getName())) {
-                            bookAuthor.setId(withSameName.getId());
-                            break;
-                        }
-                    }
-                } catch (NotFoundException e) {
-
-                }
-                if (bookAuthor.getId() == null) {
-                    authorDao.save(bookAuthor);
-                }
-            }
-
-
-            for (Genre bookGenre : book.getGenres()) {
-                try {
-                    for (Genre withSameTitle : genreDao.getByTitle(bookGenre.getTitle())) {
-                        if (bookGenre.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
-                            bookGenre.setId(withSameTitle.getId());
-                            break;
-                        }
-                    }
-                } catch (NotFoundException e) {
-
-                }
-                if (bookGenre.getId() == null) {
-                    genreDao.save(bookGenre);
-                }
-            }
-
-            Publisher bookPublisher = book.getPublisher();
-            try {
-                for (Publisher withSameTitle : publisherDao.getByTitle(bookPublisher.getTitle())) {
-                    if (bookPublisher.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
-                        bookPublisher.setId(withSameTitle.getId());
-                        break;
-                    }
-                }
-            } catch (NotFoundException e) {
-
-            }
-            if (bookPublisher.getId() == null) {
-                publisherDao.save(bookPublisher);
-            }
+            AuthorService.checkAuthors(df, book.getAuthors());
+            GenreService.checkGenres(df, book.getGenres());
+            PublisherService.checkPublisher(df, book.getPublisher());
 
             try {
-
                 bookDao.save(book);
             } catch (RuntimeException e) {
                 tm.rollback();
@@ -124,43 +75,23 @@ public final class BookService {
         return book;
     }
 
-    public static List<Book> getAll() {
-        return getAll(false);
+    public static List<Book> getAll(Pagination pagination) {
+        return getAll(pagination, null);
     }
 
-    public static List<Book> getAll(boolean fetchType) {
-        List<Book> books;
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            BookDao bookDao = df.getBookDao();
-            books = bookDao.getAll();
-
-            if (fetchType) {
-                fillNestedFields(df, books);
-            }
-
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-        return books;
+    public static List<Book> getByAuthor(Pagination pagination, Author author) {
+        return getAll(pagination, author);
     }
 
-    public static List<Book> getRange(Pagination pagination) {
-        return getRange(pagination, null);
+    public static List<Book> getByGenre(Pagination pagination, Genre genre) {
+        return getAll(pagination, genre);
     }
 
-    public static List<Book> getRangeByAuthor(Pagination pagination, Author author) {
-        return getRange(pagination, author);
+    public static List<Book> getByPublisher(Pagination pagination, Publisher publisher) {
+        return getAll(pagination, publisher);
     }
 
-    public static List<Book> getRangeByGenre(Pagination pagination, Genre genre) {
-        return getRange(pagination, genre);
-    }
-
-    public static List<Book> getRangeByPublisher(Pagination pagination, Publisher publisher) {
-        return getRange(pagination, publisher);
-    }
-
-    private static List<Book> getRange(Pagination pagination, Identified object) {
+    private static List<Book> getAll(Pagination pagination, Identified object) {
         List<Book> books;
 
         try (DaoFactory df = DaoFactory.getInstance()) {

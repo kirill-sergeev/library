@@ -71,6 +71,9 @@ public class PgAuthorDao extends JdbcDao<Author> implements AuthorDao {
 
     @Override
     public List<Author> getByName(String name) {
+        if (name == null || name.length() < 3){
+            throw new DaoException("Name must be longer than 2 characters!");
+        }
         return listQuery(SQL_SELECT_AUTHOR_BY_NAME, "%" + name.toLowerCase() + "%");
     }
 

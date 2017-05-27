@@ -27,17 +27,10 @@ public class PublisherListServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         Pagination pagination = PaginationMapper.getPagination(request);
-        Map<Integer, List<Publisher>> publishersMap;
         List<Publisher> publishers;
-        int publishersCount;
-        publishersMap = PublisherService.getRange(pagination);
-        publishers= publishersMap.entrySet().iterator().next().getValue();
-        publishersCount = publishersMap.entrySet().iterator().next().getKey();
-
-        int nOfPages = (int) Math.ceil(publishersCount/ ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        publishers = PublisherService.getAll(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("publishers", publishers);
         request.getRequestDispatcher(PUBLISHER_LIST_PAGE).forward(request, response);
     }

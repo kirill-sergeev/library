@@ -14,52 +14,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 
-@WebServlet(name = "OrderServlet", urlPatterns = {ORDER_LIST_ACTION, UNCONFIRMED_ORDER_LIST_ACTION, CURRENT_ORDER_LIST_ACTION})
+@WebServlet(name = "OrderServlet", urlPatterns = {ORDERS_ACTION})
 public class OrderServlet extends HttpServlet {
 
-    private static final String UNCONFIRMED_ORDER_LIST_PAGE = "/WEB-INF/jsp/unconfirmed-orders.jsp";
-    private static final String CURRENT_ORDER_LIST_PAGE = "/WEB-INF/jsp/current-orders.jsp";
-    private static final String ORDER_LIST_PAGE = "/WEB-INF/jsp/orders.jsp";
+    private static final String UNCONFIRMED_ORDERS_PAGE = "/WEB-INF/jsp/unconfirmed-orders.jsp";
+    private static final String CURRENT_ORDERS_PAGE = "/WEB-INF/jsp/current-orders.jsp";
+    private static final String CLOSED_ORDERS_PAGE = "/WEB-INF/jsp/closed-orders.jsp";
 
     private Integer getOrderId(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String orderParam = request.getParameter("order");
         if (!Validator.isInteger(orderParam)) {
             request.setAttribute("alert", "Unknown order!");
-           // request.getRequestDispatcher(ORDER_LIST_PAGE).forward(request, response);
+            // request.getRequestDispatcher(ORDER_LIST_PAGE).forward(request, response);
         }
         return Integer.valueOf(orderParam);
     }
 
-    private void getAllOrders(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Pagination pagination = PaginationMapper.getPagination(request);
-        List<Order> orders = OrderService.getRange(pagination);
-        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
-        request.setAttribute("orders", orders);
-    }
-
-    private void getCurrentOrders(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Pagination pagination = PaginationMapper.getPagination(request);
-        List<Order> orders = OrderService.getCurrent(pagination);
-        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
-        request.setAttribute("orders", orders);
-    }
-
-    private void getUnconfirmedOrders(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Pagination pagination = PaginationMapper.getPagination(request);
-        List<Order> orders = OrderService.getUnconfirmed(pagination);
-        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
-        request.setAttribute("orders", orders);
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
         Integer orderId = getOrderId(request, response);
         Order order = new Order().setId(orderId);
@@ -80,21 +56,31 @@ public class OrderServlet extends HttpServlet {
         doGet(request, response);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String path = request.getServletPath();
-        switch (path) {
-            case UNCONFIRMED_ORDER_LIST_ACTION:
-                getUnconfirmedOrders(request, response);
-                request.getRequestDispatcher(UNCONFIRMED_ORDER_LIST_PAGE).forward(request, response);
-                return;
-            case CURRENT_ORDER_LIST_ACTION:
-                getCurrentOrders(request, response);
-                request.getRequestDispatcher(CURRENT_ORDER_LIST_PAGE).forward(request, response);
-                return;
-            case ORDER_LIST_ACTION:
-                getAllOrders(request, response);
-                request.getRequestDispatcher(UNCONFIRMED_ORDER_LIST_PAGE).forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Pagination pagination = PaginationMapper.getPagination(request);
+        String type = request.getParameter("type");
+        List<Order> orders;
+        String path;
+
+        switch (type) {
+            default:
+            case "unconfirmed":
+                orders = OrderService.getUnconfirmed(pagination);
+                path = UNCONFIRMED_ORDERS_PAGE;
+                break;
+            case "current":
+                orders = OrderService.getCurrent(pagination);
+                path = CURRENT_ORDERS_PAGE;
+                break;
+            case "closed":
+                orders = OrderService.getClosed(pagination);
+                path = CLOSED_ORDERS_PAGE;
         }
+
+        request.setAttribute("orders", orders);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
+        request.getRequestDispatcher(path).forward(request, response);
     }
 
 }

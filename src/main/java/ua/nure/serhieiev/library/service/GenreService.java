@@ -6,40 +6,35 @@ import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.*;
 
-public class GenreService {
+public final class GenreService {
 
-    public static List<Genre> getAll() {
+    public static List<Genre> getAll(Pagination pagination) {
         List<Genre> genres;
         try (DaoFactory df = DaoFactory.getInstance()) {
             GenreDao genreDao = df.getGenreDao();
-            genres = genreDao.getAll();
-        } catch (NotFoundException e) {
-            genres = Collections.emptyList();
+            genres = genreDao.getAll(pagination);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
         return genres;
     }
 
-    public static Map<Integer, List<Genre>> getRange(Pagination pagination) {
-        Map<Integer, List<Genre>> genresMap = new HashMap<>(1);
-        List<Genre> genres;
-        Integer count;
-        try (DaoFactory df = DaoFactory.getInstance()) {
-            GenreDao genreDao = df.getGenreDao();
-            count = genreDao.count();
-            checkPagination(pagination, count);
-            genres = genreDao.getAll(pagination);
-            genresMap.put(count, genres);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-        return genresMap;
-    }
+    static void checkGenres(DaoFactory df, List<Genre> genres) {
+        GenreDao genreDao = df.getGenreDao();
+        for (Genre bookGenre : genres) {
+            try {
+                for (Genre withSameTitle : genreDao.getByTitle(bookGenre.getTitle())) {
+                    if (bookGenre.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
+                        bookGenre.setId(withSameTitle.getId());
+                        break;
+                    }
+                }
+            } catch (NotFoundException e) {
 
-    private static void checkPagination(Pagination pagination, Integer count) {
-        if ((pagination.getOffset()) >= count) {
-            throw new ApplicationException("Too high offset!");
+            }
+            if (bookGenre.getId() == null) {
+                genreDao.save(bookGenre);
+            }
         }
     }
 

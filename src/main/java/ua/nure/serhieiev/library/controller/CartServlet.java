@@ -80,7 +80,7 @@ public class CartServlet extends HttpServlet {
         }
     }
 
-    private void clearCart(HttpServletRequest request, HttpServletResponse response)
+    private void clearCart(HttpServletRequest request)
             throws ServletException, IOException {
         Map<LocalDateTime, Integer> globalCart = getGlobalCart();
         Map<Integer, LocalDateTime> localCart = getLocalCart(request);
@@ -122,14 +122,14 @@ public class CartServlet extends HttpServlet {
                 removeFromCart(request, response);
                 break;
             case "clear":
-                clearCart(request, response);
+                clearCart(request);
                 break;
             case "order":
                 makeOrder(request);
-                clearCart(request, response);
+                clearCart(request);
         }
         getCartContent(request);
-        request.getRequestDispatcher(BOOK_LIST_ACTION).forward(request, response);
+        request.getRequestDispatcher(BOOKS_ACTION).forward(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

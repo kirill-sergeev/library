@@ -23,33 +23,36 @@ import java.util.Map;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 
-@WebServlet(name = "BookListServlet", urlPatterns = BOOK_LIST_ACTION)
+@WebServlet(name = "BookListServlet", urlPatterns = BOOKS_ACTION)
 public class BookListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(BookListServlet.class);
-    private static final String BOOK_LIST_PAGE = "/WEB-INF/jsp/books.jsp";
+    private static final String BOOKS_PAGE = "/WEB-INF/jsp/books.jsp";
 
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         doGet(request,response);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        List<Book> books;
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
+        List<Book> books;
 
         if (request.getParameterMap().containsKey("author")) {
-            Integer author = Integer.valueOf(request.getParameter("author"));
-            books = BookService.getRangeByAuthor(pagination, new Author().setId(author));
+            Integer authorId = Integer.valueOf(request.getParameter("author"));
+            books = BookService.getByAuthor(pagination, new Author().setId(authorId));
+            request.setAttribute("author", authorId);
         } else if (request.getParameterMap().containsKey("genre")) {
-            Integer genre = Integer.valueOf(request.getParameter("genre"));
-            books = BookService.getRangeByGenre(pagination, new Genre().setId(genre));
+            Integer genreId = Integer.valueOf(request.getParameter("genre"));
+            books = BookService.getByGenre(pagination, new Genre().setId(genreId));
+            request.setAttribute("genre", genreId);
         } else if(request.getParameterMap().containsKey("publisher")){
-            Integer publisher = Integer.valueOf(request.getParameter("publisher"));
-            books = BookService.getRangeByPublisher(pagination, new Publisher().setId(publisher));
+            Integer publisherId = Integer.valueOf(request.getParameter("publisher"));
+            books = BookService.getByPublisher(pagination, new Publisher().setId(publisherId));
+            request.setAttribute("publisher", publisherId);
         } else {
-            books = BookService.getRange(pagination);
+            books = BookService.getAll(pagination);
         }
 
         Map<LocalDateTime, Integer> globalCart = (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");
@@ -60,7 +63,7 @@ public class BookListServlet extends HttpServlet {
 
         request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("books", books);
-        request.getRequestDispatcher(BOOK_LIST_PAGE).forward(request, response);
+        request.getRequestDispatcher(BOOKS_PAGE).forward(request, response);
     }
 
 }

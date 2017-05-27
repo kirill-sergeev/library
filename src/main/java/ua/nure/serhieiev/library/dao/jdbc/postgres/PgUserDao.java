@@ -3,6 +3,7 @@ package ua.nure.serhieiev.library.dao.jdbc.postgres;
 import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.UserDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.User;
 
 import java.sql.*;
@@ -23,10 +24,11 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     private static final String ROLE = "role_id";
     private static final String[] SORT_FIELDS = {ENABLED, LAST_VISIT, NAME, REGISTRATION_DATE, ROLE};
 
+    private static final String SQL_COUNT_USERS_BY_ROLE = "SELECT count(*) FROM users WHERE role_id = ?";
     private static final String SQL_CREATE_USER = "INSERT INTO users (email, password, name, activation_token, role_id, enabled) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
     private static final String SQL_SELECT_USER_BY_NAME = "SELECT * FROM users WHERE lower(name) LIKE (?)";
-    private static final String SQL_SELECT_USER_BY_ROLE = "SELECT * FROM users WHERE role_id = ? ORDER BY name";
+    private static final String SQL_SELECT_USER_BY_ROLE = "SELECT * FROM users WHERE role_id = ?";
     private static final String SQL_SELECT_USER_BY_AUTH_TOKEN = "SELECT * FROM users WHERE auth_token = ?";
     private static final String SQL_SELECT_USER_BY_ACTIVATION_TOKEN = "SELECT * FROM users WHERE activation_token = ?";
     private static final String SQL_SELECT_USER_BY_RESET_PASSWORD_TOKEN = "SELECT * FROM users WHERE reset_token = ?";
@@ -36,10 +38,12 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     protected String getCreateQuery() {
         return SQL_CREATE_USER;
     }
+
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_USER;
     }
+
     @Override
     protected String[] getSortFields() {
         return SORT_FIELDS.clone();
@@ -102,8 +106,9 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     }
 
     @Override
-    public List<User> getAll(User.Role role) {
-        return listQuery(SQL_SELECT_USER_BY_ROLE, role.ordinal());
+    public List<User> getAll(Pagination pagination, User.Role role) {
+        pagination.setNumberOfItems(countByRole(role.ordinal()));
+        return getAll(pagination, SQL_SELECT_USER_BY_ROLE, role.ordinal());
     }
 
     @Override
@@ -129,6 +134,10 @@ public class PgUserDao extends JdbcDao<User> implements UserDao {
     @Override
     public List<User> getByName(String name) {
         return listQuery(SQL_SELECT_USER_BY_NAME, "%" + name.toLowerCase() + "%");
+    }
+
+    private Integer countByRole(int ordinal) {
+        return count(SQL_COUNT_USERS_BY_ROLE, ordinal);
     }
 
     PgUserDao(Connection con) {

@@ -1,3 +1,4 @@
+/*
 package ua.nure.serhieiev.library;
 
 import ua.nure.serhieiev.library.dao.*;
@@ -55,21 +56,25 @@ public class Main {
             throw new ApplicationException(e);
         }
 
+*/
 /*        try (DaoFactory df = DaoFactory.getInstance()
          ) {
             BookDao bookDao = df.getBookDao();
 
         } catch (Exception e) {
             throw new ApplicationException(e);
-        }*/
+        }*//*
 
 
 
 
-     /*   Pagination pagination = new Pagination().setAscending(true).setLimit(10).setOffset(0).setSortBy("id");
-        System.out.println(BookService.getByAuthor(new Author().setId(10),pagination));*/
 
-       // System.out.println(BookService.getAll(1, BookService.Field.TITLE, true, 2));
+     */
+/*   Pagination pagination = new Pagination().setAscending(true).setLimit(10).setOffset(0).setSortBy("id");
+        System.out.println(BookService.getByAuthor(new Author().setId(10),pagination));*//*
+
+
+       // System.out.println(BookService.getByRole(1, BookService.Field.TITLE, true, 2));
     }
 
     public static void main2(String[] args) {
@@ -80,11 +85,14 @@ public class Main {
         long finish = System.nanoTime();
         System.out.println((finish-start)/100000000);
 
-       /* List<String> fields = new ArrayList<>();
+       */
+/* List<String> fields = new ArrayList<>();
         for (Field field : Book.class.getDeclaredFields()){
                 fields.add(field.getName().replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase());
         }
-        System.out.println(fields);*/
+        System.out.println(fields);*//*
+
     }
 
 }
+*/

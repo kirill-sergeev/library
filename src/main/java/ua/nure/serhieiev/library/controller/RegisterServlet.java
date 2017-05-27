@@ -22,9 +22,9 @@ public class RegisterServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
     private static final String REGISTER_PAGE = "/WEB-INF/jsp/login.jsp";
-    private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/admin-new-librarian.jsp";
+    private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/new-librarian.jsp";
 
-    private void register(HttpServletRequest request)
+    private void register(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String name = request.getParameter("name");
         String email = request.getParameter("email").toLowerCase();
@@ -39,6 +39,8 @@ public class RegisterServlet extends HttpServlet {
                 new Thread(() -> EmailUtil.sendRegistrationLink(user)).start();
             } else {
                 UserService.saveLibrarian(user);
+                response.sendRedirect(LIBRARIANS_ACTION);
+                return;
             }
             request.setAttribute("alert", Alert.REGISTRATION_SUCCESSFUL);
             LOG.info("Registered new user with email {}.", email);
@@ -46,12 +48,12 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("alert", Alert.EMAIL_ALREADY_IN_USE);
             LOG.info("Unsuccessful registration with email {}.", email, e);
         }
+        request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        register(request);
-        doGet(request, response);
+        register(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

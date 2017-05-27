@@ -1,5 +1,6 @@
 package ua.nure.serhieiev.library.dao;
 
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.User;
 
 import java.util.List;
@@ -14,8 +15,8 @@ public interface UserDao extends GenericDao<User> {
 
     User getByResetPasswordToken(String resetPasswordToken);
 
-    List<User> getAll(User.Role role);
-
     List<User> getByName(String name);
+
+    List<User> getAll(Pagination pagination, User.Role role);
 
 }

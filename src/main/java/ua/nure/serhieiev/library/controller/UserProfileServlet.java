@@ -12,7 +12,7 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 @WebServlet(name = "UserProfileServlet", urlPatterns = {USER_PROFILE_ACTION})
 public class UserProfileServlet extends HttpServlet {
 
-    private static final String USER_PROFILE_PAGE = "/WEB-INF/jsp/admin-users.jsp";
+    private static final String USER_PROFILE_PAGE = "/WEB-INF/jsp/users.jsp";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

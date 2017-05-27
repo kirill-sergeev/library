@@ -27,17 +27,10 @@ public class AuthorListServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         Pagination pagination = PaginationMapper.getPagination(request);
-        Map<Integer, List<Author>> authorsMap;
         List<Author> authors;
-        int authorsCount;
-        authorsMap = AuthorService.getRange(pagination);
-        authors= authorsMap.entrySet().iterator().next().getValue();
-        authorsCount = authorsMap.entrySet().iterator().next().getKey();
-
-        int nOfPages = (int) Math.ceil(authorsCount/ ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        authors = AuthorService.getAll(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("authors", authors);
         request.getRequestDispatcher(AUTHOR_LIST_PAGE).forward(request, response);
     }

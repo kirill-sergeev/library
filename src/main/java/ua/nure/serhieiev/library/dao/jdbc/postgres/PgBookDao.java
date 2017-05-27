@@ -52,7 +52,11 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
                     " FROM books b, books_authors ba, books_genres bg, authors a, genres g" +
                     " WHERE b.id = ba.book_id AND b.id = bg.book_id AND ba.author_id = a.id AND bg.genre_id = g.id AND b.publisher_id = ?" +
                     " GROUP BY b.id";
-
+    private static final String SQL_SELECT_BOOK_BY_TITLE =
+            "SELECT b.*, array_agg (DISTINCT ba.author_id) AS authors, array_agg(DISTINCT bg.genre_id) AS genres" +
+                    " FROM books b, books_authors ba, books_genres bg" +
+                    " WHERE b.id = ba.book_id AND b.id = bg.book_id AND lower(b.title) LIKE (?)" +
+                    " GROUP BY b.id";
 
     @Override
     protected String getSelectQuery() {
@@ -206,6 +210,14 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
         removeGenresFromBook(book);
         addAuthorsToBook(book);
         addGenresToBook(book);
+    }
+
+    @Override
+    public List<Book> getByTitle(String title) {
+        if (title == null || title.length() < 3){
+            throw new DaoException("Title must be longer than 2 characters!");
+        }
+        return listQuery(SQL_SELECT_BOOK_BY_TITLE, "%" + title.toLowerCase() + "%");
     }
 
     @Override

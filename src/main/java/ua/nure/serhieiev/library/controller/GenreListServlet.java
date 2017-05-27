@@ -29,15 +29,9 @@ public class GenreListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Pagination pagination = PaginationMapper.getPagination(request);
-        Map<Integer, List<Genre>> genresMap;
         List<Genre> genres;
-        int genresCount;
-        genresMap = GenreService.getRange(pagination);
-        genres= genresMap.entrySet().iterator().next().getValue();
-        genresCount = genresMap.entrySet().iterator().next().getKey();
-
-        int nOfPages = (int) Math.ceil(genresCount/ ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
+        genres = GenreService.getAll(pagination);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("genres", genres);
         request.getRequestDispatcher(GENRE_LIST_PAGE).forward(request, response);
     }

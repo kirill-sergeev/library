@@ -8,40 +8,49 @@ import ua.nure.serhieiev.library.model.Pagination;
 
 import java.util.*;
 
-public class AuthorService {
+public final class AuthorService {
 
-    public static List<Author> getAll() {
+    public static List<Author> getAll(Pagination pagination) {
         List<Author> authors;
         try (DaoFactory df = DaoFactory.getInstance()) {
             AuthorDao authorDao = df.getAuthorDao();
-            authors = authorDao.getAll();
-        } catch (NotFoundException e) {
-            authors = Collections.emptyList();
+            authors = authorDao.getAll(pagination);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
         return authors;
     }
 
-    public static Map<Integer, List<Author>> getRange(Pagination pagination) {
-        Map<Integer, List<Author>> authorsMap = new HashMap<>(1);
+    public static List<Author> getByName(String name) {
+        if (name == null || name.trim().length() < 3){
+            throw new ApplicationException("Name must be longer than 2 characters!");
+        }
         List<Author> authors;
-        Integer count;
         try (DaoFactory df = DaoFactory.getInstance()) {
             AuthorDao authorDao = df.getAuthorDao();
-            count = authorDao.count();
-            checkPagination(pagination, count);
-            authors = authorDao.getAll(pagination);
-            authorsMap.put(count, authors);
+            authors = authorDao.getByName(name);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
-        return authorsMap;
+        return authors;
     }
 
-    private static void checkPagination(Pagination pagination, Integer count) {
-        if ((pagination.getOffset()) >= count) {
-            throw new ApplicationException("Too high offset!");
+    static void checkAuthors(DaoFactory df, List<Author> authors){
+        AuthorDao authorDao = df.getAuthorDao();
+        for (Author bookAuthor : authors) {
+            try {
+                for (Author withSameName : authorDao.getByName(bookAuthor.getName())) {
+                    if (bookAuthor.getName().equalsIgnoreCase(withSameName.getName())) {
+                        bookAuthor.setId(withSameName.getId());
+                        break;
+                    }
+                }
+            } catch (NotFoundException e) {
+
+            }
+            if (bookAuthor.getId() == null) {
+                authorDao.save(bookAuthor);
+            }
         }
     }
 

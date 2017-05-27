@@ -17,7 +17,7 @@
         <div class="row">
             <div class="signup-form"><!--register form-->
                 <h2><fmt:message key="login.section.registration"/></h2>
-                <form action="<c:url value="/admin/new-librarian.do"/>" method="POST">
+                <form action="<c:url value="/new-librarian.do"/>" method="POST">
                     <input type="text" name="name" placeholder="<fmt:message key="login.label.name"/>"/>
                     <input type="email" name="email" placeholder="<fmt:message key="login.label.username"/>"/>
                     <input type="password" name="password" placeholder="<fmt:message key="login.label.password"/>"/>

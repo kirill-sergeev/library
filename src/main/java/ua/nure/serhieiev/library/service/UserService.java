@@ -3,6 +3,7 @@ package ua.nure.serhieiev.library.service;
 import ua.nure.serhieiev.library.dao.DaoFactory;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.dao.UserDao;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.User;
 
 import java.time.LocalDate;
@@ -135,13 +136,11 @@ public final class UserService {
         return registeredUser;
     }
 
-    public static List<User> getAll(User.Role role) {
+    public static List<User> getByRole(Pagination pagination, User.Role role) {
         List<User> users;
         try (DaoFactory df = DaoFactory.getInstance()) {
             UserDao userDao = df.getUserDao();
-            users = userDao.getAll(role);
-        } catch (NotFoundException e){
-            users = Collections.emptyList();
+            users = userDao.getAll(pagination, role);
         }catch (Exception e) {
             throw new ApplicationException(e);
         }

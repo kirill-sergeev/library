@@ -160,6 +160,18 @@ public final class OrderService {
         return orders;
     }
 
+    public static List<Order> getClosed(Pagination pagination) {
+        List<Order> orders;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            OrderDao orderDao = df.getOrderDao();
+            orders = orderDao.getClosed(pagination);
+            fillNestedFields(df, orders);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return orders;
+    }
+
     public static List<Order> getAll() {
         List<Order> orders;
         try (DaoFactory df = DaoFactory.getInstance()) {
@@ -172,15 +184,11 @@ public final class OrderService {
         return orders;
     }
 
-    public static List<Order> getRange(Pagination pagination) {
-        return getRange(pagination, null);
+    public static List<Order> getAll(Pagination pagination) {
+        return getAll(pagination, null);
     }
 
-    public static List<Order> getRangeByReader(Pagination pagination, User reader) {
-        return getRange(pagination, reader);
-    }
-
-    private static List<Order> getRange(Pagination pagination, Identified object) {
+    private static List<Order> getAll(Pagination pagination, Identified object) {
         List<Order> orders;
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
@@ -198,6 +206,10 @@ public final class OrderService {
         return orders;
     }
 
+    public static List<Order> getByReader(Pagination pagination, User reader) {
+        return getAll(pagination, reader);
+    }
+    
     private static void fillNestedFields(DaoFactory df, List<Order> orders) {
         UserDao userDao = df.getUserDao();
         BookDao bookDao = df.getBookDao();

@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 
@@ -37,10 +36,10 @@ public class ProfileServlet extends HttpServlet {
         String path;
         List<Order> orders;
         if (user.getRole().ordinal() < LIBRARIAN.ordinal()){
-            orders = OrderService.getRangeByReader(pagination, user);
+            orders = OrderService.getByReader(pagination, user);
             path = PROFILE_PAGE;
         } else{
-            orders = OrderService.getRange(pagination);
+            orders = OrderService.getAll(pagination);
             path = ORDER_LIST_PAGE;
         }
 

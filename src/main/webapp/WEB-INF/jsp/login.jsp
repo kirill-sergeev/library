@@ -3,48 +3,49 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pagename" scope="request" value="login"/>
 <%@ include file="../jspf/header.jspf" %>
-<%@ include file="../jspf/navbar.jspf" %>
-<%--@elvariable id="alert" type="com.sergeev.webapp.controller.util.Alert"--%>
 
-<section id="form"><!--form-->
-    <div class="container">
-        <c:if test="${not empty alert}">
-            <div class="alert ${alert.type} alert-dismissable">
-                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <fmt:message key="${alert.description}"/>
+<div class="ui middle aligned center aligned grid segment">
+    <div class="column">
+        <h2 class="ui teal image header"><fmt:message key="login.header.login"/></h2>
+        <form action="<c:url value="/login.do"/>" method="post" class="ui large form">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="email" placeholder="<fmt:message key="login.field.email"/>">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="<fmt:message key="login.field.password"/>">
+                    </div>
+                </div>
+                <div class="ui fluid large teal submit button"><fmt:message key="login.button.login"/></div>
             </div>
-        </c:if>
-        <div class="row">
-            <div class="col-sm-4 col-sm-offset-1">
-                <div class="login-form"><!--login form-->
-                    <h2><fmt:message key="login.section.login"/></h2>
-                    <form action="<c:url value="login.do"/>" method="POST">
-                        <input type="email" name="email" placeholder="<fmt:message key="login.label.username"/>"/>
-                        <input type="text" name="password" placeholder="<fmt:message key="login.label.password"/>"/>
-                        <span><input type="checkbox" class="checkbox" name="remember" value="true">
-                            <fmt:message key="login.checkbox.remember"/>
-                        </span>
-                        <button type="submit" class="btn btn-default"><fmt:message key="login.button.login"/></button>
-                    </form>
-                </div><!--/login form-->
+            <div class="inline field">
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" id="remember" name="remember" value="true">
+                        <label for="remember"><fmt:message key="login.checkbox.remember"/></label>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-1">
-                <h2 class="or"><fmt:message key="login.text.or"/></h2>
-            </div>
-            <div class="col-sm-4">
-                <div class="signup-form"><!--register form-->
-                    <h2><fmt:message key="login.section.registration"/></h2>
-                    <form action="<c:url value="register.do"/>" method="POST">
-                        <input type="text" name="name" placeholder="<fmt:message key="login.label.name"/>"/>
-                        <input type="email" name="email" placeholder="<fmt:message key="login.label.username"/>"/>
-                        <input type="password" name="password" placeholder="<fmt:message key="login.label.password"/>"/>
-                        <button type="submit" class="btn btn-default"><fmt:message key="login.button.register"/></button>
-                    </form>
-                </div><!--/register form-->
-            </div>
+            <div class="ui error message"></div>
+            <%--@elvariable id="alert" type="ua.nure.serhieiev.library.controller.util.Alert"--%>
+            <c:if test="${not empty alert}">
+                <div class="ui message ${alert.type}">
+                    <ul class="list"><li><fmt:message key="${alert.description}"/></li></ul>
+                </div>
+            </c:if>
+        </form>
+        <div class="ui message">
+            <fmt:message key="login.label.new"/><a href="<c:url value="/register.do"/>"> <fmt:message key="login.url.register"/></a>
+        </div>
+        <div class="ui message">
+            <fmt:message key="login.label.forgot"/><a href="<c:url value="/reset.do"/>"> <fmt:message key="login.url.reset"/></a>
         </div>
     </div>
-</section>
-<!--/form-->
+</div>
 
 <%@ include file="../jspf/footer.jspf" %>

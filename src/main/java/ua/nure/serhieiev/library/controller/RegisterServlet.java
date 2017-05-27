@@ -21,8 +21,9 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 public class RegisterServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
-    private static final String REGISTER_PAGE = "/WEB-INF/jsp/login.jsp";
-    private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/new-librarian.jsp";
+    private static final String REGISTER_PAGE = "/WEB-INF/jsp/register.jsp";
+    private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/register-librarian.jsp";
+    private static final String ALERT = "alert";
 
     private void register(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -42,13 +43,13 @@ public class RegisterServlet extends HttpServlet {
                 response.sendRedirect(LIBRARIANS_ACTION);
                 return;
             }
-            request.setAttribute("alert", Alert.REGISTRATION_SUCCESSFUL);
+            request.setAttribute(ALERT, Alert.REGISTRATION_SUCCESSFUL);
             LOG.info("Registered new user with email {}.", email);
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.EMAIL_ALREADY_IN_USE);
-            LOG.info("Unsuccessful registration with email {}.", email, e);
+            request.setAttribute(ALERT, Alert.EMAIL_ALREADY_IN_USE);
+            LOG.info("Unsuccessful registration with email {}.", email);
         }
-        request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
+        doGet(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

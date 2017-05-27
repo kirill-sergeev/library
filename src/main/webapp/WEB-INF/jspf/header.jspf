@@ -1,27 +1,88 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="language"
-       value="${not empty param.language ? param.language : not empty language ? language : pageContext.request.locale}"
-       scope="session"/>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="action" scope="page" value="${requestScope['javax.servlet.forward.request_uri']}"/>
+<c:set var="language" scope="session" value="${not empty param.language ? param.language : not empty language ? language : pageContext.request.locale}"/>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="text"/>
 
+<!doctype html>
 <html lang="${language}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title><fmt:message key="title.${pagename}"/> | E-Shopper</title>
-    <link href="../../resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../resources/css/font-awesome.min.css" rel="stylesheet">
-    <link href="../../resources/css/prettyPhoto.css" rel="stylesheet">
-    <link href="../../resources/css/price-range.css" rel="stylesheet">
-    <link href="../../resources/css/animate.css" rel="stylesheet">
-    <link href="../../resources/css/main.css" rel="stylesheet">
-    <link href="../../resources/css/responsive.css" rel="stylesheet">
-    <link rel="shortcut icon" href="images/ico/favicon.ico">
-</head><!--/head-->
+    <meta charset="UTF-8">
+    <title><fmt:message key="${pagename}.title"/> | Library</title>
+    <!-- 3rd party scripts and styles -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../../resources/images/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../resources/semantic/semantic.min.css">
+    <script src="../../resources/jquery.js"></script>
+    <script src="../../resources/semantic/semantic.min.js"></script>
+    <!-- Custom scripts and styles -->
+    <link rel="stylesheet" type="text/css" href="../../resources/custom/header.css">
+    <link rel="stylesheet" type="text/css" href="../../resources/custom/${pagename}.css">
+    <script src="../../resources/custom/header.jsp" language="JavaScript" type="text/javascript"></script>
+    <script src="../../resources/custom/${pagename}.jsp" language="JavaScript" type="text/javascript"></script>
+</head>
 <body>
+
+<!-- Following Menu -->
+<div class="ui large top fixed hidden menu">
+    <div class="ui container">
+        <a href="<c:url value="/authors.do"/>" class="item <c:if test="${action == '/authors.do'}">active</c:if>"><fmt:message key="header.url.authors"/></a>
+        <a href="<c:url value="/books.do"/>" class="item <c:if test="${action == '/books.do'}">active</c:if>"><fmt:message key="header.url.books"/></a>
+        <a href="<c:url value="/genres.do"/>" class="item <c:if test="${action == '/genres.do'}">active</c:if>"><fmt:message key="header.url.genres"/></a>
+        <a href="<c:url value="/publishers.do"/>" class="item <c:if test="${action == '/publishers.do'}">active</c:if>"><fmt:message key="header.url.publishers"/></a>
+        <div class="right menu">
+            <c:if test="${user == null || user.role == 'GUEST' && action != '/login.do' && action != '/register.do'}">
+                <div class="item"><a href="<c:url value="/login.do"/>" class="ui button"><fmt:message key="header.url.login"/></a></div>
+                <div class="item"><a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a></div>
+            </c:if>
+            <c:if test="${user != null && user.role != 'GUEST'}">
+                <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
+                    <div class="item"><div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div></div>
+                </form>
+            </c:if>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar Menu -->
+<div class="ui vertical sidebar menu">
+    <a href="<c:url value="/authors.do"/>" class="item <c:if test="${action == '/authors.do'}">active</c:if>"><fmt:message key="header.url.authors"/></a>
+    <a href="<c:url value="/books.do"/>" class="item <c:if test="${action == '/books.do'}">active</c:if>"><fmt:message key="header.url.books"/></a>
+    <a href="<c:url value="/genres.do"/>" class="item <c:if test="${action == '/genres.do'}">active</c:if>"><fmt:message key="header.url.genres"/></a>
+    <a href="<c:url value="/publishers.do"/>" class="item <c:if test="${action == '/publishers.do'}">active</c:if>"><fmt:message key="header.url.publishers"/></a>
+</div>
+
+<!-- Page Content -->
+<div class="pusher">
+    <div class="ui vertical masthead center aligned">
+        <div class="ui container">
+            <div class="ui large secondary pointing menu">
+                <a class="toc item"><i class="sidebar icon"></i></a>
+                <a href="<c:url value="/authors.do"/>" class="item <c:if test="${action == '/authors.do'}">active</c:if>"><fmt:message key="header.url.authors"/></a>
+                <a href="<c:url value="/books.do"/>" class="item <c:if test="${action == '/books.do'}">active</c:if>"><fmt:message key="header.url.books"/></a>
+                <a href="<c:url value="/genres.do"/>" class="item <c:if test="${action == '/genres.do'}">active</c:if>"><fmt:message key="header.url.genres"/></a>
+                <a href="<c:url value="/publishers.do"/>" class="item <c:if test="${action == '/publishers.do'}">active</c:if>"><fmt:message key="header.url.publishers"/></a>
+
+                <div class="right item">
+                    <form method="get" class="ui form">
+                        <select id="language" name="language" onchange="submit()">
+                            <option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
+                            <option value="ru" ${language == 'ru' ? 'selected' : ''}>Russian</option>
+                        </select>
+                    </form>
+                    <%--@elvariable id="user" type="ua.nure.serhieiev.library.model.entities.User"--%>
+                    <c:if test="${user == null || user.role == 'GUEST' && action != '/login.do' && action != '/register.do'}">
+                        <a href="<c:url value="/login.do"/>" class="ui button"><fmt:message key="header.url.login"/></a>
+                        <a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a>
+                    </c:if>
+                    <c:if test="${user != null && user.role != 'GUEST'}">
+                        <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
+                            <div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div>
+                        </form>
+                    </c:if>
+                </div>
+            </div>
+        </div>
+    </div>
+

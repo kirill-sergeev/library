@@ -20,6 +20,7 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 public class ActivateAccountServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivateAccountServlet.class);
+    private static final String ALERT = "alert";
 
     private void activate(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -27,14 +28,13 @@ public class ActivateAccountServlet extends HttpServlet {
         try {
             User user = new User().setActivationToken(activationToken);
             user = UserService.activate(user);
-            request.setAttribute("alert", Alert.ACTIVATION_SUCCESSFUL);
-            request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
+            request.setAttribute(ALERT, Alert.ACTIVATION_SUCCESSFUL);
             LOG.info("Account {} activated.", user.getEmail());
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.WRONG_TOKEN);
-            request.getRequestDispatcher(MAIN_ACTION).forward(request, response);
+            request.setAttribute(ALERT, Alert.WRONG_TOKEN);
             LOG.info("Wrong activation token {}.", activationToken, e);
         }
+        request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

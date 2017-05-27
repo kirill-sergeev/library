@@ -23,6 +23,7 @@ public class ResetPasswordServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(ResetPasswordServlet.class);
     private static final String RESET_PAGE = "/WEB-INF/jsp/reset.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "/WEB-INF/jsp/change-password.jsp";
+    private static final String ALERT = "alert";
 
     private void sendResetToken(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,10 +31,10 @@ public class ResetPasswordServlet extends HttpServlet {
         try {
             User user = UserService.resetPassword(new User().setEmail(email));
             EmailUtil.sendResetLink(user);
-            request.setAttribute("alert", Alert.PASSWORD_RESET_SUCCESSFUL);
+            request.setAttribute(ALERT, Alert.PASSWORD_RESET_SUCCESSFUL);
             LOG.info("Reset password request with email {}.", email);
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.WRONG_EMAIL);
+            request.setAttribute(ALERT, Alert.WRONG_EMAIL);
             LOG.info("Wrong reset password request with email {}.", email);
         }
         request.getRequestDispatcher(RESET_PAGE).forward(request, response);
@@ -47,7 +48,7 @@ public class ResetPasswordServlet extends HttpServlet {
             request.setAttribute("token", resetToken);
             LOG.info("Used reset password token on account {}.", user.getEmail());
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.WRONG_TOKEN);
+            request.setAttribute(ALERT, Alert.WRONG_TOKEN);
             request.getRequestDispatcher(RESET_PAGE).forward(request, response);
             LOG.info("Used wrong reset password token {}.", resetToken);
             return;
@@ -62,10 +63,10 @@ public class ResetPasswordServlet extends HttpServlet {
         User user = new User().setResetPasswordToken(resetToken).setPassword(password);
         try {
             user = UserService.changePassword(user);
-            request.setAttribute("alert", Alert.PASSWORD_CHANGED_SUCCESSFUL);
+            request.setAttribute(ALERT, Alert.PASSWORD_CHANGED_SUCCESSFUL);
             LOG.info("Password changed by reset token on account {}.", user.getEmail());
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.PASSWORD_NOT_CHANGED);
+            request.setAttribute(ALERT, Alert.PASSWORD_NOT_CHANGED);
             request.getRequestDispatcher(RESET_PAGE).forward(request, response);
             LOG.info("Password not changed by reset token {}.", resetToken);
             return;

@@ -25,6 +25,7 @@ public class LoginServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoginServlet.class);
     private static final String LOGIN_PAGE = "/WEB-INF/jsp/login.jsp";
+    private static final String ALERT = "alert";
 
     private void login(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,9 +47,9 @@ public class LoginServlet extends HttpServlet {
             request.getSession().setAttribute("user", user);
             LOG.info("Log in with email {}.", email);
         } catch (ApplicationException e) {
-            request.setAttribute("alert", Alert.BAD_LOGIN_OR_PASSWORD);
+            request.setAttribute(ALERT, Alert.BAD_LOGIN_OR_PASSWORD);
             request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
-            LOG.info("Unsuccessful log in with email {}.", email, e);
+            LOG.info("Unsuccessful log in with email {}.", email);
             return;
         }
         response.sendRedirect(MAIN_ACTION);

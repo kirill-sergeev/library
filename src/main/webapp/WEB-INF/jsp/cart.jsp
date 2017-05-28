@@ -1,61 +1,73 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pagename" scope="request" value="cart"/>
 <%@ include file="../jspf/header.jspf" %>
-<%@ include file="../jspf/navbar.jspf" %>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+<div class="ui middle aligned center aligned grid basic segment">
+    <div class="ui grid centered">
+        <div class="ui center aligned segment">
             <c:if test="${not empty alert}">
-                <div class="alert ${alert} alert-dismissable">
-                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <div class="ui message ${alert.type}">
+                    <ul class="list">
+                        <li><fmt:message key="${alert.description}"/></li>
+                    </ul>
                 </div>
             </c:if>
             <c:choose>
                 <c:when test="${not empty localCart}">
-                    <table class="table table-sm table-bordered sortable">
+                    <table class="ui green striped table">
                         <thead>
                         <tr>
-                            <th>Book</th>
-                            <th>Actions</th>
+                            <th>Title</th>
+                            <th>Authors</th>
+                            <th>Genres</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach var="book" items="${books}">
+                            <%--@elvariable id="books" type="java.util.List<ua.nure.serhieiev.library.model.entities.Book>"--%>
+                        <c:forEach items="${books}" var="book">
                             <tr>
-                                <th scope="row">
-                                    <a href="<c:url value="/book.do?id=${book.id}"/>">${book.title}</a>
-                                </th>
+                                <td class="selectable"><a href="<c:url value="/book.do?id=${book.id}"/>">${book.title}</a></td>
                                 <td>
-                                    <div class="btn-group">
-                                        <form action="<c:url value="/cart.do"/>" method="post">
-                                            <input type="hidden" name="book" value="${book.id}"/>
-                                            <button type="submit" name="button" value="remove" class="btn btn-danger">
-                                                Remove
-                                            </button>
-                                            <button type="submit" name="button" value="order" class="btn btn-primary">
-                                                Make order
-                                            </button>
-                                        </form>
-                                    </div>
+                                    <c:forEach items="${book.authors}" var="author" varStatus="status">
+                                        ${author.name}<c:if test="${not status.last}">,</c:if>
+                                    </c:forEach>
+                                </td>
+                                <td>
+                                    <c:forEach items="${book.genres}" var="genre" varStatus="status">
+                                        ${genre.title}<c:if test="${not status.last}">,</c:if>
+                                    </c:forEach>
+                                </td>
+                                <td>
+                                    <form action="<c:url value="/cart.do"/>" method="post">
+                                        <input type="hidden" name="book" value="${book.id}"/>
+                                        <button class="ui submit button circular icon negative" type="submit" name="button" value="remove"><i class="remove icon"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         </c:forEach>
                         </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="3">
+                                <form action="<c:url value="/cart.do"/>" method="post" class="ui form">
+                                    <button type="submit" name="button" value="order" class="ui submit button positive">
+                                        Make order
+                                    </button>
+                                    <button type="submit" name="button" value="clear" class="ui submit button negative right floated">
+                                        Clear cart
+                                    </button>
+                                </form>
+                            </th>
+                        </tr>
+                        </tfoot>
                     </table>
-                    <form action="<c:url value="/cart.do"/>" method="post">
-                        <button type="submit" name="button" value="clear" class="btn btn-danger">
-                            Clear cart
-                        </button>
-                        <button type="submit" name="button" value="order" class="btn btn-primary">
-                            Make order
-                        </button>
-                    </form>
                 </c:when>
                 <c:otherwise>
-                    <div class="alert alert-info">
-                        Cart is empty, maybe you want to read something?
+                    <div class="ui message info">
+                        <div class="header">Cart is empty, maybe you want to read something?</div>
                     </div>
                 </c:otherwise>
             </c:choose>
@@ -64,19 +76,3 @@
 </div>
 
 <%@ include file="../jspf/footer.jspf" %>
-
-
-<%--            <table class="table table-sm table-bordered sortable">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${globalCart}" var="b">
-                    <tr>
-                        <th scope="row">${b}</th>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>--%>

@@ -23,6 +23,7 @@ import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 public class CartServlet extends HttpServlet {
 
     private static final String CART_PAGE = "/WEB-INF/jsp/cart.jsp";
+    private static final String ALERT = "alert";
 
     private Map<Integer, LocalDateTime> getLocalCart(HttpServletRequest request) {
         return (Map<Integer, LocalDateTime>) request.getSession().getAttribute("localCart");
@@ -36,7 +37,7 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
         String bookParam = request.getParameter("book");
         if (!Validator.isInteger(bookParam)) {
-            request.setAttribute("alert", "Bad parameter!");
+            request.setAttribute(ALERT, "Bad parameter!");
             request.getRequestDispatcher(CART_PAGE).forward(request, response);
         }
         return Integer.valueOf(bookParam);
@@ -48,11 +49,11 @@ public class CartServlet extends HttpServlet {
         Map<LocalDateTime, Integer> globalCart = getGlobalCart();
         Map<Integer, LocalDateTime> localCart = getLocalCart(request);
         if (localCart.containsKey(bookId)) {
-            request.setAttribute("alert", "You already add this book to cart!");
+            request.setAttribute(ALERT, "You already add this book to cart!");
             return;
         }
         if (localCart.size() > 10) {
-            request.setAttribute("alert", "Limit 10 books for reader!");
+            request.setAttribute(ALERT, "Limit 10 books for reader!");
             return;
         }
         try {
@@ -61,10 +62,10 @@ public class CartServlet extends HttpServlet {
                 localCart.put(book.getId(), LocalDateTime.now());
                 globalCart.put(LocalDateTime.now(), book.getId());
             } else {
-                request.setAttribute("alert", "Book not available!");
+                request.setAttribute(ALERT, "Book not available!");
             }
         } catch (NotFoundException e) {
-            request.setAttribute("alert", "Book not found!");
+            request.setAttribute(ALERT, "Book not found!");
         }
     }
 
@@ -76,7 +77,7 @@ public class CartServlet extends HttpServlet {
         if (localCart.containsKey(bookId)) {
             globalCart.remove(localCart.remove(bookId));
         } else {
-            request.setAttribute("alert", "You have not this book in cart!");
+            request.setAttribute(ALERT, "You have not this book in cart!");
         }
     }
 
@@ -113,6 +114,14 @@ public class CartServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
+        String header = request.getHeader("referer");
+        String path;
+
+        if (header == null){
+           path = BOOKS_ACTION;
+        } else{
+            path = header.substring(header.lastIndexOf('/'));
+        }
 
         switch (action) {
             case "add":
@@ -129,7 +138,7 @@ public class CartServlet extends HttpServlet {
                 clearCart(request);
         }
         getCartContent(request);
-        request.getRequestDispatcher(BOOKS_ACTION).forward(request, response);
+        response.sendRedirect(path);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

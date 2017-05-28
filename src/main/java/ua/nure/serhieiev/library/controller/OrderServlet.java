@@ -40,6 +40,10 @@ public class OrderServlet extends HttpServlet {
         Integer orderId = getOrderId(request, response);
         Order order = new Order().setId(orderId);
 
+        if (action == null){
+            action = "";
+        }
+
         switch (action) {
             case "accept":
                 User librarian = (User) request.getSession().getAttribute("user");
@@ -62,6 +66,10 @@ public class OrderServlet extends HttpServlet {
         String type = request.getParameter("type");
         List<Order> orders;
         String path;
+
+        if (type == null){
+            type = "unconfirmed";
+        }
 
         switch (type) {
             default:

@@ -4,7 +4,7 @@
 <c:set var="pagename" scope="request" value="login"/>
 <%@ include file="../jspf/header.jspf" %>
 
-<div class="ui middle aligned center aligned grid segment">
+<div class="ui middle aligned center aligned grid basic segment">
     <div class="column">
         <h2 class="ui teal image header"><fmt:message key="login.header.login"/></h2>
         <form action="<c:url value="/login.do"/>" method="post" class="ui large form">

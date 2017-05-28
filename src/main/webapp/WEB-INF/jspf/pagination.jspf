@@ -7,7 +7,7 @@
 <nav>
     <div class="ui pagination menu">
         <c:if test="${page > 3}">
-            <a class="item" href="<c:url value="${action}?${group}page=1${items}${sort}${order}"/>"><i class="angle double left icon"></i></a>
+            <a class="item" href="<c:url value="${action}?${group}page=1${items}${sort}${order}"/>"><i class="left chevron icon"></i></a>
         </c:if>
         <c:if test="${page > 2}">
             <a class="item" href="<c:url value="${action}?${group}page=${page-2}${items}${sort}${order}"/>">${page-2}</a>
@@ -23,7 +23,7 @@
             <a class="item" href="<c:url value="${action}?${group}page=${page+2}${items}${sort}${order}"/>">${page+2}</a>
         </c:if>
         <c:if test="${page + 2 < numberOfPages}">
-            <a class="item" href="<c:url value="${action}?${group}page=${numberOfPages}${items}${sort}${order}"/>"><i class="angle double right icon"></i></a>
+            <a class="item" href="<c:url value="${action}?${group}page=${numberOfPages}${items}${sort}${order}"/>"><i class="right chevron icon"></i></a>
         </c:if>
     </div>
 </nav>

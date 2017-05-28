@@ -4,7 +4,7 @@
 <c:set var="pagename" scope="request" value="authors"/>
 <%@ include file="../jspf/header.jspf" %>
 
-<div class="ui middle aligned center aligned grid segment">
+<div class="ui middle aligned center aligned grid basic segment">
     <div class="ui grid centered">
         <div class="ui center aligned segment">
             <div class="center floated column">

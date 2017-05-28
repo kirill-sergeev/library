@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="action" scope="page" value="${requestScope['javax.servlet.forward.request_uri']}"/>
+<c:set var="url" scope="page" value="${requestScope['javax.servlet.forward.query_string']}"/>
 <c:set var="language" scope="session" value="${not empty param.language ? param.language : not empty language ? language : pageContext.request.locale}"/>
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="text"/>
@@ -37,9 +38,8 @@
                 <div class="item"><a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a></div>
             </c:if>
             <c:if test="${user != null && user.role != 'GUEST'}">
-                <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
-                    <div class="item"><div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div></div>
-                </form>
+                <div class="item"><a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a></div>
+                <div class="item"><a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a></div>
             </c:if>
         </div>
     </div>
@@ -77,6 +77,8 @@
                         <a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a>
                     </c:if>
                     <c:if test="${user != null && user.role != 'GUEST'}">
+                        <a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a>
+                        <a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a>
                         <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
                             <div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div>
                         </form>

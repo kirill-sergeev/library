@@ -28,7 +28,11 @@ public enum Alert {
      */
     USER_UNBLOCKED("alert.success.user_unblocked", Type.SUCCESS),
     USER_BLOCKED("alert.success.user_blocked", Type.SUCCESS),
-    USER_REMOVED("alert.success.user_removed", Type.SUCCESS);
+    USER_REMOVED("alert.success.user_removed", Type.SUCCESS),
+    /**
+     * Alerts for search action
+     */
+    NOT_FOUND("alert.warning.not_found", Type.WARNING);
 
     private final String description;
     private final Type type;

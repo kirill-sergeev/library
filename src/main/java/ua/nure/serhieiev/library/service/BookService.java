@@ -75,6 +75,21 @@ public final class BookService {
         return book;
     }
 
+    public static List<Book> getByTitle(String title) {
+        if (title == null || title.trim().length() < 3){
+            throw new ApplicationException("Title must be longer than 2 characters!");
+        }
+        List<Book> books;
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            BookDao bookDao = df.getBookDao();
+            books = bookDao.getByTitle(title);
+            fillNestedFields(df, books);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+        return books;
+    }
+
     public static List<Book> getAll(Pagination pagination) {
         return getAll(pagination, null);
     }

@@ -7,8 +7,9 @@
 <div class="ui middle aligned center aligned grid basic segment">
     <div class="ui grid centered">
         <div class="ui center aligned segment">
-
-            <table class="ui red striped table sortable">
+            <c:choose>
+            <c:when test="${not empty users}">
+            <table class="ui purple celled table sortable">
                 <thead>
                 <tr>
                     <th ${sort != 'email' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>Email</th>
@@ -27,51 +28,30 @@
                         <td>${user.name}</td>
                         <td>${user.registrationDate}</td>
                         <td>${user.lastVisit}</td>
-                        <td>${user.enabled}</td>
-
-                        <td>
-                            <button class="ui left attached button">Left</button>
-                            <button class="right attached ui button">Right</button>
-
-                            <form
-                                    <c:if test="${pageType == 'reader'}">
-                                        action="<c:url value="/readers.do"/>" method="post">
-                                    </c:if>
-                                    <c:if test="${pageType == 'librarian'}">
-                                        action="<c:url value="/librarians.do"/>" method="post">
-                                    </c:if>
-                            <input type="hidden" name="user" value="${user.id}"/>
+                        <td class="center aligned">${user.enabled? '<i class="large green checkmark icon"></i>' : '<i class="large red minus icon"></i>'}</td>
+                        <td class="center aligned">
+                                <form action="${requestUri}" method="post">
+                                <input type="hidden" name="user" value="${user.id}"/>
                                 <c:if test="${user.enabled}">
-                                    <button type="submit" name="button" value="block"
-                                            class="btn btn-warning"><i class="fa fa-ban fa-lg"></i></button>
+                                <button class="ui left attached button submit orange icon" name="button" value="block"><i class="minus circle icon"></i></button>
                                 </c:if>
                                 <c:if test="${not user.enabled}">
-                                    <button type="submit" name="button" value="activate"
-                                            class="btn btn-success"><i class="fa fa-circle-o fa-lg"></i>
-                                    </button>
+                                    <button class="ui left attached button submit positive icon" name="button" value="activate"><i class="check circle outline icon"></i></button>
                                 </c:if>
-                                <button type="submit" name="button" value="remove"
-                                        class="btn btn-danger"><i class="fa fa-times fa-lg"></i></button>
+                                <button class="right attached ui button submit negative icon" name="button" value="remove"><i class="remove circle icon"></i></button>
                             </form>
-
-
-
                         </td>
                     </tr>
                 </c:forEach>
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="3">
-                        <c:if test="${not empty author}"><c:set var="group" scope="page" value="author=${author}&"/></c:if>
-                        <c:if test="${not empty genre}"><c:set var="group" scope="page" value="genre=${genre}&"/></c:if>
-                        <c:if test="${not empty publisher}"><c:set var="group" scope="page" value="publisher=${publisher}&"/></c:if>
-                        <c:set var="action" scope="page" value="books.do"/>
+                    <th colspan="2">
+                        <c:set var="action" scope="page" value="${requestUri.replace('/', '')}"/>
                         <%@ include file="../jspf/pagination.jspf" %>
                     </th>
-                    <th colspan="1"></th>
                     <th colspan="4">
-                        <form action="<c:url value="/books.do"/>" method="get" class="ui form right floated">
+                        <form action="${requestUri}" method="get" class="ui form right floated">
                             <div class="inline fields">
                                 <div class="field">
                                     <select class="ui dropdown" name="items">
@@ -84,11 +64,11 @@
                                 </div>
                                 <div class="field">
                                     <select class="ui dropdown" name="sort">
-                                        <option value="title">Title</option>
-                                        <option value="publisher_id">Publisher</option>
-                                        <option value="publication_date">Publication Date</option>
-                                        <option value="isbn">ISBN</option>
-                                        <option value="available">Available</option>
+                                        <option value="name">Name</option>
+                                        <option value="email">Email</option>
+                                        <option value="registration_date">Registration Date</option>
+                                        <option value="last_visit">Last Visit</option>
+                                        <option value="enabled">Active</option>
                                     </select>
                                 </div>
                                 <div class="field">
@@ -106,6 +86,16 @@
                 </tr>
                 </tfoot>
             </table>
+            </c:when>
+                <c:otherwise>
+                    <div class="ui message info"><div class="header">No users</div></div>
+                </c:otherwise>
+            </c:choose>
+            <c:if test="${requestUri == '/librarians.do'}">
+                <div class="ui right floated small primary labeled icon button" onclick="location.href='<c:url value="/new-librarian.do"/>'">
+                    <i class="user icon"></i> Add Librarian
+                </div>
+            </c:if>
         </div>
     </div>
 </div>

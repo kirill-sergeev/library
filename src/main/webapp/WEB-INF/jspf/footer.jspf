@@ -1,5 +1,29 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<script>
+    $('.datepicker').calendar();
+
+    $(document)
+        .ready(function() {
+            $('.ui.form')
+                .form({
+                    fields: {
+                        search: {
+                            identifier  : 'search',
+                            rules: [
+                                {
+                                    type   : 'length[3]',
+                                    prompt : '<fmt:message key="validation.search"/>'
+                                }
+                            ]
+                        }
+                    }
+                })
+            ;
+        })
+    ;
+</script>
+
 </div>
 </body>
 </html>

@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-@WebServlet(name = "AddBookServlet", urlPatterns = {"/admin/new-book.do"})
+@WebServlet(name = "AddBookServlet", urlPatterns = {"/new-book.do"})
 public class AddBookServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AddBookServlet.class);
-    private static final String ADD_BOOK_PAGE = "/WEB-INF/jsp/admin-new-book.jsp";
+    private static final String ADD_BOOK_PAGE = "/WEB-INF/jsp/new-book.jsp";
 
     private Book parseInput(HttpServletRequest request) {
         String bookTitle = request.getParameter("bookTitle");

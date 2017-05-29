@@ -9,6 +9,7 @@ import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.BookService;
 import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Book;
+import ua.nure.serhieiev.library.service.PublisherService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,7 +32,7 @@ public class BookListServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request,response);
+        doGet(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,24 +40,29 @@ public class BookListServlet extends HttpServlet {
         Pagination pagination = PaginationMapper.getPagination(request);
         List<Book> books;
 
-        if (request.getParameterMap().containsKey("author")) {
-            Integer authorId = Integer.valueOf(request.getParameter("author"));
-            books = BookService.getByAuthor(pagination, new Author().setId(authorId));
-            request.setAttribute("author", authorId);
-        } else if (request.getParameterMap().containsKey("genre")) {
-            Integer genreId = Integer.valueOf(request.getParameter("genre"));
-            books = BookService.getByGenre(pagination, new Genre().setId(genreId));
-            request.setAttribute("genre", genreId);
-        } else if(request.getParameterMap().containsKey("publisher")){
-            Integer publisherId = Integer.valueOf(request.getParameter("publisher"));
-            books = BookService.getByPublisher(pagination, new Publisher().setId(publisherId));
-            request.setAttribute("publisher", publisherId);
+        String title = request.getParameter("search");
+        if (title != null && !title.trim().isEmpty()) {
+            books = BookService.getByTitle(title);
         } else {
-            books = BookService.getAll(pagination);
+            if (request.getParameterMap().containsKey("author")) {
+                Integer authorId = Integer.valueOf(request.getParameter("author"));
+                books = BookService.getByAuthor(pagination, new Author().setId(authorId));
+                request.setAttribute("author", authorId);
+            } else if (request.getParameterMap().containsKey("genre")) {
+                Integer genreId = Integer.valueOf(request.getParameter("genre"));
+                books = BookService.getByGenre(pagination, new Genre().setId(genreId));
+                request.setAttribute("genre", genreId);
+            } else if (request.getParameterMap().containsKey("publisher")) {
+                Integer publisherId = Integer.valueOf(request.getParameter("publisher"));
+                books = BookService.getByPublisher(pagination, new Publisher().setId(publisherId));
+                request.setAttribute("publisher", publisherId);
+            } else {
+                books = BookService.getAll(pagination);
+            }
         }
 
         Map<LocalDateTime, Integer> globalCart = (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");
-        for (Book book: books){
+        for (Book book : books) {
             int inCart = Collections.frequency(globalCart.values(), book.getId());
             book.setAvailable(book.getAvailable() - inCart);
         }

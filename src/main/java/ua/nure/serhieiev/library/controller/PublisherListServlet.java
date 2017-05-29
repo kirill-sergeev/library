@@ -29,7 +29,13 @@ public class PublisherListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
         List<Publisher> publishers;
-        publishers = PublisherService.getAll(pagination);
+
+        String title = request.getParameter("search");
+        if (title != null && !title.trim().isEmpty()) {
+            publishers = PublisherService.getByTitle(title);
+        } else {
+            publishers = PublisherService.getAll(pagination);
+        }
         request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("publishers", publishers);
         request.getRequestDispatcher(PUBLISHER_LIST_PAGE).forward(request, response);

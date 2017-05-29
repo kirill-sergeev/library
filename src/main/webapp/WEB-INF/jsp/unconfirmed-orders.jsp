@@ -45,7 +45,7 @@
                                         </div>
                                     </td>
                                     <td>${order.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
-                                    <td class="collapsing">
+                                    <td>
                                         <form action="<c:url value="/orders.do"/>" method="post">
                                             <input type="hidden" name="order" value="${order.id}"/>
                                             <button class="ui left attached button submit positive icon" name="button" value="accept"><i class="checkmark icon"></i></button>

@@ -10,7 +10,7 @@ public class Pagination {
 
     public Pagination() {
         page = 1;
-        limit = 20;
+        limit = 15;
         sortBy = "";
         ascending = true;
     }

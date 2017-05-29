@@ -28,6 +28,7 @@ public class UserListServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
+
         Integer userId = Integer.valueOf(request.getParameter("user"));
         User user = new User().setId(userId);
 
@@ -48,22 +49,27 @@ public class UserListServlet extends HttpServlet {
                 LOG.info("Removed user with id {}.", userId);
                 break;
         }
-        doGet(request, response);
+        String header = request.getHeader("referer");
+        String path;
+
+        if (header == null){
+            path = USER_LIST_PAGE;
+        } else{
+            path = header.substring(header.lastIndexOf('/'));
+        }
+        response.sendRedirect(path);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
         List<User> users;
 
-        String pageType;
         if (request.getServletPath().equals(READERS_ACTION)){
             users = UserService.getByRole(pagination, READER);
-            pageType = READER.value();
         } else {
             users = UserService.getByRole(pagination, LIBRARIAN);
-            pageType = LIBRARIAN.value();
         }
-        request.setAttribute("pageType", pageType);
+
         request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("users", users);
         request.getRequestDispatcher(USER_LIST_PAGE).forward(request, response);

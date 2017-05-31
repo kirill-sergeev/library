@@ -40,7 +40,9 @@
                 <div class="item"><a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a></div>
             </c:if>
             <c:if test="${user != null && user.role != 'GUEST'}">
-                <div class="item"><a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a></div>
+                <c:if test="${user.role == 'READER'}">
+                    <a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a>
+                </c:if>
                 <div class="item"><a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a></div>
             </c:if>
         </div>
@@ -79,7 +81,9 @@
                         <a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a>
                     </c:if>
                     <c:if test="${user != null && user.role != 'GUEST'}">
+                        <c:if test="${user.role == 'READER'}">
                         <a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a>
+                        </c:if>
                         <a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a>
                         <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
                             <div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div>

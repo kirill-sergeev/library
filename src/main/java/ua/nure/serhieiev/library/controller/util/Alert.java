@@ -1,38 +1,45 @@
 package ua.nure.serhieiev.library.controller.util;
 
+import static ua.nure.serhieiev.library.controller.util.Alert.Type.*;
+
 public enum Alert {
 
     /**
      * Alerts for registration page
      */
-    EMAIL_ALREADY_IN_USE("alert.warning.email_already_in_use", Type.WARNING),
-    REGISTRATION_SUCCESSFUL("alert.success.registration_successful", Type.SUCCESS),
+    EMAIL_ALREADY_IN_USE("alert.warning.email_already_in_use", WARNING),
+    REGISTRATION_SUCCESSFUL("alert.success.registration_successful", SUCCESS),
     /**
      * Alerts for login page
      */
-    BAD_LOGIN_OR_PASSWORD("alert.warning.bad_login_or_password", Type.WARNING),
-    ACTIVATION_SUCCESSFUL("alert.success.activation_successful", Type.SUCCESS),
+    BAD_LOGIN_OR_PASSWORD("alert.warning.bad_login_or_password", WARNING),
+    ACTIVATION_SUCCESSFUL("alert.success.activation_successful", SUCCESS),
     /**
      * Alerts for reset-password page
      */
-    WRONG_EMAIL("alert.warning.wrong_email", Type.WARNING),
-    WRONG_TOKEN("alert.warning.wrong_token", Type.WARNING),
-    PASSWORD_RESET_SUCCESSFUL("alert.success.reset_successful", Type.SUCCESS),
+    WRONG_EMAIL("alert.warning.wrong_email", WARNING),
+    WRONG_TOKEN("alert.warning.wrong_token", WARNING),
+    PASSWORD_RESET_SUCCESSFUL("alert.success.reset_successful", SUCCESS),
     /**
      * Alerts for change-password page
      */
-    PASSWORD_NOT_CHANGED("alert.warning.password_not_changed", Type.WARNING),
-    PASSWORD_CHANGED_SUCCESSFUL("alert.success.password_changed_successful", Type.SUCCESS),
+    PASSWORD_NOT_CHANGED("alert.warning.password_not_changed", WARNING),
+    PASSWORD_CHANGED_SUCCESSFUL("alert.success.password_changed_successful", SUCCESS),
     /**
      * Alerts for users page
      */
-    USER_UNBLOCKED("alert.success.user_unblocked", Type.SUCCESS),
-    USER_BLOCKED("alert.success.user_blocked", Type.SUCCESS),
-    USER_REMOVED("alert.success.user_removed", Type.SUCCESS),
+    USER_UNBLOCKED("alert.success.user_unblocked", SUCCESS),
+    USER_BLOCKED("alert.success.user_blocked", SUCCESS),
+    USER_REMOVED("alert.success.user_removed", SUCCESS),
     /**
      * Alerts for search action
      */
-    NOT_FOUND("alert.warning.not_found", Type.WARNING);
+    NOT_FOUND("alert.warning.not_found", WARNING),
+    /**
+     * Alerts for add book page
+     */
+    BOOK_ADDED("alert.success.book_added", SUCCESS),
+    BOOK_NOT_ADDED("alert.warning.book_not_added", WARNING);
 
     private final String description;
     private final Type type;

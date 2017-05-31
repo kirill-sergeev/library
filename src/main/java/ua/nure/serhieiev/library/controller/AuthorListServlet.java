@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "AuthorListServlet", urlPatterns = {"/authors.do"})
+import static ua.nure.serhieiev.library.controller.Action.Constants.AUTHORS_ACTION;
+
+@WebServlet(name = "AuthorListServlet", urlPatterns = {AUTHORS_ACTION})
 public class AuthorListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthorListServlet.class);

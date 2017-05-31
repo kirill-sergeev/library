@@ -26,6 +26,7 @@ public final class GenreService {
                 for (Genre withSameTitle : genreDao.getByTitle(bookGenre.getTitle())) {
                     if (bookGenre.getTitle().equalsIgnoreCase(withSameTitle.getTitle())) {
                         bookGenre.setId(withSameTitle.getId());
+                        System.out.println("genre found "+withSameTitle);
                         break;
                     }
                 }
@@ -33,7 +34,9 @@ public final class GenreService {
 
             }
             if (bookGenre.getId() == null) {
+                System.out.println("genre not found "+bookGenre);
                 genreDao.save(bookGenre);
+                System.out.println("genre saved "+bookGenre);
             }
         }
     }

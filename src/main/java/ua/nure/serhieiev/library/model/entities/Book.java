@@ -5,16 +5,18 @@ import java.util.List;
 
 public class Book implements Identified{
 
-    Integer id;
-    Integer quantity;
-    Integer available;
-    Long isbn;
-    String title;
-    String description;
-    LocalDate publicationDate;
-    Publisher publisher;
-    List<Author> authors;
-    List<Genre> genres;
+    private static final long serialVersionUID = 7688715476225409138L;
+
+    private Integer id;
+    private Integer quantity;
+    private Integer available;
+    private Long isbn;
+    private String title;
+    private String description;
+    private LocalDate publicationDate;
+    private Publisher publisher;
+    private List<Author> authors;
+    private List<Genre> genres;
 
     @Override
     public Integer getId() {
@@ -106,6 +108,20 @@ public class Book implements Identified{
     public Book setGenres(List<Genre> genres) {
         this.genres = genres;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Book) && (id != null)
+                ? id.equals(((Book) other).id)
+                : (other == this);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+                ? (this.getClass().hashCode() + id.hashCode())
+                : super.hashCode();
     }
 
     @Override

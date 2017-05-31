@@ -1,4 +1,3 @@
-/*
 package ua.nure.serhieiev.library;
 
 import ua.nure.serhieiev.library.dao.*;
@@ -7,14 +6,15 @@ import ua.nure.serhieiev.library.model.entities.Book;
 import ua.nure.serhieiev.library.model.entities.Genre;
 import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.ApplicationException;
-import ua.nure.serhieiev.library.service.BookService;
+import ua.nure.serhieiev.library.service.util.PasswordAuthentication;
+
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         Genre genre = new Genre().setTitle("Modernon");
         Genre genre2 = new Genre().setTitle("Fantasynon");
 
@@ -41,14 +41,14 @@ public class Main {
             AuthorDao authorDao = df.getAuthorDao();
             PublisherDao publisherDao = df.getPublisherDao();
             tm.start();
-            try{
+            try {
                 publisherDao.save(publisher);
                 genreDao.save(genre);
                 genreDao.save(genre2);
                 authorDao.save(author);
                 authorDao.save(author2);
                 bookDao.save(book);
-            }catch (Exception e){
+            } catch (Exception e) {
                 tm.rollback();
                 e.printStackTrace();
             }
@@ -56,43 +56,19 @@ public class Main {
             throw new ApplicationException(e);
         }
 
-*/
-/*        try (DaoFactory df = DaoFactory.getInstance()
-         ) {
+        try (DaoFactory df = DaoFactory.getInstance()
+        ) {
             BookDao bookDao = df.getBookDao();
 
         } catch (Exception e) {
             throw new ApplicationException(e);
-        }*//*
-
-
-
-
-
-     */
-/*   Pagination pagination = new Pagination().setAscending(true).setLimit(10).setOffset(0).setSortBy("id");
-        System.out.println(BookService.getByAuthor(new Author().setId(10),pagination));*//*
-
-
-       // System.out.println(BookService.getByRole(1, BookService.Field.TITLE, true, 2));
+        }
     }
 
-    public static void main2(String[] args) {
-        long start = System.nanoTime();
-        for (int i = 0; i < 1000; i++) {
-            System.out.println(BookService.getAll(true).size());
-        }
-        long finish = System.nanoTime();
-        System.out.println((finish-start)/100000000);
-
-       */
-/* List<String> fields = new ArrayList<>();
-        for (Field field : Book.class.getDeclaredFields()){
-                fields.add(field.getName().replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase());
-        }
-        System.out.println(fields);*//*
-
+    public static void main(String[] args) {
+        PasswordAuthentication pa = new PasswordAuthentication();
+        String hash = pa.hash("111111".toCharArray());
+        System.out.println(hash);
+        System.out.println(pa.authenticate("123456".toCharArray(), hash));
     }
-
 }
-*/

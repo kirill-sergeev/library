@@ -7,6 +7,7 @@ import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,36 +17,46 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.model.entities.User.Role.*;
 
-@WebServlet(name = "ProfileServlet", urlPatterns = {"/profile.do"})
+@WebServlet(name = "ProfileServlet", urlPatterns = {PROFILE_ACTION, USER_ACTION})
 public class ProfileServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(ProfileServlet.class);
-    private static final String PROFILE_PAGE = "/WEB-INF/jsp/user-profile.jsp";
-    private static final String ORDER_LIST_PAGE = "/WEB-INF/jsp/orders.jsp";
+    private static final String USER_PAGE = "/WEB-INF/jsp/user.jsp";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+    private void readerOrders(HttpServletRequest request, User user) {
         Pagination pagination = PaginationMapper.getPagination(request);
-        User user = (User) request.getSession().getAttribute("user");
-
-        String path;
-        List<Order> orders;
-        if (user.getRole().ordinal() < LIBRARIAN.ordinal()){
-            orders = OrderService.getByReader(pagination, user);
-            path = PROFILE_PAGE;
-        } else{
-            orders = OrderService.getAll(pagination);
-            path = ORDER_LIST_PAGE;
-        }
-
+        List<Order> orders = OrderService.getByReader(pagination, user);
         request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("orders", orders);
-        request.getRequestDispatcher(path).forward(request, response);
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        User user = null;
+        if (request.getServletPath().equals(PROFILE_ACTION)) {
+            user = (User) request.getSession().getAttribute("user");
+            if (user.getRole() == READER) {
+                readerOrders(request, user);
+            }
+        } else if (request.getServletPath().equals(USER_ACTION)) {
+            Integer userId = Integer.valueOf(request.getParameter("id"));
+            user = UserService.getUniqueMatching(new User().setId(userId));
+            if (user.getRole() == READER) {
+                readerOrders(request, user);
+            }
+        }
+
+        request.setAttribute("user", user);
+        request.getRequestDispatcher(USER_PAGE).forward(request, response);
     }
 
 }

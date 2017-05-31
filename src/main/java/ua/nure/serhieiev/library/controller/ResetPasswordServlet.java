@@ -29,7 +29,8 @@ public class ResetPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
         String email = request.getParameter("email");
         try {
-            User user = UserService.resetPassword(new User().setEmail(email));
+            User user = new User().setEmail(email);
+            UserService.resetPassword(user);
             EmailUtil.sendResetLink(user);
             request.setAttribute(ALERT, Alert.PASSWORD_RESET_SUCCESSFUL);
             LOG.info("Reset password request with email {}.", email);
@@ -62,7 +63,7 @@ public class ResetPasswordServlet extends HttpServlet {
         String password = request.getParameter("password");
         User user = new User().setResetPasswordToken(resetToken).setPassword(password);
         try {
-            user = UserService.changePassword(user);
+            UserService.changePassword(user);
             request.setAttribute(ALERT, Alert.PASSWORD_CHANGED_SUCCESSFUL);
             LOG.info("Password changed by reset token on account {}.", user.getEmail());
         } catch (ApplicationException e) {

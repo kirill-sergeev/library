@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import static ua.nure.serhieiev.library.controller.Action.Constants.*;
 
-@WebServlet(name = "ActivateAccountServlet", urlPatterns = {ACTIVATE_ACTION})
+@WebServlet(name = "ActivateAccountServlet", urlPatterns = ACTIVATE_ACTION)
 public class ActivateAccountServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivateAccountServlet.class);
@@ -27,7 +27,7 @@ public class ActivateAccountServlet extends HttpServlet {
         String activationToken = request.getParameter("token");
         try {
             User user = new User().setActivationToken(activationToken);
-            user = UserService.activate(user);
+            UserService.activate(user);
             request.setAttribute(ALERT, Alert.ACTIVATION_SUCCESSFUL);
             LOG.info("Account {} activated.", user.getEmail());
         } catch (ApplicationException e) {

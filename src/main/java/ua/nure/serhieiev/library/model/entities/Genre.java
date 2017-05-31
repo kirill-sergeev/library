@@ -2,8 +2,10 @@ package ua.nure.serhieiev.library.model.entities;
 
 public class Genre implements Identified {
 
-    Integer id;
-    String title;
+    private static final long serialVersionUID = 7070967959735927042L;
+
+    private Integer id;
+    private String title;
 
     @Override
     public Integer getId() {
@@ -23,6 +25,20 @@ public class Genre implements Identified {
     public Genre setTitle(String title) {
         this.title = title;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Genre) && (id != null)
+                ? id.equals(((Genre) other).id)
+                : (other == this);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+                ? (this.getClass().hashCode() + id.hashCode())
+                : super.hashCode();
     }
 
     @Override

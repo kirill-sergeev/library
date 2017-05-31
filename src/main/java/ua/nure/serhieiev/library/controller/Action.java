@@ -10,6 +10,12 @@ import static ua.nure.serhieiev.library.model.entities.User.Role.*;
 public enum Action{
 
     BOOK_LIST(BOOKS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    AUTHOR_LIST(AUTHORS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    GENRE_LIST(GENRES_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    PUBLISHER_LIST(PUBLISHERS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+
+
+
     ORDER_LIST(CLOSED_ORDERS_ACTION, LIBRARIAN, ADMIN),
     UNCONFIRMED_ORDER_LIST(ORDERS_ACTION, LIBRARIAN, ADMIN),
     CURRENT_ORDER_LIST(CURRENT_ORDERS_ACTION, LIBRARIAN, ADMIN),
@@ -17,6 +23,8 @@ public enum Action{
     READERS(READERS_ACTION, LIBRARIAN, ADMIN),
     LIBRARIANS(LIBRARIANS_ACTION, ADMIN),
     REGISTER_LIBRARIAN(REGISTER_LIBRARIAN_ACTION, ADMIN),
+    PROFILE(PROFILE_ACTION, READER, LIBRARIAN, ADMIN),
+    USER(USER_ACTION, LIBRARIAN, ADMIN),
 
 
 
@@ -64,6 +72,12 @@ public enum Action{
         String READERS_ACTION = "/readers.do";
         String LIBRARIANS_ACTION = "/librarians.do";
         String REGISTER_LIBRARIAN_ACTION = "/new-librarian.do";
+        String PROFILE_ACTION = "/profile.do";
+        String USER_ACTION = "/user.do";
+
+        String AUTHORS_ACTION = "/authors.do";
+        String GENRES_ACTION = "/genres.do";
+        String PUBLISHERS_ACTION = "/publishers.do";
 
 
 

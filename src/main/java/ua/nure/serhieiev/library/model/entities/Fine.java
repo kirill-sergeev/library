@@ -2,6 +2,8 @@ package ua.nure.serhieiev.library.model.entities;
 
 public class Fine implements Identified{
 
+    private static final long serialVersionUID = 9044755252271193574L;
+
     Integer id;
     Order order;
     Double cost;

@@ -30,8 +30,13 @@
                             <th ${sort != 'publisher_id' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>Publisher</th>
                             <th ${sort != 'publication_date' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>Publication</th>
                             <th ${sort != 'isbn' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>ISBN</th>
+                            <c:if test="${user.role == 'ADMIN'}">
+                            <th ${sort != 'quantity' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>Quantity</th>
+                            </c:if>
                             <th ${sort != 'available' ? '' : order == 'desc' ? 'class="sorted descending"' : 'class="sorted ascending"'}>Available</th>
+                            <c:if test="${user.role == 'READER' && user.enabled}">
                             <th>To cart</th>
+                            </c:if>
                         </tr>
                         </thead>
                         <tbody>
@@ -54,8 +59,12 @@
                                 <td>${book.publisher.title}</td>
                                 <td>${book.publicationDate}</td>
                                 <td>${book.isbn}</td>
+                                <c:if test="${user.role == 'ADMIN'}">
+                                <td>${book.quantity}</td>
+                                </c:if>
                                 <td>${book.available}</td>
-                                <td class="collapsing">
+                                <c:if test="${user.role == 'READER' && user.enabled}">
+                                <td>
                                     <jsp:useBean id="localCart" scope="session"
                                                  type="java.util.Map<java.lang.Integer, java.time.LocalDateTime>"/>
                                     <c:if test="${book.available > 0 || localCart.get(book.id) != null}">
@@ -72,6 +81,7 @@
                                         </form>
                                     </c:if>
                                 </td>
+                                </c:if>
                             </tr>
                         </c:forEach>
                         </tbody>
@@ -114,6 +124,9 @@
                                                 <option value="publisher_id">Publisher</option>
                                                 <option value="publication_date">Publication Date</option>
                                                 <option value="isbn">ISBN</option>
+                                                <c:if test="${user.role == 'ADMIN'}">
+                                                <option value="quantity">Quantity</option>
+                                                </c:if>
                                                 <option value="available">Available</option>
                                             </select>
                                         </div>

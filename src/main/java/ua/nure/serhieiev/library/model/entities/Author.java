@@ -2,8 +2,10 @@ package ua.nure.serhieiev.library.model.entities;
 
 public class Author implements Identified {
 
-    Integer id;
-    String name;
+    private static final long serialVersionUID = -4399004977176241611L;
+
+    private Integer id;
+    private String name;
 
     @Override
     public Integer getId() {
@@ -23,6 +25,20 @@ public class Author implements Identified {
     public Author setName(String name) {
         this.name = name;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Author) && (id != null)
+                ? id.equals(((Author) other).id)
+                : (other == this);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+                ? (this.getClass().hashCode() + id.hashCode())
+                : super.hashCode();
     }
 
     @Override

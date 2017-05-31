@@ -22,7 +22,7 @@ public final class BookService {
                 bookDao.save(book);
             } catch (RuntimeException e) {
                 tm.rollback();
-                e.printStackTrace();
+                throw new ApplicationException(e);
             }
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -34,12 +34,17 @@ public final class BookService {
         try (DaoFactory df = DaoFactory.getInstance();
              TransactionManager tm = df.getTransactionManager()) {
             BookDao bookDao = df.getBookDao();
+
             tm.start();
+            AuthorService.checkAuthors(df, book.getAuthors());
+            GenreService.checkGenres(df, book.getGenres());
+            PublisherService.checkPublisher(df, book.getPublisher());
+
             try {
                 bookDao.update(book);
             } catch (RuntimeException e) {
                 tm.rollback();
-                e.printStackTrace();
+                throw new ApplicationException(e);
             }
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -56,7 +61,7 @@ public final class BookService {
                 bookDao.remove(book.getId());
             } catch (RuntimeException e) {
                 tm.rollback();
-                e.printStackTrace();
+                throw new ApplicationException(e);
             }
         } catch (Exception e) {
             throw new ApplicationException(e);

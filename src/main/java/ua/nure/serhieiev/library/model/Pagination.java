@@ -71,4 +71,40 @@ public class Pagination {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Pagination that = (Pagination) o;
+
+        if (page != that.page) return false;
+        if (limit != that.limit) return false;
+        if (ascending != that.ascending) return false;
+        if (numberOfItems != null ? !numberOfItems.equals(that.numberOfItems) : that.numberOfItems != null)
+            return false;
+        return sortBy != null ? sortBy.equals(that.sortBy) : that.sortBy == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = page;
+        result = 31 * result + limit;
+        result = 31 * result + (ascending ? 1 : 0);
+        result = 31 * result + (numberOfItems != null ? numberOfItems.hashCode() : 0);
+        result = 31 * result + (sortBy != null ? sortBy.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Pagination{" +
+                "page=" + page +
+                ", limit=" + limit +
+                ", ascending=" + ascending +
+                ", numberOfItems=" + numberOfItems +
+                ", sortBy='" + sortBy + '\'' +
+                '}';
+    }
+
 }

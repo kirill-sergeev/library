@@ -5,13 +5,15 @@ import java.util.List;
 
 public class Order implements Identified{
 
-    Integer id;
-    User reader;
-    User librarian;
-    LocalDate orderDate;
-    LocalDate returnDate;
-    Boolean internal;
-    List<Book> books;
+    private static final long serialVersionUID = 6362562512634226437L;
+
+    private Integer id;
+    private User reader;
+    private User librarian;
+    private LocalDate orderDate;
+    private LocalDate returnDate;
+    private Boolean internal;
+    private List<Book> books;
 
     @Override
     public Integer getId() {
@@ -76,6 +78,20 @@ public class Order implements Identified{
     public Order setBooks(List<Book> books) {
         this.books = books;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Order) && (id != null)
+                ? id.equals(((Order) other).id)
+                : (other == this);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+                ? (this.getClass().hashCode() + id.hashCode())
+                : super.hashCode();
     }
 
     @Override

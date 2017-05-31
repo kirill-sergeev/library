@@ -205,11 +205,11 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
 
     @Override
     public void update(Book book) {
-        super.update(book);
         removeAuthorsFromBook(book);
         removeGenresFromBook(book);
         addAuthorsToBook(book);
         addGenresToBook(book);
+        super.update(book);
     }
 
     @Override

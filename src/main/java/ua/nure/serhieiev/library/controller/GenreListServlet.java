@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "GenreListServlet", urlPatterns = {"/genres.do"})
+import static ua.nure.serhieiev.library.controller.Action.Constants.GENRES_ACTION;
+
+@WebServlet(name = "GenreListServlet", urlPatterns = {GENRES_ACTION})
 public class GenreListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenreListServlet.class);

@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 public class User implements Identified{
 
+    private static final long serialVersionUID = 3761971688699895147L;
+
     private Integer id;
     private String email;
     private String name;
@@ -115,13 +117,32 @@ public class User implements Identified{
         return this;
     }
 
+    /**
+     * The user ID is unique for each User. So this should compare User by ID only.
+     */
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof User) && (id != null)
+                ? id.equals(((User) other).id)
+                : (other == this);
+    }
+
+    /**
+     * The user ID is unique for each User. So User with same ID should return same hashcode.
+     */
+    @Override
+    public int hashCode() {
+        return (id != null)
+                ? (this.getClass().hashCode() + id.hashCode())
+                : super.hashCode();
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", authToken='" + authToken + '\'' +
                 ", activationToken='" + activationToken + '\'' +
                 ", resetPasswordToken='" + resetPasswordToken + '\'' +

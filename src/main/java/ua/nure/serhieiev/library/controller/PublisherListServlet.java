@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "PublisherListServlet", urlPatterns = {"/publishers.do"})
+import static ua.nure.serhieiev.library.controller.Action.Constants.PUBLISHERS_ACTION;
+
+@WebServlet(name = "PublisherListServlet", urlPatterns = {PUBLISHERS_ACTION})
 public class PublisherListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublisherListServlet.class);

@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
-@WebServlet(name = "LogoutServlet", urlPatterns = {LOGOUT_ACTION})
+@WebServlet(name = "LogoutServlet", urlPatterns = LOGOUT_ACTION)
 public class LogoutServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogoutServlet.class);
@@ -25,7 +25,7 @@ public class LogoutServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
         removeCookie(request, response);
         request.getSession().invalidate();
-        response.sendRedirect(MAIN_ACTION);
+        response.sendRedirect(INDEX_ACTION);
         LOG.info("User {} logged out.", user.getEmail());
     }
 

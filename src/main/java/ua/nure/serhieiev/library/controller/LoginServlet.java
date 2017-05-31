@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
 
-@WebServlet(name = "LoginServlet", urlPatterns = {LOGIN_ACTION})
+@WebServlet(name = "LoginServlet", urlPatterns = LOGIN_ACTION)
 public class LoginServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LoginServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginServlet.class);
     private static final String LOGIN_PAGE = "/WEB-INF/jsp/login.jsp";
     private static final String ALERT = "alert";
 
@@ -40,19 +40,19 @@ public class LoginServlet extends HttpServlet {
                 String authToken = UUID.randomUUID().toString();
                 user.setAuthToken(authToken);
                 user = UserService.authenticate(user);
-                setCookie(request, response , authToken);
+                setCookie(request, response, authToken);
             } else {
                 user = UserService.authenticate(user);
             }
             request.getSession().setAttribute("user", user);
-            LOG.info("Log in with email {}.", email);
+            logger.info("User {} logged in.", email);
         } catch (ApplicationException e) {
             request.setAttribute(ALERT, Alert.BAD_LOGIN_OR_PASSWORD);
             request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
-            LOG.info("Unsuccessful log in with email {}.", email);
+            logger.info("Unsuccessful log in with email {}.", email);
             return;
         }
-        response.sendRedirect(MAIN_ACTION);
+        response.sendRedirect(INDEX_ACTION);
     }
 
     private void setCookie(HttpServletRequest request, HttpServletResponse response, String authToken) {

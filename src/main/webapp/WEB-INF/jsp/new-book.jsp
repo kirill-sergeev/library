@@ -5,8 +5,8 @@
 <c:set var="pagename" scope="request" value="new-book"/>
 <%@ include file="../jspf/header.jspf" %>
 
-<div class="ui three column center aligned grid basic segment">
-    <div class="column">
+<div class="ui center aligned grid basic segment">
+    <div class="column form-column">
         <div class="center aligned row">
         <h2 class="ui header">New book</h2>
         <form action="<c:url value="/new-book.do"/>" method="post" class="ui large form">

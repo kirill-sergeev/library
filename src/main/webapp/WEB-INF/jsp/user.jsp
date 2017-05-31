@@ -5,40 +5,41 @@
 <%@ include file="../jspf/header.jspf" %>
 
 <div class="ui center aligned grid basic segment">
-    <div class="ui two column grid centered">
+    <div class="ui grid centered">
+        <c:if test="${not empty alert}">
+            <div class="ui message ${alert.type}">
+                <ul class="list">
+                    <li><fmt:message key="${alert.description}"/></li>
+                </ul>
+            </div>
+        </c:if>
         <div class="column">
-            <div class="ui center aligned segment">
-                <%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
-                <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
-                <c:if test="${not empty alert}">
-                    <div class="ui message ${alert.type}">
-                        <ul class="list">
-                            <li><fmt:message key="${alert.description}"/></li>
-                        </ul>
+            <div class="ui card">
+                <div class="content centered">
+                    <a class="header">${profile.name}</a>
+                    <div class="meta">
+                        <span class="date">Joined ${profile.registrationDate}</span>
+                    </div>
+                    <div class="meta">
+                        <span class="date">Last visit ${profile.lastVisit}</span>
+                    </div>
+                    <div class="description">
+                        <a class="ui basic label">${profile.role.value()}</a>
+                        <c:if test="${not profile.enabled}"><a class="ui red label">blocked</a></c:if>
+                    </div>
+                </div>
+                <c:if test="${profile.role == 'READER'}">
+                    <div class="extra content">
+                        <i class="remove bookmark icon"></i>Orders: ${orders.size()}
                     </div>
                 </c:if>
-                <div class="ui card">
-                    <div class="content">
-                        <a class="header">${user.name}</a>
-                        <div class="meta">
-                            <span class="date">Joined ${user.registrationDate}</span>
-                        </div>
-                        <div class="meta">
-                            <span class="date">Last visit ${user.lastVisit}</span>
-                        </div>
-                        <div class="description">
-                            ${user.role.value()}
-                        </div>
-                    </div>
-                    <c:if test="${user.role == 'READER'}">
-                        <div class="extra content">
-                            <i class="remove bookmark icon"></i>Orders: ${orders.size()}
-                        </div>
-                    </c:if>
-                </div>
-                <c:choose>
-                    <c:when test="${not empty orders}">
-                        <table class="ui black striped fixed table">
+            </div>
+            <%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+            <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
+            <c:choose>
+                <c:when test="${not empty orders}">
+                    <div class="ui center aligned segment">
+                        <table class="ui black striped table">
                             <thead>
                             <tr>
                                 <th>Books</th>
@@ -76,7 +77,7 @@
                                     <%@ include file="../jspf/pagination.jspf" %>
                                 </th>
                                 <th colspan="3">
-                                    <form action="<c:url value="/orders.do"/>" method="get" class="ui form right floated">
+                                    <form action="<c:url value="/user.do"/>" method="get" class="ui form right floated">
                                         <div class="inline fields">
                                             <div class="field">
                                                 <select class="ui dropdown" name="items">
@@ -95,14 +96,6 @@
                                                 </select>
                                             </div>
                                             <div class="field">
-                                                <div class="ui toggle checkbox">
-                                                    <input
-                                                        <c:out value="${order == 'desc' ? 'checked=checked' : 'value=desc'}"/>
-                                                            type="checkbox" name="order">
-                                                    <label>DESC</label>
-                                                </div>
-                                            </div>
-                                            <div class="field">
                                                 <div class="ui submit button">Submit</div>
                                             </div>
                                         </div>
@@ -111,14 +104,14 @@
                             </tr>
                             </tfoot>
                         </table>
-                    </c:when>
-                    <c:when test="${empty orders && user.role == 'READER'}">
-                        <div class="ui message info">
-                            <div class="header">No orders</div>
-                        </div>
-                    </c:when>
-                </c:choose>
-            </div>
+                    </div>
+                </c:when>
+                <c:when test="${empty orders && profile.role == 'READER'}">
+                    <div class="ui message info">
+                        <div class="header">No orders</div>
+                    </div>
+                </c:when>
+            </c:choose>
         </div>
     </div>
 </div>

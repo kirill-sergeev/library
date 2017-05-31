@@ -4,7 +4,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
-@WebFilter("/*")
+@WebFilter(filterName = "CharsetFilter", urlPatterns = "/*")
 public class CharsetFilter implements Filter {
 
     private String encoding;

@@ -4,8 +4,8 @@
 <c:set var="pagename" scope="request" value="change-password"/>
 <%@ include file="../jspf/header.jspf" %>
 
-<div class="ui middle aligned center aligned grid basic segment">
-    <div class="column">
+<div class="ui center aligned grid basic segment">
+    <div class="column form-column">
         <h2 class="ui teal image header"><fmt:message key="change-password.header.change"/></h2>
         <form action="<c:url value="/register.do"/>" method="post" class="ui large form">
             <div class="ui stacked segment">

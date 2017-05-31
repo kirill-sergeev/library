@@ -14,83 +14,37 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebListener()
-public class CartListener implements ServletContextListener,
-        HttpSessionListener, HttpSessionAttributeListener, ServletRequestListener {
+public class CartListener implements ServletContextListener, HttpSessionListener {
 
-    // Public constructor is required by servlet spec
     public CartListener() {
     }
 
-    // -------------------------------------------------------
-    // ServletContextListener implementation
-    // -------------------------------------------------------
+    /**
+     * This method is called when the servlet context is
+     * initialized(when the Web application is deployed).
+     */
     public void contextInitialized(ServletContextEvent sce) {
         sce.getServletContext()
                 .setAttribute("globalCart",
                         new ConcurrentHashMap<LocalDateTime, Integer>());
-      /* This method is called when the servlet context is
-         initialized(when the Web application is deployed). 
-         You can initialize servlet context related data here.
-      */
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
-      /* This method is invoked when the Servlet Context 
-         (the Web application) is undeployed or 
-         Application Server shuts down.
-      */
     }
 
-    // -------------------------------------------------------
-    // HttpSessionListener implementation
-    // -------------------------------------------------------
+
     public void sessionCreated(HttpSessionEvent se) {
         se.getSession()
                 .setAttribute("localCart",
                         new ConcurrentHashMap<Integer, LocalDateTime>());
-      /* Session is created. */
     }
 
     public void sessionDestroyed(HttpSessionEvent se) {
-        Map<Integer, LocalDateTime> localCart = (Map<Integer, LocalDateTime>) se.getSession().getAttribute("localCart");
-        Map<LocalDateTime, Integer> globalCart = (Map<LocalDateTime, Integer>) se.getSession().getServletContext().getAttribute("globalCart");
+        Map<Integer, LocalDateTime> localCart = (Map<Integer, LocalDateTime>)
+                se.getSession().getAttribute("localCart");
+        Map<LocalDateTime, Integer> globalCart = (Map<LocalDateTime, Integer>)
+                se.getSession().getServletContext().getAttribute("globalCart");
         globalCart.keySet().removeAll(localCart.values());
-      /* Session is destroyed. */
     }
-
-    // -------------------------------------------------------
-    // HttpSessionAttributeListener implementation
-    // -------------------------------------------------------
-
-    public void attributeAdded(HttpSessionBindingEvent sbe) {
-      /* This method is called when an attribute 
-         is added to a session.
-      */
-    }
-
-    public void attributeRemoved(HttpSessionBindingEvent sbe) {
-      /* This method is called when an attribute
-         is removed from a session.
-      */
-    }
-
-    public void attributeReplaced(HttpSessionBindingEvent sbe) {
-      /* This method is invoked when an attibute
-         is replaced in a session.
-      */
-   /*   sbe.getSession().getServletContext()
-      sbe.getSource()
-      if (sbe.getName().equals("localCart")){
-            sbe.getValue()
-        }*/
-    }
-
-    @Override
-    public void requestDestroyed(ServletRequestEvent sre) {
-    }
-
-    public void requestInitialized(ServletRequestEvent sre) {
-    }
-
 
 }

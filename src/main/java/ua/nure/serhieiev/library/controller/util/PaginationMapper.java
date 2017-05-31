@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public final class PaginationMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PaginationMapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaginationMapper.class);
 
     public static Pagination getPagination(HttpServletRequest request) {
         Pagination pagination = new Pagination();
@@ -30,7 +30,7 @@ public final class PaginationMapper {
                 pagination.setSortBy(sortParam.toLowerCase());
             }
         } catch (RuntimeException e) {
-            LOG.trace("Bad parameters for items list extracting.", e);
+            logger.trace("Bad parameters for items list extracting.", e);
         }
 
         request.setAttribute("items", pagination.getLimit());
@@ -42,7 +42,6 @@ public final class PaginationMapper {
     }
 
     private PaginationMapper() {
-
     }
 
 }

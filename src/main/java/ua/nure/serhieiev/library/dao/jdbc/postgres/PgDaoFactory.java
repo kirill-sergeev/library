@@ -1,5 +1,8 @@
 package ua.nure.serhieiev.library.dao.jdbc.postgres;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.nure.serhieiev.library.controller.LogoutServlet;
 import ua.nure.serhieiev.library.dao.*;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcTransactionManager;
 
@@ -16,28 +19,20 @@ public class PgDaoFactory extends DaoFactory {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/postgresql");
         } catch (NamingException e) {
-            //throw new IllegalStateException("Missing JNDI!", e);
+            throw new IllegalStateException("Missing JNDI!", e);
         }
     }
 
-    static int var = 0;
     private static DataSource dataSource;
     private Connection con;
 
     private static Connection getConnection() {
-        Connection con = null;
-        System.out.println(++var);
+        Connection con;
         try {
-            if (dataSource == null) {
-                con = DriverManager.getConnection
-                        ("jdbc:postgresql://localhost:5432/library?user=postgres&password=kirill");
-                return con;
-            }
             con = dataSource.getConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DaoException(e);
         }
-
         return con;
     }
 

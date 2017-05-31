@@ -56,6 +56,10 @@
                                     <button type="submit" name="button" value="order" class="ui submit button positive">
                                         Make order
                                     </button>
+                                    <div class="ui checkbox">
+                                        <input type="checkbox" name="internal" value="true">
+                                        <label>I want to read this books in the library.</label>
+                                    </div>
                                     <button type="submit" name="button" value="clear" class="ui submit button negative right floated">
                                         Clear cart
                                     </button>

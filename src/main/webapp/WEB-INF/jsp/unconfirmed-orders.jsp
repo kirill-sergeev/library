@@ -4,8 +4,8 @@
 <c:set var="pagename" scope="request" value="unconfirmed-orders"/>
 <%@ include file="../jspf/header.jspf" %>
 
-<div class="ui middle aligned center aligned grid basic segment">
-    <div class="ui two column grid centered">
+<div class="ui center aligned grid basic segment">
+    <div class="ui grid centered">
         <div class="column">
             <div class="ui center aligned segment">
                 <%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
@@ -19,7 +19,7 @@
                 <c:choose>
                     <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
                     <c:when test="${not empty orders}">
-                        <table class="ui yellow striped fixed table">
+                        <table class="ui yellow striped table">
                             <thead>
                             <tr>
                                 <th class="six wide">Reader</th>
@@ -49,7 +49,7 @@
                                         <form action="<c:url value="/orders.do"/>" method="post">
                                             <input type="hidden" name="order" value="${order.id}"/>
                                             <button class="ui left attached button submit positive icon" name="button" value="accept"><i class="checkmark icon"></i></button>
-                                            <button class="right attached ui button submit negative icon" name="button" value="decline"><i class="remove icon"></i></button>
+                                            <button class="right attached ui button submit negative icon" name="button" value="reject"><i class="remove icon"></i></button>
                                         </form>
                                     </td>
                                 </tr>

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
@@ -26,11 +26,26 @@ public class UserListServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(UserListServlet.class);
     private static final String USER_LIST_PAGE = "/WEB-INF/jsp/users.jsp";
 
+    private String setPath(HttpServletRequest request){
+        String header = request.getHeader("referer");
+        String path;
+
+        if (header == null){
+            path = USER_LIST_PAGE;
+        } else{
+            path = header.substring(header.lastIndexOf('/'));
+        }
+        return path;
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
-
         Integer userId = Integer.valueOf(request.getParameter("user"));
         User user = new User().setId(userId);
+
+        if (action == null) {
+            action = "";
+        }
 
         switch (action) {
             case "activate":
@@ -49,27 +64,18 @@ public class UserListServlet extends HttpServlet {
                 LOG.info("Removed user with id {}.", userId);
                 break;
         }
-        String header = request.getHeader("referer");
-        String path;
-
-        if (header == null){
-            path = USER_LIST_PAGE;
-        } else{
-            path = header.substring(header.lastIndexOf('/'));
-        }
-        response.sendRedirect(path);
+        response.sendRedirect(setPath(request));
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Pagination pagination = PaginationMapper.getPagination(request);
-        List<User> users;
+        List<User> users = null;
 
         if (request.getServletPath().equals(READERS_ACTION)){
             users = UserService.getByRole(pagination, READER);
-        } else {
+        } else if (request.getServletPath().equals(LIBRARIANS_ACTION)){
             users = UserService.getByRole(pagination, LIBRARIAN);
         }
-
         request.setAttribute("numberOfPages", pagination.getNumberOfPages());
         request.setAttribute("users", users);
         request.getRequestDispatcher(USER_LIST_PAGE).forward(request, response);

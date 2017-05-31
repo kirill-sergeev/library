@@ -15,12 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
-@WebServlet(name = "RegisterServlet", asyncSupported = true,urlPatterns = {REGISTER_ACTION, REGISTER_LIBRARIAN_ACTION})
+@WebServlet(name = "RegisterServlet",urlPatterns = {REGISTER_ACTION, REGISTER_LIBRARIAN_ACTION})
 public class RegisterServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RegisterServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegisterServlet.class);
     private static final String REGISTER_PAGE = "/WEB-INF/jsp/register.jsp";
     private static final String REGISTER_LIBRARIAN_PAGE = "/WEB-INF/jsp/register-librarian.jsp";
     private static final String ALERT = "alert";
@@ -40,14 +40,15 @@ public class RegisterServlet extends HttpServlet {
                 new Thread(() -> EmailUtil.sendRegistrationLink(user)).start();
             } else {
                 UserService.saveLibrarian(user);
+                new Thread(() -> EmailUtil.sendWelcomeMessage(user)).start();
                 response.sendRedirect(LIBRARIANS_ACTION);
                 return;
             }
             request.setAttribute(ALERT, Alert.REGISTRATION_SUCCESSFUL);
-            LOG.info("Registered new user with email {}.", email);
+            logger.info("Registered new user with email {}.", email);
         } catch (ApplicationException e) {
             request.setAttribute(ALERT, Alert.EMAIL_ALREADY_IN_USE);
-            LOG.info("Unsuccessful registration with email {}.", email);
+            logger.info("Unsuccessful registration with email {}.", email);
         }
         doGet(request, response);
     }

@@ -3,7 +3,6 @@ package ua.nure.serhieiev.library.controller.util;
 import static ua.nure.serhieiev.library.controller.util.Alert.Type.*;
 
 public enum Alert {
-
     /**
      * Alerts for registration page
      */
@@ -39,7 +38,13 @@ public enum Alert {
      * Alerts for add book page
      */
     BOOK_ADDED("alert.success.book_added", SUCCESS),
-    BOOK_NOT_ADDED("alert.warning.book_not_added", WARNING);
+    BOOK_NOT_ADDED("alert.warning.book_not_added", WARNING),
+    /**
+     * Alerts for change book page
+     */
+    BOOK_CHANGED("alert.success.book_changed", SUCCESS),
+    BOOK_NOT_CHANGED("alert.warning.book_not_changed", WARNING),
+    AVAILABLE_MORE_THAN_QUANTITY("alert.warning.available_more_than_quantity", WARNING);
 
     private final String description;
     private final Type type;
@@ -57,9 +62,10 @@ public enum Alert {
         return type.getType();
     }
 
+
     public enum Type {
 
-        SUCCESS("positive"), DANGER("negative"), INFO("positive"), WARNING("negative");
+        SUCCESS("positive"), WARNING("negative");
 
         private String type;
 

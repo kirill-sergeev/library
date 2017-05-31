@@ -6,7 +6,7 @@
 <jsp:useBean id="book" scope="request" type="ua.nure.serhieiev.library.model.entities.Book"/>
 
 <div class="ui three column center aligned grid basic segment">
-    <div class="column">
+    <div class="column form-column">
         <div class="center aligned row">
             <h2 class="ui header">Change book</h2>
             <form action="<c:url value="/change-book.do"/>" method="post" class="ui large form">

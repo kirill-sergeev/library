@@ -1,9 +1,7 @@
 package ua.nure.serhieiev.library.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ua.nure.serhieiev.library.controller.util.Alert;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
+import ua.nure.serhieiev.library.controller.util.Validator;
 import ua.nure.serhieiev.library.model.entities.Author;
 import ua.nure.serhieiev.library.service.AuthorService;
 import ua.nure.serhieiev.library.model.Pagination;
@@ -14,18 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.AUTHORS_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
-@WebServlet(name = "AuthorListServlet", urlPatterns = {AUTHORS_ACTION})
+@WebServlet(name = "AuthorListServlet", urlPatterns = AUTHORS_ACTION)
 public class AuthorListServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorListServlet.class);
     private static final String AUTHOR_LIST_PAGE = "/WEB-INF/jsp/authors.jsp";
-    private static final String ALERT = "alert";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -36,7 +30,7 @@ public class AuthorListServlet extends HttpServlet {
         List<Author> authors;
 
         String name = request.getParameter("search");
-        if (name != null && !name.trim().isEmpty()) {
+        if (Validator.isString(name)) {
             authors = AuthorService.getByName(name);
         } else {
             authors = AuthorService.getAll(pagination);

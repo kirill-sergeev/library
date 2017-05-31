@@ -7,15 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "MainServlet", urlPatterns = {""})
+@WebServlet(name = "MainServlet", urlPatterns = "")
 public class MainServlet extends HttpServlet {
 
-    static final String ERROR_PAGE = "/WEB-INF/jsp/404.jsp";
     private static final String INDEX_PAGE = "/WEB-INF/jsp/index.jsp";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        request.getRequestDispatcher(INDEX_PAGE).forward(request, response);
+       doGet(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

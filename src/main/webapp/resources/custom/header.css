@@ -87,6 +87,7 @@ body > .grid {
     height: 100%;
 }
 
-.column {
+.form-column {
     max-width: 450px;
+    margin-top: 5%;
 }

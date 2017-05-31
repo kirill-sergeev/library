@@ -5,7 +5,7 @@
 <%@ include file="../jspf/header.jspf" %>
 
 <div class="ui center aligned grid basic segment">
-    <div class="column">
+    <div class="column form-column">
         <h2 class="ui teal image header"><fmt:message key="login.header.login"/></h2>
         <form action="<c:url value="/login.do"/>" method="post" class="ui large form">
             <div class="ui stacked segment">

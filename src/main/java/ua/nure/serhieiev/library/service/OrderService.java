@@ -73,7 +73,7 @@ public final class OrderService {
         return order;
     }
 
-    public static void declineOrder(Order order) {
+    public static void rejectOrder(Order order) {
         if (order == null || order.getId() == null) {
             throw new ApplicationException("Bad order!");
         }
@@ -124,12 +124,8 @@ public final class OrderService {
         Order order;
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
-            UserDao userDao = df.getUserDao();
             order = orderDao.getById(orderId);
-            User reader = userDao.getById(order.getReader().getId());
-            User librarian = userDao.getById(order.getLibrarian().getId());
-            order.setReader(reader)
-                    .setLibrarian(librarian);
+            fillNestedFields(df, Collections.singletonList(order));
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -209,7 +205,22 @@ public final class OrderService {
     public static List<Order> getByReader(Pagination pagination, User reader) {
         return getAll(pagination, reader);
     }
-    
+
+    public static List<Book> getCurrentBooksByReader(User reader) {
+        List<Order> orders = getByReader(new Pagination().setLimit(1000), reader);
+        List<Book> books = new ArrayList<>();
+        for(Order order: orders) {
+            if (order.getReturnDate() == null) {
+                for (Book book : order.getBooks()) {
+                    if (order.getReturnDate() == null){
+                        books.add(book);
+                    }
+                }
+            }
+        }
+        return books;
+    }
+
     private static void fillNestedFields(DaoFactory df, List<Order> orders) {
         UserDao userDao = df.getUserDao();
         BookDao bookDao = df.getBookDao();

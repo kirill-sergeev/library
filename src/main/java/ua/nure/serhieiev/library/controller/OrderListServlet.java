@@ -1,13 +1,11 @@
-/*
 package ua.nure.serhieiev.library.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.service.util.EmailUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,41 +14,75 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.BOOK_LIST_ACTION;
-import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
-@WebServlet(name = "OrderListServlet", urlPatterns = "/orders.do")
+@WebServlet(name = "OrderListServlet", urlPatterns = ORDERS_ACTION)
 public class OrderListServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BookListServlet.class);
-    private static final String ORDER_LIST_PAGE = "/WEB-INF/jsp/orders.jsp";
+    private static final String UNCONFIRMED_ORDERS_PAGE = "/WEB-INF/jsp/unconfirmed-orders.jsp";
+    private static final String CURRENT_ORDERS_PAGE = "/WEB-INF/jsp/current-orders.jsp";
+    private static final String CLOSED_ORDERS_PAGE = "/WEB-INF/jsp/closed-orders.jsp";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("button");
+        Integer orderId = Integer.valueOf(request.getParameter("order"));
+        Order order = OrderService.getById(orderId);
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Pagination pagination = PaginationMapper.getPagination(request);
-
-        Map<Integer, List<Order>> ordersMap;
-
-        if (request.getParameterMap().containsKey("reader")) {
-            Integer readerId = Integer.valueOf(request.getParameter("reader"));
-            ordersMap = OrderService.getRangeByReader(pagination, new User().setId(readerId));
-        } else{
-            ordersMap = OrderService.getRange(pagination);
+        if (action == null) {
+            action = "";
         }
 
-        int ordersCount;
-        List<Order> orders = ordersMap.entrySet().iterator().next().getValue();
-        ordersCount = ordersMap.entrySet().iterator().next().getKey();
-
-        int nOfPages = (int) Math.ceil(ordersCount / ((double) pagination.getLimit()));
-        request.setAttribute("nOfPages", nOfPages);
-        request.setAttribute("orders", orders);
-        request.getRequestDispatcher(ORDER_LIST_PAGE).forward(request, response);
+        switch (action) {
+            case "accept":
+                User librarian = (User) request.getSession().getAttribute("user");
+                order.setLibrarian(librarian);
+                OrderService.acceptOrder(order);
+                break;
+            case "reject":
+                OrderService.rejectOrder(order);
+                new Thread(() -> EmailUtil.sendRejectMessage(order.getReader())).start();
+                break;
+            case "return":
+                OrderService.returnOrder(order);
+                break;
+            case "email":
+                new Thread(() -> EmailUtil.sendWarnMessage(order.getReader())).start();
+        }
+        doGet(request, response);
     }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Pagination pagination = PaginationMapper.getPagination(request);
+        String type = request.getParameter("type");
+        List<Order> orders;
+        String path;
+
+        if (type == null) {
+            type = "unconfirmed";
+        }
+
+        switch (type) {
+            default:
+            case "unconfirmed":
+                orders = OrderService.getUnconfirmed(pagination);
+                path = UNCONFIRMED_ORDERS_PAGE;
+                break;
+            case "current":
+                orders = OrderService.getCurrent(pagination);
+                path = CURRENT_ORDERS_PAGE;
+                break;
+            case "closed":
+                orders = OrderService.getClosed(pagination);
+                path = CLOSED_ORDERS_PAGE;
+        }
+
+        request.setAttribute("orders", orders);
+        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
+        request.getRequestDispatcher(path).forward(request, response);
+    }
+
 }
-*/

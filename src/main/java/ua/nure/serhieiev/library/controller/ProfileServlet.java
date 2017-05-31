@@ -1,7 +1,5 @@
 package ua.nure.serhieiev.library.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
@@ -17,13 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.*;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {PROFILE_ACTION, USER_ACTION})
 public class ProfileServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProfileServlet.class);
     private static final String USER_PAGE = "/WEB-INF/jsp/user.jsp";
 
     private void readerOrders(HttpServletRequest request, User user) {
@@ -55,7 +52,7 @@ public class ProfileServlet extends HttpServlet {
             }
         }
 
-        request.setAttribute("user", user);
+        request.setAttribute("profile", user);
         request.getRequestDispatcher(USER_PAGE).forward(request, response);
     }
 

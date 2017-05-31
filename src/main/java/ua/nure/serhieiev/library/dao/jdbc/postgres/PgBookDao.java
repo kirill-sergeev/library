@@ -62,22 +62,18 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
     protected String getSelectQuery() {
         return SQL_SELECT_BOOK_BY_ID;
     }
-
     @Override
     protected String getSelectAllQuery() {
         return SQL_SELECT_ALL_BOOKS;
     }
-
     @Override
     protected String getCreateQuery() {
         return SQL_CREATE_BOOK;
     }
-
     @Override
     protected String getUpdateQuery() {
         return SQL_UPDATE_BOOK;
     }
-
     @Override
     protected String[] getSortFields() {
         return SORT_FIELDS.clone();
@@ -97,6 +93,9 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
                         .setQuantity(rs.getInt(QUANTITY))
                         .setAvailable(rs.getInt(AVAILABLE))
                         .setIsbn(rs.getLong(ISBN));
+                if (book.getIsbn() == 0){
+                    book.setIsbn(null);
+                }
 
                 List<Author> authors = new ArrayList<>();
                 if (hasColumn(rs, AUTHORS)) {
@@ -130,7 +129,11 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
             st.setInt(3, book.getPublisher().getId());
             st.setDate(4, Date.valueOf(book.getPublicationDate()));
             st.setString(5, book.getDescription());
-            st.setLong(6, book.getIsbn());
+            if (book.getIsbn() == null){
+                st.setNull(6, Types.NULL);
+            } else{
+                st.setLong(6, book.getIsbn());
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -145,7 +148,11 @@ public class PgBookDao extends JdbcDao<Book> implements BookDao {
             st.setInt(4, book.getPublisher().getId());
             st.setDate(5, Date.valueOf(book.getPublicationDate()));
             st.setString(6, book.getDescription());
-            st.setLong(7, book.getIsbn());
+            if (book.getIsbn() == null){
+                st.setNull(7, Types.NULL);
+            } else{
+                st.setLong(7, book.getIsbn());
+            }
             st.setInt(8, book.getId());
         } catch (SQLException e) {
             throw new DaoException(e);

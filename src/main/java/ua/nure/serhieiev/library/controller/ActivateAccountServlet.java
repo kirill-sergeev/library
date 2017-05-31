@@ -14,25 +14,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ua.nure.serhieiev.library.controller.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
 @WebServlet(name = "ActivateAccountServlet", urlPatterns = ACTIVATE_ACTION)
 public class ActivateAccountServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ActivateAccountServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActivateAccountServlet.class);
     private static final String ALERT = "alert";
 
     private void activate(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String activationToken = request.getParameter("token");
+
         try {
             User user = new User().setActivationToken(activationToken);
             UserService.activate(user);
             request.setAttribute(ALERT, Alert.ACTIVATION_SUCCESSFUL);
-            LOG.info("Account {} activated.", user.getEmail());
+            logger.info("Account {} activated.", user.getEmail());
         } catch (ApplicationException e) {
             request.setAttribute(ALERT, Alert.WRONG_TOKEN);
-            LOG.info("Wrong activation token {}.", activationToken, e);
+            logger.info("Wrong activation token {}.", activationToken);
         }
         request.getRequestDispatcher(LOGIN_ACTION).forward(request, response);
     }

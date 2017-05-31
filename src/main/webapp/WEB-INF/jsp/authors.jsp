@@ -5,13 +5,10 @@
 <%@ include file="../jspf/header.jspf" %>
 
 <div class="ui center aligned grid basic segment">
-    <div class="ui three column grid centered">
-        <div class="center floated row">
+    <div class="ui grid centered">
+        <div class="center row">
             <form action="<c:url value="/authors.do"/>" method="get" class="ui form">
-                <div class="ui action input">
-                    <input type="text" name="search" placeholder="Search...">
-                    <button class="ui icon button"><i class="search icon"></i></button>
-                </div>
+                <input type="text" name="search" placeholder="Search...">
                 <div class="ui error message"></div>
             </form>
         </div>

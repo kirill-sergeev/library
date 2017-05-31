@@ -82,3 +82,11 @@
         font-size: 1.5em;
     }
 }
+
+body > .grid {
+    height: 100%;
+}
+
+.column {
+    max-width: 450px;
+}

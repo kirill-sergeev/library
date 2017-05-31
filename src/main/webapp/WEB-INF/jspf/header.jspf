@@ -21,9 +21,6 @@
     <script src="../../resources/semantic/calendar.min.js"></script>
     <!-- Custom scripts and styles -->
     <link rel="stylesheet" type="text/css" href="../../resources/custom/header.css">
-    <link rel="stylesheet" type="text/css" href="../../resources/custom/${pagename}.css">
-    <script src="../../resources/custom/header.jsp" language="JavaScript" type="text/javascript"></script>
-    <script src="../../resources/custom/${pagename}.jsp" language="JavaScript" type="text/javascript"></script>
 </head>
 <body>
 

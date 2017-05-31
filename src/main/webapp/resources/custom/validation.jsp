@@ -1,7 +1,7 @@
 <%@ page contentType="text/javascript" %>
-    <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-    <fmt:setLocale value="${language}"/>
-    <fmt:setBundle basename="text"/>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="${language}"/>
+<fmt:setBundle basename="text"/>
 
     $(document)
         .ready(function () {
@@ -136,6 +136,15 @@
                                 {
                                     type: 'email',
                                     prompt: '<fmt:message key="validation.email"/>'
+                                }
+                            ]
+                        },
+                        search: {
+                            identifier  : 'search',
+                            rules: [
+                                {
+                                    type   : 'length[3]',
+                                    prompt : '<fmt:message key="validation.search"/>'
                                 }
                             ]
                         },

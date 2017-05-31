@@ -1,16 +1,18 @@
 package ua.nure.serhieiev.library.service;
 
 import ua.nure.serhieiev.library.dao.DaoFactory;
-import ua.nure.serhieiev.library.dao.NotFoundException;
+import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.UserDao;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.util.PasswordAuthentication;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
 public final class UserService {
 
@@ -135,7 +137,7 @@ public final class UserService {
     /**
      * Looking for user with same authToken or email and password in data store.
      * If user exist and authToken passed in value object, sets that token.
-     *
+     * Also it blocks reader account if he has debts.
      * @return registered user.
      */
     public static User authenticate(User user) {
@@ -154,11 +156,28 @@ public final class UserService {
                 }
             }
             registeredUser.setLastVisit(LocalDate.now());
+            registeredUser.setEnabled(checkReturnedBooks(df, registeredUser));
             userDao.update(registeredUser);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
         return registeredUser;
+    }
+
+    private static boolean checkReturnedBooks(DaoFactory df, User user){
+        if (!user.getEnabled()){
+            return false;
+        }
+        if (user.getRole() == READER && user.getEnabled()) {
+            OrderDao orderDao = df.getOrderDao();
+            List<Order> orders = orderDao.getByReader(user.getId());
+            for (Order order : orders) {
+                if (order.getReturnDate() == null && order.getExpectedDate().isBefore(LocalDate.now())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

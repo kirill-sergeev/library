@@ -24,9 +24,10 @@
                             <tr>
                                 <th class="three wide">Reader</th>
                                 <th class="three wide">Librarian</th>
-                                <th class="four wide">Books</th>
-                                <th>Internal</th>
+                                <th class="three wide">Books</th>
+                                <th>In Library</th>
                                 <th>Order date</th>
+                                <th>Expected date</th>
                                 <th>Return date</th>
                             </tr>
                             </thead>
@@ -52,18 +53,19 @@
                                     </td>
                                     <td>${order.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
                                     <td>${order.orderDate}</td>
+                                    <td>${order.expectedDate}</td>
                                     <td>${order.returnDate}</td>
                                 </tr>
                             </c:forEach>
                             </tbody>
                             <tfoot>
                             <tr>
-                                <th colspan="2">
+                                <th colspan="1">
                                     <c:set var="group" scope="page" value="type=closed&"/>
                                     <c:set var="action" scope="page" value="orders.do"/>
                                     <%@ include file="../jspf/pagination.jspf" %>
                                 </th>
-                                <th colspan="4">
+                                <th colspan="6">
                                     <form action="<c:url value="/orders.do"/>" method="get" class="ui form right floated">
                                         <input type="hidden" name="type" value="closed">
                                         <div class="inline fields">
@@ -81,8 +83,9 @@
                                                     <option value="reader_id">Reader</option>
                                                     <option value="librarian_id">Librarian</option>
                                                     <option value="order_date">Order Date</option>
-                                                    <option value="order_date">Return Date</option>
-                                                    <option value="internal">Internal</option>
+                                                    <option value="expected_date">Expected Date</option>
+                                                    <option value="return_date">Return Date</option>
+                                                    <option value="internal">In Library</option>
                                                 </select>
                                             </div>
                                             <div class="field">

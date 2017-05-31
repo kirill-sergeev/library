@@ -26,7 +26,8 @@
                                 <th class="three wide">Librarian</th>
                                 <th class="four wide">Books</th>
                                 <th>Order date</th>
-                                <th>Internal</th>
+                                <th>Expected date</th>
+                                <th>In library</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -51,6 +52,7 @@
                                         </div>
                                     </td>
                                     <td>${order.orderDate}</td>
+                                    <td>${order.expectedDate}</td>
                                     <td>${order.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
                                     <td>
                                         <form action="<c:url value="/orders.do"/>" method="post">
@@ -69,7 +71,7 @@
                                 <c:set var="action" scope="page" value="orders.do"/>
                                 <%@ include file="../jspf/pagination.jspf" %>
                             </th>
-                            <th colspan="4">
+                            <th colspan="5">
                                 <form action="<c:url value="/orders.do"/>" method="get" class="ui form right floated">
                                     <input type="hidden" name="type" value="current">
                                     <div class="inline fields">
@@ -87,7 +89,9 @@
                                                 <option value="reader_id">Reader</option>
                                                 <option value="librarian_id">Librarian</option>
                                                 <option value="order_date">Order Date</option>
-                                                <option value="internal">Internal</option>
+                                                <option value="expected_date">Expected Date</option>
+                                                <option value="return_date">Return Date</option>
+                                                <option value="internal">In Library</option>
                                             </select>
                                         </div>
                                         <div class="field">

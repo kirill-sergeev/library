@@ -15,19 +15,19 @@ import java.util.List;
 public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
 
     private static final String ORDER_DATE = "order_date";
+    private static final String EXPECTED_DATE = "expected_date";
     private static final String RETURNED_DATE = "return_date";
     private static final String INTERNAL = "internal";
     private static final String READER = "reader_id";
     private static final String LIBRARIAN = "librarian_id";
     private static final String BOOKS = "books";
-    private static final String[] SORT_FIELDS = {INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
+    private static final String[] SORT_FIELDS = {EXPECTED_DATE, INTERNAL, LIBRARIAN, ORDER_DATE, READER, RETURNED_DATE};
 
-    private static final String SQL_COUNT_ORDERS_BY_READER = "SELECT count(*) FROM orders WHERE reader_id = ?";
     private static final String SQL_COUNT_UNCONFIRMED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NULL";
     private static final String SQL_COUNT_CURRENT_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NULL";
     private static final String SQL_COUNT_CLOSED_ORDERS = "SELECT count(*) FROM orders WHERE order_date IS NOT NULL AND return_date IS NOT NULL";
     private static final String SQL_CREATE_ORDER = "INSERT INTO orders (reader_id, internal) VALUES (?, ?)";
-    private static final String SQL_UPDATE_ORDER = "UPDATE orders SET librarian_id = ?, order_date = ?, return_date = ? WHERE id = ?";
+    private static final String SQL_UPDATE_ORDER = "UPDATE orders SET librarian_id = ?, order_date = ?, expected_date = ?, return_date = ? WHERE id = ?";
     private static final String SQL_INSERT_BOOK_INTO_ORDER = "INSERT INTO books_orders(book_id, order_id) VALUES (?, ?)";
     private static final String SQL_DELETE_ALL_BOOK_FROM_ORDER = "DELETE FROM books_orders VALUES WHERE order_id = ?";
     private static final String SQL_SELECT_ALL_ORDERS =
@@ -101,6 +101,9 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
                 if (rs.getDate(ORDER_DATE) != null) {
                     order.setOrderDate((rs.getDate(ORDER_DATE).toLocalDate()));
                 }
+                if (rs.getDate(EXPECTED_DATE) != null) {
+                    order.setExpectedDate((rs.getDate(EXPECTED_DATE).toLocalDate()));
+                }
                 if (rs.getDate(RETURNED_DATE) != null) {
                     order.setReturnDate((rs.getDate(RETURNED_DATE).toLocalDate()));
                 }
@@ -133,8 +136,9 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
         try {
             st.setInt(1, order.getLibrarian().getId());
             st.setDate(2, Date.valueOf(order.getOrderDate()));
-            st.setDate(3, order.getReturnDate() == null ? null : Date.valueOf(order.getReturnDate()));
-            st.setInt(4, order.getId());
+            st.setDate(3, Date.valueOf(order.getExpectedDate()));
+            st.setDate(4, order.getReturnDate() == null ? null : Date.valueOf(order.getReturnDate()));
+            st.setInt(5, order.getId());
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -176,10 +180,9 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     }
 
     @Override
-    public List<Order> getByReader(Pagination pagination, Integer readerId) {
+    public List<Order> getByReader(Integer readerId) {
         checkId(readerId);
-        pagination.setNumberOfItems(countByReader(readerId));
-        return getAll(pagination, SQL_SELECT_ORDERS_BY_READER, readerId);
+        return listQuery(SQL_SELECT_ORDERS_BY_READER, readerId);
     }
 
     @Override
@@ -198,11 +201,6 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
     public List<Order> getClosed(Pagination pagination) {
         pagination.setNumberOfItems(countClosed());
         return getAll(pagination, SQL_SELECT_CLOSED_ORDERS);
-    }
-
-    private int countByReader(Integer readerId) {
-        checkId(readerId);
-        return count(SQL_COUNT_ORDERS_BY_READER, readerId);
     }
 
     private int countCurrent() {

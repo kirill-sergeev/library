@@ -1,5 +1,7 @@
 package ua.nure.serhieiev.library.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
@@ -24,9 +26,7 @@ public class ProfileServlet extends HttpServlet {
     private static final String USER_PAGE = "/WEB-INF/jsp/user.jsp";
 
     private void readerOrders(HttpServletRequest request, User user) {
-        Pagination pagination = PaginationMapper.getPagination(request);
-        List<Order> orders = OrderService.getByReader(pagination, user);
-        request.setAttribute("numberOfPages", pagination.getNumberOfPages());
+        List<Order> orders = OrderService.getByReader(user);
         request.setAttribute("orders", orders);
     }
 

@@ -66,11 +66,20 @@ public class CartServlet extends HttpServlet {
             request.setAttribute(ALERT, "Limit 10 books for reader!");
             return;
         }
-        List<Book> currentBooks = OrderService.getCurrentBooksByReader(user);
+
+        List<Order> currentOrders = OrderService.getByReader(user);
+        List<Book> currentBooks = new ArrayList<>();
+        for (Order order: currentOrders){
+            if (order.getReturnDate() == null) {
+                currentBooks.addAll(order.getBooks());
+            }
+        }
+
         if (currentBooks.contains(new Book().setId(bookId))) {
             request.setAttribute(ALERT, "You have not returned this books yet!");
             return;
         }
+
         try {
             Book book = BookService.getById(bookId);
             int inCart = Collections.frequency(globalCart.values(), book.getId());

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
@@ -24,6 +25,14 @@ public class OrderListServlet extends HttpServlet {
     private static final String CURRENT_ORDERS_PAGE = "/WEB-INF/jsp/current-orders.jsp";
     private static final String CLOSED_ORDERS_PAGE = "/WEB-INF/jsp/closed-orders.jsp";
 
+    private void setExpectedDate(Order order) {
+        if (order.getInternal()) {
+            order.setExpectedDate(LocalDate.now());
+        } else {
+            Integer orderDays = Integer.valueOf(getServletContext().getInitParameter("orderDays"));
+            order.setExpectedDate(LocalDate.now().plusDays(orderDays));
+        }
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -39,6 +48,7 @@ public class OrderListServlet extends HttpServlet {
             case "accept":
                 User librarian = (User) request.getSession().getAttribute("user");
                 order.setLibrarian(librarian);
+                setExpectedDate(order);
                 OrderService.acceptOrder(order);
                 break;
             case "reject":

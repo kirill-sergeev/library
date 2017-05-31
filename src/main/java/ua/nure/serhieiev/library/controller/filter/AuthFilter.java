@@ -3,8 +3,10 @@ package ua.nure.serhieiev.library.controller.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.Action;
+import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
+import ua.nure.serhieiev.library.service.OrderService;
 import ua.nure.serhieiev.library.service.UserService;
 
 import javax.servlet.*;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.*;
@@ -46,7 +50,6 @@ public class AuthFilter implements Filter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession session = req.getSession(true);

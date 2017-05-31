@@ -78,7 +78,7 @@
                                             <div class="field">
                                                 <select class="ui dropdown" name="sort">
                                                     <option value="reader_id">Reader</option>
-                                                    <option value="internal">Internal</option>
+                                                    <option value="internal">In Library</option>
                                                 </select>
                                             </div>
                                             <div class="field">

@@ -62,9 +62,10 @@ public final class OrderService {
         }
         try (DaoFactory df = DaoFactory.getInstance()) {
             OrderDao orderDao = df.getOrderDao();
-
+            LocalDate expectedDate = order.getExpectedDate();
             order = orderDao.getById(order.getId());
             order.setOrderDate(LocalDate.now());
+            order.setExpectedDate(expectedDate);
             order.setLibrarian(librarian);
             orderDao.update(order);
         } catch (Exception e) {
@@ -191,7 +192,7 @@ public final class OrderService {
             if (object == null) {
                 orders = orderDao.getAll(pagination);
             } else if (object instanceof User) {
-                orders = orderDao.getByReader(pagination, object.getId());
+                orders = orderDao.getByReader(object.getId());
             } else {
                 throw new IllegalArgumentException("Object must be an Author, Genre, Publisher or nothing.");
             }
@@ -202,25 +203,10 @@ public final class OrderService {
         return orders;
     }
 
-    public static List<Order> getByReader(Pagination pagination, User reader) {
-        return getAll(pagination, reader);
+    public static List<Order> getByReader(User reader) {
+        return getAll(null, reader);
     }
-
-    public static List<Book> getCurrentBooksByReader(User reader) {
-        List<Order> orders = getByReader(new Pagination().setLimit(1000), reader);
-        List<Book> books = new ArrayList<>();
-        for(Order order: orders) {
-            if (order.getReturnDate() == null) {
-                for (Book book : order.getBooks()) {
-                    if (order.getReturnDate() == null){
-                        books.add(book);
-                    }
-                }
-            }
-        }
-        return books;
-    }
-
+    
     private static void fillNestedFields(DaoFactory df, List<Order> orders) {
         UserDao userDao = df.getUserDao();
         BookDao bookDao = df.getBookDao();

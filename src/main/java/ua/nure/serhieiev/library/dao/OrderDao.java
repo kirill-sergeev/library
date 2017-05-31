@@ -14,6 +14,6 @@ public interface OrderDao extends GenericDao<Order>{
 
     List<Order> getClosed(Pagination pagination);
 
-    List<Order> getByReader(Pagination pagination, Integer readerId);
+    List<Order> getByReader(Integer readerId);
 
 }

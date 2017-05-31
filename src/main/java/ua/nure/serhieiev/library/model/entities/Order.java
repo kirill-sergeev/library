@@ -11,9 +11,14 @@ public class Order implements Identified{
     private User reader;
     private User librarian;
     private LocalDate orderDate;
+    private LocalDate expectedDate;
     private LocalDate returnDate;
     private Boolean internal;
     private List<Book> books;
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 
     @Override
     public Integer getId() {
@@ -50,6 +55,15 @@ public class Order implements Identified{
 
     public Order setOrderDate(LocalDate orderDate) {
         this.orderDate = orderDate;
+        return this;
+    }
+
+    public LocalDate getExpectedDate() {
+        return expectedDate;
+    }
+
+    public Order setExpectedDate(LocalDate expectedDate) {
+        this.expectedDate = expectedDate;
         return this;
     }
 

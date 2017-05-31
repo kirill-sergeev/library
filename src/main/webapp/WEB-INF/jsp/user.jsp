@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pagename" scope="request" value="user"/>
 <%@ include file="../jspf/header.jspf" %>
+<%@taglib uri="http://example.com/functions" prefix="f" %>
 
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
@@ -43,21 +44,21 @@
                             <thead>
                             <tr>
                                 <th>Books</th>
-                                <th>Internal</th>
+                                <th>In library</th>
                                 <th>Order date</th>
+                                <th>Expected date</th>
                                 <th>Return date</th>
                             </tr>
                             </thead>
                             <tbody>
                             <c:forEach items="${orders}" var="order">
-                                <tr>
+                                <tr ${order.expectedDate.isAfter(f:getNowDate()) ? 'class="error"': ''}>
                                     <td>
                                         <div class="ui middle aligned ordered list">
                                             <c:forEach items="${order.books}" var="book">
                                                 <div class="item">
                                                     <div class="content">
-                                                        <div class="header"><a
-                                                                href="<c:url value="book.do?id=${book.id}"/>">${book.title}</a>
+                                                        <div class="header"><a href="<c:url value="book.do?id=${book.id}"/>">${book.title}</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -66,43 +67,11 @@
                                     </td>
                                     <td>${order.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
                                     <td>${order.orderDate}</td>
+                                    <td>${order.expectedDate}</td>
                                     <td>${order.returnDate}</td>
                                 </tr>
                             </c:forEach>
                             </tbody>
-                            <tfoot>
-                            <tr>
-                                <th colspan="1">
-                                    <c:set var="action" scope="page" value="user.do"/>
-                                    <%@ include file="../jspf/pagination.jspf" %>
-                                </th>
-                                <th colspan="3">
-                                    <form action="<c:url value="/user.do"/>" method="get" class="ui form right floated">
-                                        <div class="inline fields">
-                                            <div class="field">
-                                                <select class="ui dropdown" name="items">
-                                                    <option value="10">10</option>
-                                                    <option value="15">15</option>
-                                                    <option value="20">20</option>
-                                                    <option value="25">25</option>
-                                                    <option value="50">50</option>
-                                                </select>
-                                            </div>
-                                            <div class="field">
-                                                <select class="ui dropdown" name="sort">
-                                                    <option value="order_date">Order Date</option>
-                                                    <option value="order_date">Return Date</option>
-                                                    <option value="internal">Internal</option>
-                                                </select>
-                                            </div>
-                                            <div class="field">
-                                                <div class="ui submit button">Submit</div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </th>
-                            </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </c:when>

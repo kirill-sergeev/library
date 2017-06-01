@@ -29,13 +29,13 @@ public class CartListener implements ServletContextListener, HttpSessionListener
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
-
     public void sessionCreated(HttpSessionEvent se) {
         se.getSession()
                 .setAttribute("localCart",
                         new ConcurrentHashMap<Integer, LocalDateTime>());
     }
 
+    @SuppressWarnings("unchecked")
     public void sessionDestroyed(HttpSessionEvent se) {
         Map<Integer, LocalDateTime> localCart = (Map<Integer, LocalDateTime>)
                 se.getSession().getAttribute("localCart");

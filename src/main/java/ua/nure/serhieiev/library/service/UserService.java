@@ -1,5 +1,8 @@
 package ua.nure.serhieiev.library.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.nure.serhieiev.library.controller.filter.AuthFilter;
 import ua.nure.serhieiev.library.dao.DaoFactory;
 import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.UserDao;
@@ -15,6 +18,8 @@ import java.util.UUID;
 import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
 public final class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     /**
      * Saves the reader in data store.
@@ -111,9 +116,28 @@ public final class UserService {
     public static void changePassword(User user) {
         try (DaoFactory df = DaoFactory.getInstance()) {
             UserDao userDao = df.getUserDao();
+            String password = user.getPassword();
             user = getUniqueMatching(userDao, user)
-                    .setResetPasswordToken(null);
+                    .setResetPasswordToken(null)
+                    .setPassword(password);
             hashPassword(user);
+            userDao.update(user);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    /**
+     * Sets the new email to existing user.
+     *
+     * @param user, whose email needs to change.
+     */
+    public static void changeEmail(User user) {
+        try (DaoFactory df = DaoFactory.getInstance()) {
+            UserDao userDao = df.getUserDao();
+            String email = user.getEmail();
+            user = getUniqueMatching(userDao, user)
+                    .setEmail(email);
             userDao.update(user);
         } catch (Exception e) {
             throw new ApplicationException(e);
@@ -157,6 +181,9 @@ public final class UserService {
             }
             registeredUser.setLastVisit(LocalDate.now());
             registeredUser.setEnabled(checkReturnedBooks(df, registeredUser));
+            if (!registeredUser.getEnabled()){
+                logger.info("Reader {} blocked while authenticate", user.getEmail());
+            }
             userDao.update(registeredUser);
         } catch (Exception e) {
             throw new ApplicationException(e);

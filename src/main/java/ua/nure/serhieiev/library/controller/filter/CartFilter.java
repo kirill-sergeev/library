@@ -19,11 +19,13 @@ public class CartFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
 
+    @SuppressWarnings("unchecked")
     private Map<LocalDateTime, Integer> getGlobalCart(HttpServletRequest request) {
         return  (Map<LocalDateTime, Integer>) request.getServletContext()
                 .getAttribute("globalCart");
     }
 
+    @SuppressWarnings("unchecked")
     private Map<Integer, LocalDateTime> getLocalCart(HttpServletRequest request) {
         return (Map<Integer, LocalDateTime>) request.getSession()
                 .getAttribute("localCart");
@@ -34,7 +36,7 @@ public class CartFilter implements Filter {
         for (LocalDateTime time : globalCart.keySet()) {
             if (time.plusSeconds(30).isBefore(LocalDateTime.now())) {
                 Integer bookId = globalCart.remove(time);
-                logger.info("Book with ID {} removed from cart", bookId);
+                logger.info("Book with ID {} removed from global cart", bookId);
             }
         }
     }
@@ -44,7 +46,8 @@ public class CartFilter implements Filter {
         localCart.keySet().retainAll(getGlobalCart(request).values());
     }
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         updateGlobalContent(req);

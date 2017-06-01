@@ -56,7 +56,12 @@ public enum Alert {
     HAVE_THIS_BOOK(WARNING),
     LIMIT_BOOKS(WARNING),
     ORDER_IS_EMPTY(WARNING),
-    ORDER_CREATED(SUCCESS);
+    ORDER_CREATED(SUCCESS),
+    /**
+     * Alerts for profile page
+     */
+    EMAIL_CHANGED(SUCCESS),
+    EMAIL_NOT_CHANGED(WARNING);
 
     private final String description;
     private final Type type;

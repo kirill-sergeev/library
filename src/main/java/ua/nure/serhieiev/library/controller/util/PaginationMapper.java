@@ -30,7 +30,7 @@ public final class PaginationMapper {
                 pagination.setSortBy(sortParam.toLowerCase());
             }
         } catch (RuntimeException e) {
-            logger.trace("Bad parameters for items list extracting.", e);
+            logger.info("Bad parameters for items list extracting.", e);
         }
 
         request.setAttribute("items", pagination.getLimit());

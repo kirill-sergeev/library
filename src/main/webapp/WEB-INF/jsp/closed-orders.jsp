@@ -8,9 +8,9 @@
 <%--@elvariable id="order" type="ua.nure.serhieiev.library.model.entities.Order"--%>
 <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
 
-<div class="ui middle aligned center aligned grid basic segment">
+<div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
-        <div class="twelve wide column">
+        <div class="column">
             <div class="ui center aligned segment">
                 <c:if test="${not empty alert}">
                     <div class="ui message ${alert.type}">

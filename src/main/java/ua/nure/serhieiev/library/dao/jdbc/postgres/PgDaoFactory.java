@@ -53,10 +53,6 @@ public class PgDaoFactory extends DaoFactory {
         return new PgBookDao(con);
     }
     @Override
-    public FineDao getFineDao() {
-        return new PgFineDao(con);
-    }
-    @Override
     public GenreDao getGenreDao() {
         return new PgGenreDao(con);
     }

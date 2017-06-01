@@ -22,7 +22,7 @@ import java.util.List;
 import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.*;
 
-@WebFilter(filterName = "AuthFilter", urlPatterns = "*.do")
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"*.do", "/"})
 public class AuthFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
@@ -54,9 +54,13 @@ public class AuthFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession session = req.getSession(true);
         User user = (User) session.getAttribute("user");
-
         if (user == null || user.getRole() == null) {
             user = setUserRole(req);
+        }
+
+        if ("".equals(req.getServletPath())){
+            chain.doFilter(req, resp);
+            return;
         }
 
         for (Action action : Action.values()) {

@@ -11,14 +11,14 @@
 
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
-        <c:if test="${not empty alert}">
-            <div class="ui message ${alert.type}">
-                <ul class="list">
-                    <li><fmt:message key="${alert.description}"/></li>
-                </ul>
-            </div>
-        </c:if>
         <div class="column">
+            <c:if test="${not empty alert}">
+                <div class="row">
+                    <div class="ui message ${alert.type}">
+                        <div class="header"><fmt:message key="${alert.description}"/></div>
+                    </div>
+                </div>
+            </c:if>
             <div class="ui card">
                 <div class="content centered">
                     <a class="header">${profile.name}</a>
@@ -60,7 +60,8 @@
                                             <c:forEach items="${order.key.books}" var="book">
                                                 <div class="item">
                                                     <div class="content">
-                                                        <div class="header"><a href="<c:url value="book.do?id=${book.id}"/>">${book.title}</a>
+                                                        <div class="header"><a
+                                                                href="<c:url value="book.do?id=${book.id}"/>">${book.title}</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -83,6 +84,48 @@
                     </div>
                 </c:when>
             </c:choose>
+
+            <c:if test="${profile.id == user.id}">
+                <div class="column form-column">
+                    <h3 class="ui header"><fmt:message key="change-password.header.change"/></h3>
+                    <form action="<c:url value="/user.do"/>" method="post" class="ui form">
+                        <div class="ui stacked">
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="lock icon"></i>
+                                    <input type="password" name="password"
+                                           placeholder="<fmt:message key="change-password.field.password"/>">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="lock icon"></i>
+                                    <input type="password" name="retype-password"
+                                           placeholder="<fmt:message key="change-password.field.retype"/>">
+                                </div>
+                            </div>
+                            <div class="ui fluid large teal submit button"><fmt:message key="book.button.change"/></div>
+                        </div>
+                        <div class="ui error message"></div>
+                    </form>
+                </div>
+                <div class="column form-column">
+                    <h3 class="ui header"><fmt:message key="user.header.change_email"/></h3>
+                    <form action="<c:url value="/user.do"/>" method="post" class="ui form">
+                        <div class="ui stacked">
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="user icon"></i>
+                                    <input type="email" name="email"
+                                           placeholder="<fmt:message key="register.field.email"/>">
+                                </div>
+                            </div>
+                            <div class="ui fluid large teal submit button"><fmt:message key="book.button.change"/></div>
+                        </div>
+                        <div class="ui error message"></div>
+                    </form>
+                </div>
+            </c:if>
         </div>
     </div>
 </div>

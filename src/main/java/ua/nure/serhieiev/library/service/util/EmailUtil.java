@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class EmailUtil {
+public final class EmailUtil {
 
     static private Session session;
 
@@ -71,6 +71,9 @@ public class EmailUtil {
         String content = "You have been given the rights to manage the library, " +
                 "get the password from the administrator of the library.";
         sendEmail(email, subject, content);
+    }
+
+    private EmailUtil() {
     }
 
 }

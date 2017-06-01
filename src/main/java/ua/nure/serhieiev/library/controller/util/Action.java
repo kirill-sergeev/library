@@ -11,6 +11,7 @@ public enum Action {
 
     ACTIVATE_ACCOUNT(ACTIVATE_ACTION, GUEST),
     AUTHOR_LIST(AUTHORS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
+    BOOK_OVERVIEW(BOOK_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
     BOOK_LIST(BOOKS_ACTION, GUEST, READER, LIBRARIAN, ADMIN),
     CART(CART_ACTION, READER),
     CHANGE_BOOK(CHANGE_BOOK_ACTION, ADMIN),
@@ -55,6 +56,7 @@ public enum Action {
 
         String ACTIVATE_ACTION = "/activate.do";
         String AUTHORS_ACTION = "/authors.do";
+        String BOOK_ACTION = "/book.do";
         String BOOKS_ACTION = "/books.do";
         String CART_ACTION = "/cart.do";
         String CHANGE_BOOK_ACTION = "/change-book.do";

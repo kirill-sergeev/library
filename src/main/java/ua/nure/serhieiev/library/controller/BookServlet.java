@@ -21,10 +21,11 @@ import java.util.ArrayList;
 
 import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 
-@WebServlet(name = "BookServlet", urlPatterns = {NEW_BOOK_ACTION, CHANGE_BOOK_ACTION})
+@WebServlet(name = "BookServlet", urlPatterns = {BOOK_ACTION, NEW_BOOK_ACTION, CHANGE_BOOK_ACTION})
 public class BookServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(BookServlet.class);
+    private static final String BOOK_PAGE = "/WEB-INF/jsp/book.jsp";
     private static final String NEW_BOOK_PAGE = "/WEB-INF/jsp/new-book.jsp";
     private static final String CHANGE_BOOK_PAGE = "/WEB-INF/jsp/change-book.jsp";
     private static final String ALERT = "alert";
@@ -85,18 +86,10 @@ public class BookServlet extends HttpServlet {
                 .setGenres(genres);
     }
 
-    private void getBook(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
-        try {
-            Integer bookId = Integer.valueOf(request.getParameter("id"));
-            Book book = BookService.getById(bookId);
-            request.setAttribute("book", book);
-        } catch (RuntimeException e) {
-            logger.info("Book not found");
-            response.sendRedirect(BOOKS_ACTION);
-            return;
-        }
-        request.getRequestDispatcher(CHANGE_BOOK_PAGE).forward(request, response);
+    private void getBook(HttpServletRequest request) {
+        Integer bookId = Integer.valueOf(request.getParameter("id"));
+        Book book = BookService.getById(bookId);
+        request.setAttribute("book", book);
     }
 
     private void addBook(HttpServletRequest request) {
@@ -139,7 +132,12 @@ public class BookServlet extends HttpServlet {
             request.getRequestDispatcher(NEW_BOOK_PAGE).forward(request, response);
         }
         if (request.getServletPath().equals(CHANGE_BOOK_ACTION)) {
-            getBook(request, response);
+            getBook(request);
+            request.getRequestDispatcher(CHANGE_BOOK_PAGE).forward(request, response);
+        }
+        if (request.getServletPath().equals(BOOK_ACTION)){
+            getBook(request);
+            request.getRequestDispatcher(BOOK_PAGE).forward(request, response);
         }
     }
 

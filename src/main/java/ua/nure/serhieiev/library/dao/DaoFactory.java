@@ -28,7 +28,6 @@ public abstract class DaoFactory implements AutoCloseable{
 
     public abstract AuthorDao getAuthorDao();
     public abstract BookDao getBookDao();
-    public abstract FineDao getFineDao();
     public abstract GenreDao getGenreDao();
     public abstract OrderDao getOrderDao();
     public abstract PublisherDao getPublisherDao();

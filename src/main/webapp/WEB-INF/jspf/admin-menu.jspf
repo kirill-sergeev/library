@@ -1,0 +1,46 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+    <a class="toc item"><i class="sidebar icon"></i></a>
+    <div class="ui dropdown item">
+        <span class="text"><fmt:message key="header.menu.lists"/></span>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a class="item" href="<c:url value="/authors.do"/>"><fmt:message key="header.url.authors"/></a>
+            <a class="item" href="<c:url value="/books.do"/>"><fmt:message key="header.url.books"/></a>
+            <a class="item" href="<c:url value="/genres.do"/>"><fmt:message key="header.url.genres"/></a>
+            <a class="item" href="<c:url value="/publishers.do"/>"><fmt:message key="header.url.publishers"/></a>
+        </div>
+    </div>
+    <div class="ui dropdown item">
+        <span class="text"><fmt:message key="header.menu.users"/></span>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a class="item" href="<c:url value="/readers.do"/>"><fmt:message key="header.url.readers"/></a>
+            <c:if test="${user.role == 'ADMIN'}">
+                <a class="item" href="<c:url value="/librarians.do"/>"><fmt:message key="header.url.librarians"/></a>
+            </c:if>
+        </div>
+    </div>
+    <div class="ui dropdown item">
+        <span class="text"><fmt:message key="header.menu.orders"/></span>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a class="item" href="<c:url value="/orders.do?type=unconfirmed"/>"><fmt:message key="header.url.unconfirmed-orders"/></a>
+            <a class="item" href="<c:url value="/orders.do?type=current"/>"><fmt:message key="header.url.current-orders"/></a>
+            <a class="item" href="<c:url value="/orders.do?type=closed"/>"><fmt:message key="header.url.closed-orders"/></a>
+        </div>
+    </div>
+    <div class="right item">
+        <form method="get" class="ui form">
+            <select id="language" name="language" onchange="submit()">
+                <option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
+                <option value="ru" ${language == 'ru' ? 'selected' : ''}>Russian</option>
+            </select>
+        </form>
+        <a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a>
+        <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
+            <div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div>
+        </form>
+    </div>

@@ -7,6 +7,8 @@
 <fmt:setLocale value="${language}"/>
 <fmt:setBundle basename="text"/>
 
+<%--@elvariable id="user" type="ua.nure.serhieiev.library.model.entities.User"--%>
+
 <!doctype html>
 <html lang="${language}">
 <head>
@@ -58,36 +60,17 @@
 <div class="pusher">
     <div class="ui vertical masthead center aligned">
         <div class="ui container">
+            <!-- Top Menu -->
             <div class="ui large secondary pointing menu">
-                <a class="toc item"><i class="sidebar icon"></i></a>
-                <a href="<c:url value="/authors.do"/>" class="item <c:if test="${requestUri == '/authors.do'}">active</c:if>"><fmt:message key="header.url.authors"/></a>
-                <a href="<c:url value="/books.do"/>" class="item <c:if test="${requestUri == '/books.do'}">active</c:if>"><fmt:message key="header.url.books"/></a>
-                <a href="<c:url value="/genres.do"/>" class="item <c:if test="${requestUri == '/genres.do'}">active</c:if>"><fmt:message key="header.url.genres"/></a>
-                <a href="<c:url value="/publishers.do"/>" class="item <c:if test="${requestUri == '/publishers.do'}">active</c:if>"><fmt:message key="header.url.publishers"/></a>
-
-                <div class="right item">
-                    <form method="get" class="ui form">
-                        <select id="language" name="language" onchange="submit()">
-                            <option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
-                            <option value="ru" ${language == 'ru' ? 'selected' : ''}>Russian</option>
-                        </select>
-                    </form>
-                    <%--@elvariable id="user" type="ua.nure.serhieiev.library.model.entities.User"--%>
-                    <c:if test="${user == null || user.role == 'GUEST' && requestUri != '/login.do' && requestUri != '/register.do'}">
-                        <a href="<c:url value="/login.do"/>" class="ui button"><fmt:message key="header.url.login"/></a>
-                        <a href="<c:url value="/register.do"/>" class="ui button"><fmt:message key="header.url.register"/></a>
-                    </c:if>
-                    <c:if test="${user != null && user.role != 'GUEST'}">
-                        <c:if test="${user.role == 'READER' && user.enabled}">
-                        <a href="<c:url value="/cart.do"/>" class="ui button"><fmt:message key="header.url.cart"/></a>
-                        </c:if>
-                        <a href="<c:url value="/profile.do"/>" class="ui button"><fmt:message key="header.url.profile"/></a>
-                        <form action="<c:url value="/logout.do"/>" method="post" class="ui form">
-                            <div class="ui fluid submit button"><fmt:message key="header.url.logout"/></div>
-                        </form>
-                    </c:if>
-                </div>
+                <c:if test="${user.role == null || user.role == 'GUEST'}">
+                    <%@ include file="guest-menu.jspf" %>
+                </c:if>
+                <c:if test="${user.role == 'READER'}">
+                    <%@ include file="reader-menu.jspf" %>
+                </c:if>
+                <c:if test="${user.role == 'LIBRARIAN' || user.role == 'ADMIN'}">
+                    <%@ include file="admin-menu.jspf" %>
+                </c:if>
             </div>
         </div>
     </div>
-

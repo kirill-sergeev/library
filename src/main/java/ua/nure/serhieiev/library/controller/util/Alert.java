@@ -6,52 +6,67 @@ public enum Alert {
     /**
      * Alerts for registration page
      */
-    EMAIL_ALREADY_IN_USE("alert.warning.email_already_in_use", WARNING),
-    REGISTRATION_SUCCESSFUL("alert.success.registration_successful", SUCCESS),
+    EMAIL_ALREADY_IN_USE(WARNING),
+    REGISTRATION_SUCCESSFUL(SUCCESS),
     /**
      * Alerts for login page
      */
-    BAD_LOGIN_OR_PASSWORD("alert.warning.bad_login_or_password", WARNING),
-    ACTIVATION_SUCCESSFUL("alert.success.activation_successful", SUCCESS),
+    BAD_LOGIN_OR_PASSWORD(WARNING),
+    ACTIVATION_SUCCESSFUL(SUCCESS),
     /**
      * Alerts for reset-password page
      */
-    WRONG_EMAIL("alert.warning.wrong_email", WARNING),
-    WRONG_TOKEN("alert.warning.wrong_token", WARNING),
-    PASSWORD_RESET_SUCCESSFUL("alert.success.reset_successful", SUCCESS),
+    WRONG_EMAIL(WARNING),
+    WRONG_TOKEN(WARNING),
+    PASSWORD_RESET_SUCCESSFUL(SUCCESS),
     /**
      * Alerts for change-password page
      */
-    PASSWORD_NOT_CHANGED("alert.warning.password_not_changed", WARNING),
-    PASSWORD_CHANGED_SUCCESSFUL("alert.success.password_changed_successful", SUCCESS),
+    PASSWORD_NOT_CHANGED(WARNING),
+    PASSWORD_CHANGED_SUCCESSFUL(SUCCESS),
     /**
      * Alerts for users page
      */
-    USER_UNBLOCKED("alert.success.user_unblocked", SUCCESS),
-    USER_BLOCKED("alert.success.user_blocked", SUCCESS),
-    USER_REMOVED("alert.success.user_removed", SUCCESS),
+    USER_UNBLOCKED(SUCCESS),
+    USER_BLOCKED(SUCCESS),
+    USER_REMOVED(SUCCESS),
     /**
      * Alerts for search action
      */
-    NOT_FOUND("alert.warning.not_found", WARNING),
+    NOT_FOUND(WARNING),
     /**
      * Alerts for add book page
      */
-    BOOK_ADDED("alert.success.book_added", SUCCESS),
-    BOOK_NOT_ADDED("alert.warning.book_not_added", WARNING),
+    BOOK_ADDED(SUCCESS),
+    BOOK_NOT_ADDED(WARNING),
     /**
      * Alerts for change book page
      */
-    BOOK_CHANGED("alert.success.book_changed", SUCCESS),
-    BOOK_NOT_CHANGED("alert.warning.book_not_changed", WARNING),
-    AVAILABLE_MORE_THAN_QUANTITY("alert.warning.available_more_than_quantity", WARNING);
+    BOOK_CHANGED(SUCCESS),
+    BOOK_NOT_CHANGED(WARNING),
+    AVAILABLE_MORE_THAN_QUANTITY(WARNING),
+    /**
+     * Alerts for cart page
+     */
+    ACCOUNT_BLOCKED_CART(WARNING),
+    ACCOUNT_BLOCKED_ORDER(WARNING),
+    BOOK_ALREADY_IN_CART(WARNING),
+    BOOK_NOT_AVAILABLE(WARNING),
+    BOOK_NOT_IN_CART(WARNING),
+    HAVE_THIS_BOOK(WARNING),
+    LIMIT_BOOKS(WARNING),
+    ORDER_IS_EMPTY(WARNING),
+    ORDER_CREATED(SUCCESS);
 
     private final String description;
     private final Type type;
 
-    Alert(String description, Type type) {
-        this.description = description;
+    Alert(Type type) {
         this.type = type;
+        this.description = String.format("%s.%s.%s",
+                this.getClass().getSimpleName().toLowerCase(),
+                type.name().toLowerCase(),
+                this.name().toLowerCase()) ;
     }
 
     public String getDescription() {
@@ -59,7 +74,7 @@ public enum Alert {
     }
 
     public String getType() {
-        return type.getType();
+        return type.getName();
     }
 
 
@@ -67,14 +82,14 @@ public enum Alert {
 
         SUCCESS("positive"), WARNING("negative");
 
-        private String type;
+        private String name;
 
         Type(String type) {
-            this.type = type;
+            this.name = type;
         }
 
-        public String getType() {
-            return type;
+        public String getName() {
+            return name;
         }
     }
 

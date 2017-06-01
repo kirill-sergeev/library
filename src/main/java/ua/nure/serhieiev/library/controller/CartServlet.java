@@ -1,5 +1,6 @@
 package ua.nure.serhieiev.library.controller;
 
+import ua.nure.serhieiev.library.controller.util.Alert;
 import ua.nure.serhieiev.library.controller.util.Validator;
 import ua.nure.serhieiev.library.dao.NotFoundException;
 import ua.nure.serhieiev.library.model.Pagination;
@@ -38,32 +39,22 @@ public class CartServlet extends HttpServlet {
         return (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");
     }
 
-    private Integer getBookId(HttpServletRequest request, HttpServletResponse response)
+    private void addToCart(HttpServletRequest request)
             throws ServletException, IOException {
-        String bookParam = request.getParameter("book");
-        if (!Validator.isInteger(bookParam)) {
-            request.setAttribute(ALERT, "Bad parameter!");
-            request.getRequestDispatcher(CART_PAGE).forward(request, response);
-        }
-        return Integer.valueOf(bookParam);
-    }
-
-    private void addToCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Integer bookId = getBookId(request, response);
+        Integer bookId = Integer.valueOf(request.getParameter("book"));
         Map<LocalDateTime, Integer> globalCart = getGlobalCart();
         Map<Integer, LocalDateTime> localCart = getLocalCart(request);
         User user = getCurrentUser(request);
         if (!user.getEnabled()) {
-            request.setAttribute(ALERT, "You cannot add books to cart, because your account is blocked!");
+            request.getSession().setAttribute(ALERT, Alert.ACCOUNT_BLOCKED_CART);
             return;
         }
         if (localCart.containsKey(bookId)) {
-            request.setAttribute(ALERT, "You already add this book to cart!");
+            request.getSession().setAttribute(ALERT, Alert.BOOK_ALREADY_IN_CART);
             return;
         }
         if (localCart.size() > 10) {
-            request.setAttribute(ALERT, "Limit 10 books for reader!");
+            request.getSession().setAttribute(ALERT, Alert.LIMIT_BOOKS);
             return;
         }
 
@@ -76,7 +67,7 @@ public class CartServlet extends HttpServlet {
         }
 
         if (currentBooks.contains(new Book().setId(bookId))) {
-            request.setAttribute(ALERT, "You have not returned this books yet!");
+            request.getSession().setAttribute(ALERT, Alert.HAVE_THIS_BOOK);
             return;
         }
 
@@ -87,22 +78,22 @@ public class CartServlet extends HttpServlet {
                 localCart.put(book.getId(), LocalDateTime.now());
                 globalCart.put(LocalDateTime.now(), book.getId());
             } else {
-                request.setAttribute(ALERT, "Book not available!");
+                request.getSession().setAttribute(ALERT, Alert.BOOK_NOT_AVAILABLE);
             }
         } catch (NotFoundException e) {
-            request.setAttribute(ALERT, "Book not found!");
+            request.setAttribute(ALERT, Alert.NOT_FOUND);
         }
     }
 
-    private void removeFromCart(HttpServletRequest request, HttpServletResponse response)
+    private void removeFromCart(HttpServletRequest request)
             throws ServletException, IOException {
-        Integer bookId = getBookId(request, response);
+        Integer bookId = Integer.valueOf(request.getParameter("book"));
         Map<LocalDateTime, Integer> globalCart = getGlobalCart();
         Map<Integer, LocalDateTime> localCart = getLocalCart(request);
         if (localCart.containsKey(bookId)) {
             globalCart.remove(localCart.remove(bookId));
         } else {
-            request.setAttribute(ALERT, "You have not this book in cart!");
+            request.getSession().setAttribute(ALERT, Alert.BOOK_NOT_IN_CART);
         }
     }
 
@@ -128,12 +119,12 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
         User user = getCurrentUser(request);
         if (!user.getEnabled()) {
-            request.setAttribute(ALERT, "You cannot make order, because your account is blocked!");
+            request.getSession().setAttribute(ALERT, Alert.ACCOUNT_BLOCKED_ORDER);
             return;
         }
         List<Book> books = getCartContent(request);
         if (books.isEmpty()) {
-            request.setAttribute(ALERT, "Order is empty!");
+            request.getSession().setAttribute(ALERT, Alert.ORDER_IS_EMPTY);
             return;
         }
 
@@ -143,7 +134,7 @@ public class CartServlet extends HttpServlet {
                 .setInternal(internal)
                 .setBooks(books);
         OrderService.makeOrder(order);
-        request.setAttribute(ALERT, "Order successfully created, wait for approve!");
+        request.getSession().setAttribute(ALERT, Alert.ORDER_CREATED);
         clearCart(request);
     }
 
@@ -164,10 +155,10 @@ public class CartServlet extends HttpServlet {
 
         switch (action) {
             case "add":
-                addToCart(request, response);
+                addToCart(request);
                 break;
             case "remove":
-                removeFromCart(request, response);
+                removeFromCart(request);
                 break;
             case "clear":
                 clearCart(request);
@@ -182,6 +173,7 @@ public class CartServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("books", getCartContent(request));
         request.getRequestDispatcher(CART_PAGE).forward(request, response);
+        request.getSession().removeAttribute("alert");
     }
 
 }

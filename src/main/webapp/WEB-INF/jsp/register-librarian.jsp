@@ -1,9 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 <c:set var="pagename" scope="request" value="register-librarian"/>
 <%@ include file="../jspf/header.jspf" %>
+
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
 
 <div class="ui center aligned grid basic segment">
     <div class="column form-column">
@@ -31,6 +32,11 @@
                 <div class="ui fluid large teal submit button"><fmt:message key="register.button.register"/></div>
             </div>
             <div class="ui error message"></div>
+            <c:if test="${not empty alert}">
+                <div class="ui message ${alert.type}">
+                    <ul class="list"><li><fmt:message key="${alert.description}"/></li></ul>
+                </div>
+            </c:if>
         </form>
         <div class="ui message">
             <fmt:message key="register.label.login"/>

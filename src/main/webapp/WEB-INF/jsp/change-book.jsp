@@ -1,9 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="pagename" scope="request" value="new-book"/>
+<c:set var="pagename" scope="request" value="change-book"/>
 <%@ include file="../jspf/header.jspf" %>
 <jsp:useBean id="book" scope="request" type="ua.nure.serhieiev.library.model.entities.Book"/>
+
+<%--@elvariable id="alert" type="ua.nure.serhieiev.library.controller.util.Alert"--%>
 
 <div class="ui three column center aligned grid basic segment">
     <div class="column form-column">
@@ -90,7 +92,6 @@
                     <div class="ui large green submit button">Change book</div>
                 </div>
                 <div class="ui error message"></div>
-                <%--@elvariable id="alert" type="ua.nure.serhieiev.library.controller.util.Alert"--%>
                 <c:if test="${not empty alert}">
                     <div class="ui message ${alert.type}">
                         <ul class="list">

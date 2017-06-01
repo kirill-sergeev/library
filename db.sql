@@ -50,7 +50,7 @@ CREATE TABLE books (
 CREATE TABLE orders (
   id            SERIAL PRIMARY KEY,
   reader_id     INT     NOT NULL REFERENCES users (id),
-  librarian_id  INT     NOT NULL REFERENCES users (id),
+  librarian_id  INT              DEFAULT NULL REFERENCES users (id),
   internal      BOOLEAN NOT NULL DEFAULT FALSE,
   order_date    DATE             DEFAULT NULL,
   expected_date DATE             DEFAULT NULL,
@@ -82,9 +82,102 @@ CREATE TABLE books_orders (
   PRIMARY KEY (book_id, order_id)
 );
 
+-- --------------
+CREATE OR REPLACE FUNCTION trg_available_books()
+  RETURNS TRIGGER AS $$
+BEGIN
+  NEW.available = NEW.quantity;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_available_books
+ON books;
+CREATE TRIGGER trg_available_books
+BEFORE INSERT ON books
+FOR EACH ROW
+WHEN (NEW.available = 0)
+EXECUTE PROCEDURE trg_available_books();
+
+-- --------------
+
+CREATE OR REPLACE FUNCTION trg_useless_authors()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM authors
+  WHERE id NOT IN (SELECT author_id
+                   FROM books_authors);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_authors_on_books
+ON books;
+CREATE TRIGGER trg_useless_authors_on_books
+AFTER UPDATE OR DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_authors();
+-- --------------
+
+CREATE OR REPLACE FUNCTION trg_useless_genres()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM genres
+  WHERE id NOT IN (SELECT genre_id
+                   FROM books_genres);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_genres_on_books
+ON books;
+CREATE TRIGGER trg_useless_genres_on_books
+AFTER UPDATE OR DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_genres();
+-- -----
+
+CREATE OR REPLACE FUNCTION trg_useless_publishers()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM publishers
+  WHERE id NOT IN (SELECT publisher_id
+                   FROM books);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_useless_publishers_on_books
+ON books;
+CREATE TRIGGER trg_useless_publishers_on_books
+AFTER UPDATE OR DELETE ON books
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_useless_publishers();
+-- ------
+
+CREATE OR REPLACE FUNCTION trg_unconfirmed_users()
+  RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM users
+  WHERE id IN (SELECT id
+               FROM users
+               WHERE activation_token IS NOT NULL AND registration_date < now() - INTERVAL '7 days');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_unconfirmed_users
+ON users;
+CREATE TRIGGER trg_unconfirmed_users
+BEFORE INSERT ON users
+FOR EACH STATEMENT
+EXECUTE PROCEDURE trg_unconfirmed_users();
+
+-- ----------
+
 INSERT INTO roles (title) VALUES ('READER'), ('MANAGER'), ('ADMIN');
 INSERT INTO users (email, password, name, role_id, enabled)
-VALUES ('kirill@kiril.com', '111', 'Kirill Sergeev', 1, TRUE);
+VALUES ('kirill@kiril.com', '111', 'Kirill Sergeev', 2, TRUE), ('ivan@ivan.ua', '111', 'Ivan Ivanov', 1, TRUE);
 
 INSERT INTO authors (name)
 VALUES ('Heather Lindsey'), ('Alice Y. Lang'), ('Sopoline Y. Floyd'), ('Kylan Carter'), ('Eric Mclean'),
@@ -276,111 +369,9 @@ VALUES (1, 4), (2, 16), (3, 1), (4, 7), (5, 2), (6, 8), (7, 8), (8, 20), (9, 2),
   (98, 20), (99, 6), (100, 12)
 ON CONFLICT DO NOTHING;
 
--- --------------
-CREATE OR REPLACE FUNCTION trg_available_books()
-  RETURNS TRIGGER AS $$
-BEGIN
-  NEW.available = NEW.quantity;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_available_books
-ON books;
-CREATE TRIGGER trg_available_books
-BEFORE INSERT ON books
-FOR EACH ROW
-WHEN (NEW.available = 0)
-EXECUTE PROCEDURE trg_available_books();
-
--- --------------
-
-CREATE OR REPLACE FUNCTION trg_useless_authors()
-  RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM authors
-  WHERE id NOT IN (SELECT author_id
-                   FROM books_authors);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_useless_authors_on_books
-ON books;
-CREATE TRIGGER trg_useless_authors_on_books
-AFTER DELETE ON books
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_useless_authors();
-
-DROP TRIGGER IF EXISTS trg_useless_authors_on_books_authors
-ON books_authors;
-CREATE TRIGGER trg_useless_authors_on_books_authors
-AFTER DELETE ON books_authors
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_useless_authors();
-
--- --------------
-
-CREATE OR REPLACE FUNCTION trg_useless_genres()
-  RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM genres
-  WHERE id NOT IN (SELECT genre_id
-                   FROM books_genres);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_useless_genres_on_books
-ON books;
-CREATE TRIGGER trg_useless_genres_on_books
-AFTER DELETE ON books
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_useless_genres();
-
-DROP TRIGGER IF EXISTS trg_useless_authors_on_books_authors
-ON authors;
-CREATE TRIGGER trg_useless_genres_on_books_authors
-AFTER DELETE ON books_genres
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_useless_genres();
-
--- -----
-
-CREATE OR REPLACE FUNCTION trg_useless_publishers()
-  RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM publishers
-  WHERE id NOT IN (SELECT publisher_id
-                   FROM books);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_useless_publishers_on_books
-ON books;
-CREATE TRIGGER trg_useless_publishers_on_books
-AFTER DELETE ON books
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_useless_publishers();
-
--- ------
-
-CREATE OR REPLACE FUNCTION trg_unconfirmed_users()
-  RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM users
-  WHERE id IN (SELECT id
-               FROM users
-               WHERE activation_token IS NOT NULL AND registration_date < now() - INTERVAL '7 days');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_unconfirmed_users
-ON users;
-CREATE TRIGGER trg_unconfirmed_users
-BEFORE INSERT ON users
-FOR EACH STATEMENT
-EXECUTE PROCEDURE trg_unconfirmed_users();
-
+SELECT
+  o.*,
+  array_agg(DISTINCT bo.book_id) AS books
+FROM orders o, books_orders bo
+WHERE o.id = bo.order_id AND order_date IS NOT NULL AND return_date IS NULL
+GROUP BY o.id

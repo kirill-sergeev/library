@@ -25,6 +25,7 @@ public class UserListServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserListServlet.class);
     private static final String USER_LIST_PAGE = "/WEB-INF/jsp/users.jsp";
+    private static final String ALERT = "alert";
 
     private String setPath(HttpServletRequest request){
         String header = request.getHeader("referer");
@@ -50,17 +51,17 @@ public class UserListServlet extends HttpServlet {
         switch (action) {
             case "activate":
                 UserService.activate(user);
-                request.setAttribute("alert", Alert.USER_UNBLOCKED);
+                request.setAttribute(ALERT, Alert.USER_UNBLOCKED);
                 LOG.info("Unblocked user with id {}.", userId);
                 break;
             case "block":
                 UserService.block(user);
-                request.setAttribute("alert", Alert.USER_BLOCKED);
+                request.setAttribute(ALERT, Alert.USER_BLOCKED);
                 LOG.info("Blocked user with id {}.", userId);
                 break;
             case "remove":
                 UserService.remove(user);
-                request.setAttribute("alert", Alert.USER_REMOVED);
+                request.setAttribute(ALERT, Alert.USER_REMOVED);
                 LOG.info("Removed user with id {}.", userId);
                 break;
         }

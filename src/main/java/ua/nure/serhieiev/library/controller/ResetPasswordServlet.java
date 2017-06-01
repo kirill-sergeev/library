@@ -24,10 +24,13 @@ public class ResetPasswordServlet extends HttpServlet {
     private static final String RESET_PAGE = "/WEB-INF/jsp/reset.jsp";
     private static final String CHANGE_PASSWORD_PAGE = "/WEB-INF/jsp/change-password.jsp";
     private static final String ALERT = "alert";
+    private static final String TOKEN_PARAM = "token";
+    private static final String EMAIL_PARAM = "email";
+    private static final String PASSWORD_PARAM = "password";
 
     private void sendResetToken(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String email = request.getParameter("email");
+        String email = request.getParameter(EMAIL_PARAM);
         try {
             User user = new User().setEmail(email);
             UserService.resetPassword(user);
@@ -43,10 +46,10 @@ public class ResetPasswordServlet extends HttpServlet {
 
     private void confirmResetToken(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String resetToken = request.getParameter("token");
+        String resetToken = request.getParameter(TOKEN_PARAM);
         try {
             User user = UserService.getUniqueMatching(new User().setResetPasswordToken(resetToken));
-            request.setAttribute("token", resetToken);
+            request.setAttribute(TOKEN_PARAM, resetToken);
             logger.info("Used reset password token on account {}.", user.getEmail());
         } catch (ApplicationException e) {
             request.setAttribute(ALERT, Alert.WRONG_TOKEN);
@@ -59,8 +62,8 @@ public class ResetPasswordServlet extends HttpServlet {
 
     private void changePasswordByToken(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        String resetToken = request.getParameter("token");
-        String password = request.getParameter("password");
+        String resetToken = request.getParameter(TOKEN_PARAM);
+        String password = request.getParameter(PASSWORD_PARAM);
         User user = new User().setResetPasswordToken(resetToken).setPassword(password);
         try {
             UserService.changePassword(user);
@@ -77,16 +80,16 @@ public class ResetPasswordServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (request.getParameterMap().containsKey("email")) {
+        if (request.getParameterMap().containsKey(EMAIL_PARAM)) {
             sendResetToken(request, response);
-        } else if (request.getParameterMap().containsKey("token")) {
+        } else if (request.getParameterMap().containsKey(TOKEN_PARAM)) {
             changePasswordByToken(request, response);
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (request.getParameterMap().containsKey("token")) {
+        if (request.getParameterMap().containsKey(TOKEN_PARAM)) {
             confirmResetToken(request, response);
         } else {
             request.getRequestDispatcher(RESET_PAGE).forward(request, response);

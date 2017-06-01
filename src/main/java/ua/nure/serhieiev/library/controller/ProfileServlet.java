@@ -1,12 +1,8 @@
 package ua.nure.serhieiev.library.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.OrderService;
-import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.service.UserService;
 
 import javax.servlet.ServletException;
@@ -15,7 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
 import static ua.nure.serhieiev.library.model.entities.User.Role.*;
@@ -27,8 +27,28 @@ public class ProfileServlet extends HttpServlet {
 
     private void readerOrders(HttpServletRequest request, User user) {
         List<Order> orders = OrderService.getByReader(user);
-        request.setAttribute("orders", orders);
+        Map<Order, Integer> ordersWithFines = setFines(orders);
+        request.setAttribute("orders", ordersWithFines);
     }
+
+    protected Map<Order, Integer> setFines(List<Order> orders){
+        Map<Order, Integer> fines = new LinkedHashMap<>();
+        Integer oneDayFine = Integer.valueOf(getServletContext().getInitParameter("oneDayFine"));
+        Integer fine;
+        Integer days;
+        for(Order order : orders){
+            fine = 0;
+            if (order.getExpectedDate() != null
+                    && order.getReturnDate() == null
+                    && order.getExpectedDate().isBefore(LocalDate.now())){
+                days = Math.toIntExact(ChronoUnit.DAYS.between(order.getExpectedDate(), LocalDate.now()));
+                fine = order.getBooks().size() * oneDayFine * days;
+            }
+            fines.put(order, fine);
+        }
+        return fines;
+    }
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

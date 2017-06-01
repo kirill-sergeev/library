@@ -172,7 +172,9 @@ public final class UserService {
             OrderDao orderDao = df.getOrderDao();
             List<Order> orders = orderDao.getByReader(user.getId());
             for (Order order : orders) {
-                if (order.getReturnDate() == null && order.getExpectedDate().isBefore(LocalDate.now())) {
+                if (order.getExpectedDate() != null
+                        && order.getReturnDate() == null
+                        && order.getExpectedDate().isBefore(LocalDate.now())) {
                     return false;
                 }
             }

@@ -4,16 +4,24 @@
 <c:set var="pagename" scope="request" value="authors"/>
 <%@ include file="../jspf/header.jspf" %>
 
+<%--@elvariable id="numberOfPages" type="java.lang.Integer"--%>
+<%--@elvariable id="alert" type="ua.nure.serhieiev.library.controller.util.Alert"--%>
+<%--@elvariable id="authors" type="java.util.List<ua.nure.serhieiev.library.model.entities.Author>"--%>
+
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
+        <c:if test="${not empty alert}">
+            <div class="ui message ${alert.type}">
+                <div class="header"><fmt:message key="${alert.description}"/></div>
+            </div>
+        </c:if>
         <div class="center row">
             <form action="<c:url value="/authors.do"/>" method="get" class="ui form">
-                <input type="text" name="search" placeholder="Search...">
+                <input type="text" name="search" placeholder="<fmt:message key="field.search"/>">
                 <div class="ui error message"></div>
             </form>
         </div>
         <c:choose>
-            <%--@elvariable id="authors" type="java.util.List<ua.nure.serhieiev.library.model.entities.Author>"--%>
             <c:when test="${not empty authors}">
                 <div class="center floated row">
                     <form method="get" class="ui form">
@@ -46,10 +54,11 @@
             </c:when>
             <c:otherwise>
                 <div class="ui message info">
-                    <div class="header">Not found</div>
+                    <div class="header"><fmt:message key="alert.warning.not_found"/></div>
                 </div>
             </c:otherwise>
         </c:choose>
     </div>
 </div>
+
 <%@ include file="../jspf/footer.jspf" %>

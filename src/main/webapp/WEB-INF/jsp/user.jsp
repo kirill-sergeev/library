@@ -1,9 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib uri="http://example.com/functions" prefix="f" %>
 <c:set var="pagename" scope="request" value="user"/>
 <%@ include file="../jspf/header.jspf" %>
-<%@taglib uri="http://example.com/functions" prefix="f" %>
+
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+<%--@elvariable id="profile" type="ua.nure.serhieiev.library.model.entities.User"--%>
+<%--@elvariable id="orders" type="java.util.Map<ua.nure.serhieiev.library.model.entities.Order, java.lang.Integer>"--%>
 
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
@@ -35,8 +39,6 @@
                     </div>
                 </c:if>
             </div>
-            <%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
-            <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
             <c:choose>
                 <c:when test="${not empty orders}">
                     <div class="ui center aligned segment">
@@ -52,10 +54,10 @@
                             </thead>
                             <tbody>
                             <c:forEach items="${orders}" var="order">
-                                <tr ${order.expectedDate.isAfter(f:getNowDate()) ? 'class="error"': ''}>
+                                <tr ${order.key.returnDate == null && order.key.expectedDate.isBefore(f:getNowDate()) ? 'class="error"': ''}>
                                     <td>
                                         <div class="ui middle aligned ordered list">
-                                            <c:forEach items="${order.books}" var="book">
+                                            <c:forEach items="${order.key.books}" var="book">
                                                 <div class="item">
                                                     <div class="content">
                                                         <div class="header"><a href="<c:url value="book.do?id=${book.id}"/>">${book.title}</a>
@@ -65,10 +67,10 @@
                                             </c:forEach>
                                         </div>
                                     </td>
-                                    <td>${order.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
-                                    <td>${order.orderDate}</td>
-                                    <td>${order.expectedDate}</td>
-                                    <td>${order.returnDate}</td>
+                                    <td>${order.key.internal? '<i class="checkmark icon"></i>' : '<i class="minus icon"></i>'}</td>
+                                    <td>${order.key.orderDate}</td>
+                                    <td>${order.key.expectedDate}</td>
+                                    <td>${order.value == 0 ? order.key.returnDate : '<i class="attention icon"></i>$'.concat(order.value)}</td>
                                 </tr>
                             </c:forEach>
                             </tbody>

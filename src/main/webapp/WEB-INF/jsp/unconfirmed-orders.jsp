@@ -4,11 +4,14 @@
 <c:set var="pagename" scope="request" value="unconfirmed-orders"/>
 <%@ include file="../jspf/header.jspf" %>
 
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+<%--@elvariable id="order" type="ua.nure.serhieiev.library.model.entities.Order"--%>
+<%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
+
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
         <div class="column">
             <div class="ui center aligned segment">
-                <%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
                 <c:if test="${not empty alert}">
                     <div class="ui message ${alert.type}">
                         <ul class="list">
@@ -17,7 +20,6 @@
                     </div>
                 </c:if>
                 <c:choose>
-                    <%--@elvariable id="orders" type="java.util.List<ua.nure.serhieiev.library.model.entities.Order>"--%>
                     <c:when test="${not empty orders}">
                         <table class="ui yellow striped table">
                             <thead>

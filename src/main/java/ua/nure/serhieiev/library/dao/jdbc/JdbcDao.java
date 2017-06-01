@@ -17,15 +17,6 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     protected static final String ID = "id";
     protected Connection con;
 
-
-    protected String getSelectQuery() {
-        return String.format("SELECT * FROM %s WHERE id = ?", getTableName());
-    }
-
-    protected String getSelectAllQuery() {
-        return String.format("SELECT * FROM %s", getTableName());
-    }
-
     protected abstract String getCreateQuery();
 
     protected abstract String getUpdateQuery();
@@ -37,6 +28,14 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
     protected abstract void prepareStatementForInsert(PreparedStatement st, T object);
 
     protected abstract void prepareStatementForUpdate(PreparedStatement st, T object);
+
+    protected String getSelectQuery() {
+        return String.format("SELECT * FROM %s WHERE id = ?", getTableName());
+    }
+
+    protected String getSelectAllQuery() {
+        return String.format("SELECT * FROM %s", getTableName());
+    }
 
     @SuppressWarnings("unchecked")
     protected JdbcDao(Connection con) {

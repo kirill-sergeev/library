@@ -4,6 +4,9 @@
 <c:set var="pagename" scope="request" value="users"/>
 <%@ include file="../jspf/header.jspf" %>
 
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+<%--@elvariable id="users" type="java.util.List<ua.nure.serhieiev.library.model.entities.User>"--%>
+
 <div class="ui middle aligned center aligned grid basic segment">
     <div class="ui grid centered">
         <div class="ui center aligned segment">
@@ -21,7 +24,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                <%--@elvariable id="users" type="java.util.List<ua.nure.serhieiev.library.model.entities.User>"--%>
                 <c:forEach items="${users}" var="user">
                     <tr>
                         <td class="selectable"><a href="<c:url value="/user.do?id=${user.id}"/>">${user.email}</a></td>
@@ -99,3 +101,5 @@
         </div>
     </div>
 </div>
+
+<%@ include file="../jspf/footer.jspf" %>

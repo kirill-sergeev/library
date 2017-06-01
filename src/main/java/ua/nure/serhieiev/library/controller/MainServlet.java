@@ -10,6 +10,7 @@ import java.io.IOException;
 @WebServlet(name = "MainServlet", urlPatterns = "")
 public class MainServlet extends HttpServlet {
 
+
     private static final String INDEX_PAGE = "/WEB-INF/jsp/index.jsp";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

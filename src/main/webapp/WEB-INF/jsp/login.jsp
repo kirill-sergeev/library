@@ -4,6 +4,8 @@
 <c:set var="pagename" scope="request" value="login"/>
 <%@ include file="../jspf/header.jspf" %>
 
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+
 <div class="ui center aligned grid basic segment">
     <div class="column form-column">
         <h2 class="ui teal image header"><fmt:message key="login.header.login"/></h2>
@@ -32,7 +34,6 @@
                 </div>
             </div>
             <div class="ui error message"></div>
-            <%--@elvariable id="alert" type="ua.nure.serhieiev.library.controller.util.Alert"--%>
             <c:if test="${not empty alert}">
                 <div class="ui message ${alert.type}">
                     <ul class="list"><li><fmt:message key="${alert.description}"/></li></ul>

@@ -4,8 +4,17 @@
 <c:set var="pagename" scope="request" value="publishers"/>
 <%@ include file="../jspf/header.jspf" %>
 
+<%--@elvariable id="numberOfPages" type="java.lang.Integer"--%>
+<%--@elvariable id="alert" type="java.util.List<ua.nure.serhieiev.library.controller.util.Alert>"--%>
+<%--@elvariable id="publishers" type="java.util.List<ua.nure.serhieiev.library.model.entities.Publisher>"--%>
+
 <div class="ui center aligned grid basic segment">
     <div class="ui grid centered">
+        <c:if test="${not empty alert}">
+            <div class="ui message ${alert.type}">
+                <div class="header"><fmt:message key="${alert.description}"/></div>
+            </div>
+        </c:if>
         <div class="center row">
             <form action="<c:url value="/publishers.do"/>" method="get" class="ui form">
                 <input type="text" name="search" placeholder="Search...">
@@ -13,7 +22,6 @@
             </form>
         </div>
         <c:choose>
-            <%--@elvariable id="publishers" type="java.util.List<ua.nure.serhieiev.library.model.entities.Publisher>"--%>
             <c:when test="${not empty publishers}">
                 <div class="center floated row">
                     <form method="get" class="ui form">

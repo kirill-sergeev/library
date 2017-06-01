@@ -19,39 +19,19 @@
   </context-param>
 
   <context-param>
-    <param-name>oneDayFee</param-name>
+    <param-name>oneDayFine</param-name>
     <param-value>10</param-value>
   </context-param>
 
-  <!--    <error-page>
-          &lt;!&ndash; Missing login &ndash;&gt;
-          <error-code>401</error-code>
-          <location>/404.jsp</location>
-      </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error.do</location>
+  </error-page>
 
-      <error-page>
-          &lt;!&ndash; Forbidden directory listing &ndash;&gt;
-          <error-code>403</error-code>
-          <location>/404.jsp</location>
-      </error-page>
-
-      <error-page>
-          &lt;!&ndash; Missing resource &ndash;&gt;
-          <error-code>404</error-code>
-          <location>/404.jsp</location>
-
-      </error-page>
-      <error-page>
-          &lt;!&ndash; Uncaught exception &ndash;&gt;
-          <error-code>500</error-code>
-          <location>/404.jsp</location>
-      </error-page>
-
-      <error-page>
-          &lt;!&ndash; Unsupporcontrollervlet method &ndash;&gt;
-          <error-code>503</error-code>
-          <location>/404.jsp</location>
-      </error-page>-->
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error.do</location>
+  </error-page>
 
   <resource-ref>
     <res-ref-name>jdbc/postgresql</res-ref-name>
@@ -65,5 +45,6 @@
     <res-type>javax.mail.Session</res-type>
     <res-auth>Container</res-auth>
   </resource-ref>
+
 </web-app>
 

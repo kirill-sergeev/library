@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
         } catch (ApplicationException e) {
             request.setAttribute(ALERT, Alert.BAD_LOGIN_OR_PASSWORD);
             request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
-            logger.info("Unsuccessful log in with email {}.", email);
+            logger.info("Unsuccessful log in with email {}.", email, e);
             return;
         }
         response.sendRedirect(INDEX_ACTION);

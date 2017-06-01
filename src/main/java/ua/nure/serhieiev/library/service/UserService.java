@@ -2,7 +2,6 @@ package ua.nure.serhieiev.library.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ua.nure.serhieiev.library.controller.filter.AuthFilter;
 import ua.nure.serhieiev.library.dao.DaoFactory;
 import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.UserDao;

@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.BOOKS_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.CART_ACTION;
 
 @WebFilter(filterName = "CartFilter", urlPatterns = {CART_ACTION, BOOKS_ACTION})
 public class CartFilter implements Filter {

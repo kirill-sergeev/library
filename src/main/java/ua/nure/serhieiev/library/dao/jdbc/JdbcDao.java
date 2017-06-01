@@ -3,8 +3,8 @@ package ua.nure.serhieiev.library.dao.jdbc;
 import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.GenericDao;
 import ua.nure.serhieiev.library.dao.NotFoundException;
-import ua.nure.serhieiev.library.model.entities.Identified;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.model.entities.Identified;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.*;
@@ -144,8 +144,11 @@ public abstract class JdbcDao<T extends Identified> implements GenericDao<T> {
                 st.setObject(i + 1, params[i]);
             }
             ResultSet rs = st.executeQuery();
-            rs.next();
-            count = rs.getInt(1);
+            if (rs.next()) {
+                count = rs.getInt(1);
+            } else {
+                throw new DaoException("Empty Result.");
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }

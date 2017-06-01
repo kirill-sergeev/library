@@ -1,8 +1,7 @@
 package ua.nure.serhieiev.library.dao;
 
-import ua.nure.serhieiev.library.model.entities.Order;
-import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.model.entities.Order;
 
 import java.util.List;
 

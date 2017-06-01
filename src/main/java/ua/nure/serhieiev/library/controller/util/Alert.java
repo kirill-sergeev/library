@@ -1,6 +1,7 @@
 package ua.nure.serhieiev.library.controller.util;
 
-import static ua.nure.serhieiev.library.controller.util.Alert.Type.*;
+import static ua.nure.serhieiev.library.controller.util.Alert.Type.SUCCESS;
+import static ua.nure.serhieiev.library.controller.util.Alert.Type.WARNING;
 
 public enum Alert {
     /**

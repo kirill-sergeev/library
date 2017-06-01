@@ -5,7 +5,7 @@ import ua.nure.serhieiev.library.dao.jdbc.postgres.PgDaoFactory;
 public abstract class DaoFactory implements AutoCloseable{
 
     public static final int POSTGRESQL = 1;
-    private static int defaultFactory = POSTGRESQL;
+    private static final int DEFAULT_FACTORY = POSTGRESQL;
 
     public static DaoFactory getInstance(int whichFactory) {
         switch (whichFactory) {
@@ -17,11 +17,7 @@ public abstract class DaoFactory implements AutoCloseable{
     }
 
     public static DaoFactory getInstance() {
-        return getInstance(defaultFactory);
-    }
-
-    public static void changeDefaultFactory(int whichFactory) {
-        defaultFactory = whichFactory;
+        return getInstance(DEFAULT_FACTORY);
     }
 
     public abstract TransactionManager getTransactionManager();

@@ -16,12 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
-import static ua.nure.serhieiev.library.model.entities.User.Role.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.PROFILE_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.USER_ACTION;
+import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {PROFILE_ACTION, USER_ACTION})
 public class ProfileServlet extends HttpServlet {
@@ -37,7 +38,7 @@ public class ProfileServlet extends HttpServlet {
     }
 
     protected Map<Order, Integer> setFines(List<Order> orders){
-        Map<Order, Integer> fines = new LinkedHashMap<>();
+        Map<Order, Integer> fines = new ConcurrentHashMap<>();
         Integer oneDayFine = Integer.valueOf(getServletContext().getInitParameter("oneDayFine"));
         Integer fine;
         Integer days;

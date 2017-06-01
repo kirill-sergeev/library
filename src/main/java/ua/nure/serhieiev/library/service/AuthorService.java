@@ -1,14 +1,18 @@
 package ua.nure.serhieiev.library.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.nure.serhieiev.library.dao.AuthorDao;
 import ua.nure.serhieiev.library.dao.DaoFactory;
 import ua.nure.serhieiev.library.dao.NotFoundException;
-import ua.nure.serhieiev.library.dao.AuthorDao;
-import ua.nure.serhieiev.library.model.entities.Author;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.model.entities.Author;
 
-import java.util.*;
+import java.util.List;
 
 public final class AuthorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
 
     public static List<Author> getAll(Pagination pagination) {
         List<Author> authors;
@@ -35,7 +39,7 @@ public final class AuthorService {
         return authors;
     }
 
-    static void checkAuthors(DaoFactory df, List<Author> authors){
+    protected static void checkAuthors(DaoFactory df, List<Author> authors){
         AuthorDao authorDao = df.getAuthorDao();
         for (Author bookAuthor : authors) {
             try {
@@ -46,7 +50,7 @@ public final class AuthorService {
                     }
                 }
             } catch (NotFoundException e) {
-
+                logger.info("Author {} not fount.", bookAuthor.getName());
             }
             if (bookAuthor.getId() == null) {
                 authorDao.save(bookAuthor);

@@ -1,20 +1,16 @@
 package ua.nure.serhieiev.library.controller.filter;
 
-import javax.servlet.*;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.HttpSessionBindingEvent;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebListener()
 public class CartListener implements ServletContextListener, HttpSessionListener {
-
-    public CartListener() {
-    }
 
     /**
      * This method is called when the servlet context is

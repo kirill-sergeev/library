@@ -2,9 +2,9 @@ package ua.nure.serhieiev.library.controller;
 
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.controller.util.Validator;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Author;
 import ua.nure.serhieiev.library.service.AuthorService;
-import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.AUTHORS_ACTION;
 
 @WebServlet(name = "AuthorListServlet", urlPatterns = AUTHORS_ACTION)
 public class AuthorListServlet extends HttpServlet {

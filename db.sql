@@ -1,3 +1,13 @@
+CREATE DATABASE library;
+CREATE USER kirill WITH password 'kirill';
+CREATE ROLE webapp;
+GRANT SELECT, INSERT, DELETE, UPDATE ON ALL TABLES IN SCHEMA public TO webapp;
+GRANT webapp TO kirill;
+GRANT postgres TO kirill;
+
+SHOW SERVER_ENCODING;
+SHOW CLIENT_ENCODING;
+
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
@@ -5,7 +15,6 @@ CREATE TABLE roles (
   id    SMALLSERIAL PRIMARY KEY,
   title VARCHAR(10) NOT NULL
 );
-
 
 CREATE TABLE users (
   id                SERIAL PRIMARY KEY,
@@ -55,13 +64,6 @@ CREATE TABLE orders (
   order_date    DATE             DEFAULT NULL,
   expected_date DATE             DEFAULT NULL,
   return_date   DATE             DEFAULT NULL
-);
-
-CREATE TABLE fines (
-  id       SERIAL PRIMARY KEY,
-  order_id INT     NOT NULL REFERENCES orders (id),
-  cost     DECIMAL NOT NULL,
-  paid     BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE books_authors (
@@ -175,9 +177,10 @@ EXECUTE PROCEDURE trg_unconfirmed_users();
 
 -- ----------
 
-INSERT INTO roles (title) VALUES ('READER'), ('MANAGER'), ('ADMIN');
+INSERT INTO roles (title) VALUES ('READER'), ('LIBRARIAN'), ('ADMIN');
 INSERT INTO users (email, password, name, role_id, enabled)
-VALUES ('kirill@kiril.com', '111', 'Kirill Sergeev', 2, TRUE), ('ivan@ivan.ua', '111', 'Ivan Ivanov', 1, TRUE);
+VALUES ('kirill@kiril.com', '$31$16$swNTVBk_Hfj8wsqtWyy6EhmJBuckYl9LA_kl2NzRPYg', 'Kirill Sergeev', 2, TRUE),
+  ('ivan@ivan.ua', '$31$16$swNTVBk_Hfj8wsqtWyy6EhmJBuckYl9LA_kl2NzRPYg', 'Ivan Ivanov', 1, TRUE);
 
 INSERT INTO authors (name)
 VALUES ('Heather Lindsey'), ('Alice Y. Lang'), ('Sopoline Y. Floyd'), ('Kylan Carter'), ('Eric Mclean'),

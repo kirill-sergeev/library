@@ -1,9 +1,9 @@
 package ua.nure.serhieiev.library.controller;
 
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.PublisherService;
-import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

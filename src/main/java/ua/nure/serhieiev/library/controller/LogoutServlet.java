@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.INDEX_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.LOGOUT_ACTION;
 
 @WebServlet(name = "LogoutServlet", urlPatterns = LOGOUT_ACTION)
 public class LogoutServlet extends HttpServlet {

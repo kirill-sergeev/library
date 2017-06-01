@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.LIBRARIANS_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.READERS_ACTION;
 import static ua.nure.serhieiev.library.model.entities.User.Role.LIBRARIAN;
 import static ua.nure.serhieiev.library.model.entities.User.Role.READER;
 

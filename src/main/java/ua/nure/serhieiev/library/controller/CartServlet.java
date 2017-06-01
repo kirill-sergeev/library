@@ -1,9 +1,7 @@
 package ua.nure.serhieiev.library.controller;
 
 import ua.nure.serhieiev.library.controller.util.Alert;
-import ua.nure.serhieiev.library.controller.util.Validator;
 import ua.nure.serhieiev.library.dao.NotFoundException;
-import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Book;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
@@ -17,13 +15,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.BOOKS_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.CART_ACTION;
 
 @WebServlet(name = "CartServlet", urlPatterns = CART_ACTION)
 public class CartServlet extends HttpServlet {
 
+    public  static final int MAX_ORDERS = 10;
     private static final String CART_PAGE = "/WEB-INF/jsp/cart.jsp";
     private static final String ALERT = "alert";
 
@@ -31,10 +34,12 @@ public class CartServlet extends HttpServlet {
         return (User) request.getSession().getAttribute("user");
     }
 
+    @SuppressWarnings("unchecked")
     private Map<Integer, LocalDateTime> getLocalCart(HttpServletRequest request) {
         return (Map<Integer, LocalDateTime>) request.getSession().getAttribute("localCart");
     }
 
+    @SuppressWarnings("unchecked")
     private Map<LocalDateTime, Integer> getGlobalCart() {
         return (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");
     }
@@ -53,7 +58,7 @@ public class CartServlet extends HttpServlet {
             request.getSession().setAttribute(ALERT, Alert.BOOK_ALREADY_IN_CART);
             return;
         }
-        if (localCart.size() > 10) {
+        if (localCart.size() > MAX_ORDERS) {
             request.getSession().setAttribute(ALERT, Alert.LIMIT_BOOKS);
             return;
         }
@@ -152,6 +157,10 @@ public class CartServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("button");
+
+        if (action == null) {
+            action = "";
+        }
 
         switch (action) {
             case "add":

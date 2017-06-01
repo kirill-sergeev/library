@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.ACTIVATE_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.LOGIN_ACTION;
 
 @WebServlet(name = "ActivateAccountServlet", urlPatterns = ACTIVATE_ACTION)
 public class ActivateAccountServlet extends HttpServlet {

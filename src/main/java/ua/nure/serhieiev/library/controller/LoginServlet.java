@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.INDEX_ACTION;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.LOGIN_ACTION;
 
 
 @WebServlet(name = "LoginServlet", urlPatterns = LOGIN_ACTION)

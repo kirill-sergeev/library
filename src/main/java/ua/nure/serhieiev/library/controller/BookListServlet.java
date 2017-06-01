@@ -1,29 +1,26 @@
 package ua.nure.serhieiev.library.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
 import ua.nure.serhieiev.library.controller.util.Validator;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Author;
+import ua.nure.serhieiev.library.model.entities.Book;
 import ua.nure.serhieiev.library.model.entities.Genre;
 import ua.nure.serhieiev.library.model.entities.Publisher;
 import ua.nure.serhieiev.library.service.BookService;
-import ua.nure.serhieiev.library.model.Pagination;
-import ua.nure.serhieiev.library.model.entities.Book;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.RowSetInternal;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.BOOKS_ACTION;
 
 @WebServlet(name = "BookListServlet", urlPatterns = BOOKS_ACTION)
 public class BookListServlet extends HttpServlet {
@@ -34,6 +31,7 @@ public class BookListServlet extends HttpServlet {
     private static final String GENRE_PARAM = "genre";
     private static final String PUBLISHER_PARAM = "publisher";
 
+    @SuppressWarnings("unchecked")
     private void setAvailableBooks(List<Book> books) {
         Map<LocalDateTime, Integer> globalCart =
                 (Map<LocalDateTime, Integer>) getServletContext().getAttribute("globalCart");

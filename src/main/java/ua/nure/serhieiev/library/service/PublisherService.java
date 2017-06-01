@@ -1,16 +1,18 @@
 package ua.nure.serhieiev.library.service;
 
-import ua.nure.serhieiev.library.dao.PublisherDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.nure.serhieiev.library.dao.DaoFactory;
-import ua.nure.serhieiev.library.dao.PublisherDao;
 import ua.nure.serhieiev.library.dao.NotFoundException;
-import ua.nure.serhieiev.library.model.entities.Publisher;
-import ua.nure.serhieiev.library.model.entities.Publisher;
+import ua.nure.serhieiev.library.dao.PublisherDao;
 import ua.nure.serhieiev.library.model.Pagination;
+import ua.nure.serhieiev.library.model.entities.Publisher;
 
-import java.util.*;
+import java.util.List;
 
 public final class PublisherService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PublisherService.class);
 
     public static List<Publisher> getAll(Pagination pagination) {
         List<Publisher> publishers;
@@ -37,7 +39,7 @@ public final class PublisherService {
         return publishers;
     }
 
-    static void checkPublisher(DaoFactory df, Publisher publisher) {
+    protected static void checkPublisher(DaoFactory df, Publisher publisher) {
         PublisherDao publisherDao = df.getPublisherDao();
         try {
             for (Publisher withSameTitle : publisherDao.getByTitle(publisher.getTitle())) {
@@ -47,7 +49,7 @@ public final class PublisherService {
                 }
             }
         } catch (NotFoundException e) {
-
+            logger.info("Publisher {} not fount.", publisher.getTitle());
         }
         if (publisher.getId() == null) {
             publisherDao.save(publisher);

@@ -1,6 +1,5 @@
 package ua.nure.serhieiev.library.service.util;
 
-import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
 import ua.nure.serhieiev.library.service.ApplicationException;
 
@@ -21,7 +20,7 @@ public final class EmailUtil {
         try {
             session = (Session) new InitialContext().lookup("java:comp/env/mail/session");
         } catch (NamingException e) {
-            e.printStackTrace();
+            throw new ApplicationException("Missing JNDI for email.", e);
         }
     }
 

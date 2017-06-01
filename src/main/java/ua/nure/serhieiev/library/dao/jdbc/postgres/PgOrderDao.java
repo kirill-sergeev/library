@@ -3,10 +3,10 @@ package ua.nure.serhieiev.library.dao.jdbc.postgres;
 import ua.nure.serhieiev.library.dao.DaoException;
 import ua.nure.serhieiev.library.dao.OrderDao;
 import ua.nure.serhieiev.library.dao.jdbc.JdbcDao;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Book;
 import ua.nure.serhieiev.library.model.entities.Order;
 import ua.nure.serhieiev.library.model.entities.User;
-import ua.nure.serhieiev.library.model.Pagination;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -99,13 +99,13 @@ public class PgOrderDao extends JdbcDao<Order> implements OrderDao {
                     order.setLibrarian(new User().setId(rs.getInt(LIBRARIAN)));
                 }
                 if (rs.getDate(ORDER_DATE) != null) {
-                    order.setOrderDate((rs.getDate(ORDER_DATE).toLocalDate()));
+                    order.setOrderDate(rs.getDate(ORDER_DATE).toLocalDate());
                 }
                 if (rs.getDate(EXPECTED_DATE) != null) {
-                    order.setExpectedDate((rs.getDate(EXPECTED_DATE).toLocalDate()));
+                    order.setExpectedDate(rs.getDate(EXPECTED_DATE).toLocalDate());
                 }
                 if (rs.getDate(RETURNED_DATE) != null) {
-                    order.setReturnDate((rs.getDate(RETURNED_DATE).toLocalDate()));
+                    order.setReturnDate(rs.getDate(RETURNED_DATE).toLocalDate());
                 }
 
                 List<Book> books = new ArrayList<>();

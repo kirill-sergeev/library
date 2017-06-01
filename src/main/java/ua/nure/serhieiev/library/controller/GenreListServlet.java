@@ -1,9 +1,9 @@
 package ua.nure.serhieiev.library.controller;
 
 import ua.nure.serhieiev.library.controller.util.PaginationMapper;
+import ua.nure.serhieiev.library.model.Pagination;
 import ua.nure.serhieiev.library.model.entities.Genre;
 import ua.nure.serhieiev.library.service.GenreService;
-import ua.nure.serhieiev.library.model.Pagination;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static ua.nure.serhieiev.library.controller.util.Action.Constants.*;
+import static ua.nure.serhieiev.library.controller.util.Action.Constants.GENRES_ACTION;
 
 @WebServlet(name = "GenreListServlet", urlPatterns = GENRES_ACTION)
 public class GenreListServlet extends HttpServlet {

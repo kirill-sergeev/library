@@ -8,7 +8,7 @@ import ua.nure.serhieiev.library.service.ApplicationException;
 import ua.nure.serhieiev.library.service.UserService;
 import ua.nure.serhieiev.library.service.util.EmailUtil;
 
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
